@@ -1,45 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Merrimack 360 Evaluation</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+        background-color: beige;
+      }
+      header {
+        background-color: #004080;
+        color: white;
+        padding: 20px 0;
+      }
+      main {
+        padding: 20px;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 12px;
+        background-color: #004080;
+        color: white;
+      }
+    </style>
     <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <header>
-        <h1>Merrimack 360 Self Evaluation Website</h1>
+      <h1>Merrimack 360 Self Evaluation Website</h1>
     </header>
 
     <main>
-        <p>Welcome to Merrimack 360 Evaluation</p>
-        <button id="signIn">Sign In With Merrimack</button>
-        <p id="output"></p>
+      <p>Welcome to Merrimack 360 Evaluation</p>
+      <button id="signIn">Sign In With Merrimack</button>
+      <p id="output"></p>
     </main>
 
     <script src="script.js"></script>
     <script>
-        const msalConfig = {
-            auth: {
-                clientId: "75b59301-f0a4-46da-85c9-d65ceb765775",
-                authority: "https://login.microsoftonline.com/57e1236c-0fa3-4739-9edf-fd0721c8744d",
-                redirectUri: window.location.origin
-            }
-        };
-        const msalInstance = new msal.PublicClientApplication(msalConfig);
+      const msalConfig = {
+        auth: {
+          clientId: "75b59301-f0a4-46da-85c9-d65ceb765775",
+          authority:
+            "https://login.microsoftonline.com/57e1236c-0fa3-4739-9edf-fd0721c8744d",
+          redirectUri: window.location.origin,
+        },
+      };
+      const msalInstance = new msal.PublicClientApplication(msalConfig);
 
-        document.getElementById("signIn").addEventListener("click", async () => {
-            try {
-                const result = await msalInstance.loginPopup({
-                    scopes: ["openid", "profile", "User.Read"]
-                });
-                document.getElementById("output").textContent =
-                    "Welcome, " + result.account.name + " (" + result.account.username + ")";
-            } catch (err) {
-                document.getElementById("output").textContent = "Error: " + err.message;
-            }
-        });
+      document.getElementById("signIn").addEventListener("click", async () => {
+        try {
+          const result = await msalInstance.loginPopup({
+            scopes: ["openid", "profile", "User.Read"],
+          });
+          document.getElementById("output").textContent =
+            "Welcome, " +
+            result.account.name +
+            " (" +
+            result.account.username +
+            ")";
+        } catch (err) {
+          document.getElementById("output").textContent =
+            "Error: " + err.message;
+        }
+      });
     </script>
-</body>
+  </body>
 </html>
