@@ -3,17 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Merrimack 360 Evaluation</title>
+    <title>Datapulse360</title>
     <style>
       body {
         font-family: Arial, sans-serif;
         text-align: center;
         margin: 0;
         padding: 0;
-        background-color: beige;
+        background-color: #1f232d;
       }
       header {
-        background-color: #004080;
+        background-color: #1f232d;
         color: white;
         padding: 20px 0;
         position: relative;
@@ -39,9 +39,29 @@
         padding: 10px 20px;
         font-size: 16px;
         cursor: pointer;
+        border: 1px solid #976d03;
         border-radius: 12px;
-        background-color: #004080;
+        background-color: #121d3a;
         color: white;
+        margin-left: 5px;
+        margin-right: 5px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+        transition: all 0.2s ease;
+      } button:hover {
+        background-color: #0e162c;
+        transform: translateY(-1px);
+      } button:active {
+        transform: translateZ(2px);
+      }
+      #buttonSection {
+        height: 60px;
+        width: 100%;
+        background-color: #1f232d;
+        border: 2px solid #976d03;
+        border-radius: 5px;
+        display:flex;
+        align-items: center;
+        justify-content:center;
       }
     </style>
     <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
@@ -54,12 +74,15 @@
         alt="Merrimack College Logo"
         style="height: 50px; margin-left: 10px"
       />
-      <h1>Merrimack 360 Self Evaluation Website</h1>
+      <h1>DataPulse 360 Merrimack</h1>
     </header>
+    <div id="buttonSection">
+      <button id="signIn">Sign In With Merrimack</button>
+    </div>
 
     <main>
-      <p>Welcome to Merrimack 360 Evaluation</p>
-      <button id="signIn">Sign In With Merrimack</button>
+      
+      
       <p id="output"></p>
     </main>
 
