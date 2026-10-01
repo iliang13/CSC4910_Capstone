@@ -13,9 +13,6 @@
         padding: 0;
         font-family: Arial, sans-serif;
         background-color: #1f232d;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
       }
 
       header {
@@ -141,9 +138,9 @@
       .my-div {
         display:none;
         padding:20px;
-        background-color: #f0f0f0;
-        border: 1px solid #ccc;
+        background-color: #1f232d;
         flex: 1;
+        color: white;
       }
       .my-div.active {
         display: block;
@@ -161,34 +158,23 @@
     <div id="buttonSection">
       <button id="signUp">Sign Up</button>
       <button id="signIn">Sign In</button>
-      <button id="signOut">Sign Out</button>
       <button id="SurveysBtn">View Surveys</button>
       <button id="InvitesBtn">My Invites</button>
       <button id="PersonalResults">Personal Results</button>
       <button id="home">Home</button>
     </div>
     <div id="mainPageContainer">
-        <div class="my-div active">Content 1: First Screen</div>
-        <div class="my-div">Content 2: Second Screen</div>
-        <div class="my-div">Content 3: Third Screen</div>
-    </div>
-
-    <main>
-      <div id="welcomeMessage">
-        <h2>Welcome to DataPulse360</h2>
-        <p>
-          DataPulse360 is designed to streamline survey participation, student
-          feedback collection, and engagement analytics across Merrimack
-          College.
-        </p>
-      </div>
-
-      <input
-        type="text"
-        id="surveySearch"
-        placeholder="Search for surveys..."
-      />
-
+        <div id="homeDiv" class="my-div active">
+          
+          <div id="welcomeMessage">
+            <h2>Welcome to DataPulse360</h2>
+            <p>
+                DataPulse360 is designed to streamline survey participation, student
+                feedback collection, and engagement analytics across Merrimack
+                College.
+          </p>
+        </div>
+        
       <div id="dashboard">
         <div class="card">
           <h3>Active Surveys</h3>
@@ -204,14 +190,13 @@
           <h3>Completed Surveys</h3>
           <p class="stat">2</p>
         </div>
-      </div>
 
-      <div id="userPanel">
-        <h2>User Status</h2>
-        <p id="userStatus">Not Signed In</p>
-      </div>
+        <div id="userPanel">
+          <h2>User Status</h2>
+          <p id="userStatus">Not Signed In</p>
+        </div>
 
-      <div id="activityFeed">
+        <div id="activityFeed">
         <h2>Recent Activity</h2>
 
         <ul>
@@ -222,10 +207,96 @@
         </ul>
       </div>
 
+      </div>
+
+        </div>
+        <div id="surveysDiv" class="my-div">
+          <input
+        type="text"
+        id="surveySearch"
+        placeholder="Search for surveys..."
+          />
+
+
+        </div>
+
+        <div id="invitesDiv" class="my-div">
+
+        </div>
+
+        <div id="resultsDiv" class="my-div">
+
+        </div>
+    </div>
+
+    <main>
+      
+
+      
+      
+
+      
+
       <p id="output"></p>
     </main>
 
     <script>
+
+      const signUpButton = document.getElementById("signUp");
+      const signInButton = document.getElementById("signIn");
+      const surveysButton = document.getElementById("SurveysBtn");
+      const invitesButton = document.getElementById("InvitesBtn");
+      const personalResultsButton = document.getElementById("PersonalResults");
+      const homeButton = document.getElementById("home");
+      const homeDiv = document.getElementById("homeDiv");
+      const surveysDiv = document.getElementById("surveysDiv");
+      const invitesDiv = document.getElementById("invitesDiv");
+      const resultsDiv = document.getElementById("resultsDiv");
+
+      homeButton.addEventListener("click", () => {
+        homeDiv.classList.add("active");
+        surveysDiv.classList.remove("active");
+        invitesDiv.classList.remove("active");
+        resultsDiv.classList.remove("active");
+      });
+
+      surveysButton.addEventListener("click", () => {
+        surveysDiv.classList.add("active");
+        homeDiv.classList.remove("active");
+        invitesDiv.classList.remove("active");
+        resultsDiv.classList.remove("active");
+      });
+
+      invitesButton.addEventListener("click", () => {
+        invitesDiv.classList.add("active");
+        homeDiv.classList.remove("active");
+        surveysDiv.classList.remove("active");
+        resultsDiv.classList.remove("active");
+      });
+
+      personalResultsButton.addEventListener("click", () => {
+        resultsDiv.classList.add("active");
+        homeDiv.classList.remove("active");
+        surveysDiv.classList.remove("active");
+        invitesDiv.classList.remove("active");
+      });
+
+      homeButton.addEventListener("click", () => {
+        homeDiv.classList.add("active");
+        surveysDiv.classList.remove("active");
+        invitesDiv.classList.remove("active");
+        resultsDiv.classList.remove("active");
+      });
+
+      homeButton.addEventListener("click", () => {
+        homeDiv.classList.add("active");
+        surveysDiv.classList.remove("active");
+        invitesDiv.classList.remove("active");
+        resultsDiv.classList.remove("active");
+      });
+
+
+
       const msalConfig = {
         auth: {
           clientId: "75b59301-f0a4-46da-85c9-d65ceb765775",
