@@ -3,84 +3,148 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Datapulse360</title>
+    <title>DataPulse360 Merrimack</title>
+
+    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+
     <style>
       body {
-        font-family: Arial, sans-serif;
-        text-align: center;
         margin: 0;
         padding: 0;
-        background-color: #1f232d;
-      }
-      header {
+        font-family: Arial, sans-serif;
         background-color: #1f232d;
         color: white;
-        padding: 20px 0;
+      }
+
+      header {
+        background-color: #1f232d;
+        padding: 20px;
         position: relative;
-        text-align: center;
+        border-bottom: 2px solid #976d03;
       }
 
       header img {
         position: absolute;
-        left: 10px;
+        left: 20px;
         top: 50%;
         transform: translateY(-50%);
         height: 50px;
-        width: auto;
       }
 
       header h1 {
+        text-align: center;
         margin: 0;
+        color: white;
       }
-      main {
-        padding: 20px;
+
+      #buttonSection {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 15px;
+        border-bottom: 2px solid #976d03;
       }
+
       button {
-        padding: 10px 20px;
-        font-size: 16px;
-        cursor: pointer;
+        width: 190px;
+        padding: 10px;
         border: 1px solid #976d03;
-        border-radius: 12px;
+        border-radius: 10px;
         background-color: #121d3a;
         color: white;
-        margin-left: 5px;
-        margin-right: 5px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-        transition: all 0.2s ease;
-        width: 225px;
-      } button:hover {
-        background-color: #0e162c;
-        transform: translateY(-1px);
-      } button:active {
-        transform: translateZ(2px);
+        font-size: 15px;
+        cursor: pointer;
+        transition: 0.2s;
       }
-      #buttonSection {
-        height: 60px;
-        width: 100%;
-        background-color: #1f232d;
+
+      button:hover {
+        background-color: #0e162c;
+      }
+
+      main {
+        padding: 25px;
+      }
+
+      #welcomeMessage {
+        background-color: #121d3a;
         border: 2px solid #976d03;
-        border-radius: 5px;
-        display:flex;
-        
-        align-items: center;
-        justify-content:space-evenly;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 25px;
+        text-align: center;
+      }
+
+      #dashboard {
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+      }
+
+      .card {
+        width: 230px;
+        background-color: #121d3a;
+        border: 2px solid #976d03;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .card h3 {
+        margin-top: 0;
+      }
+
+      .stat {
+        font-size: 42px;
+        color: #ffd166;
+        margin: 15px 0;
+      }
+
+      #userPanel,
+      #activityFeed {
+        width: 85%;
+        margin: 20px auto;
+        background-color: #121d3a;
+        border: 2px solid #976d03;
+        border-radius: 10px;
+        padding: 20px;
+      }
+
+      #activityFeed ul {
+        text-align: left;
+        line-height: 2;
+      }
+
+      #surveySearch {
+        width: 350px;
+        max-width: 90%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #976d03;
+        margin-bottom: 25px;
+      }
+
+      #output {
+        text-align: center;
+        color: #ffd166;
+        font-size: 18px;
+        margin-top: 20px;
       }
     </style>
-    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
-    <link rel="stylesheet" href="style.css" />
   </head>
+
   <body>
     <header>
-      <img
-        src="images/logo.png"
-        alt="Merrimack College Logo"
-        style="height: 50px; margin-left: 10px"
-      />
-      <h1>DataPulse 360 Merrimack</h1>
+      images/logo.png
+      <h1>DataPulse360 Merrimack</h1>
     </header>
+
     <div id="buttonSection">
       <button id="signUp">Sign Up</button>
       <button id="signIn">Sign In</button>
+      <button id="signOut">Sign Out</button>
       <button id="SurveysBtn">View Surveys</button>
       <button id="InvitesBtn">My Invites</button>
       <button id="PersonalResults">Personal Results</button>
@@ -88,12 +152,57 @@
     </div>
 
     <main>
-      
-      
+      <div id="welcomeMessage">
+        <h2>Welcome to DataPulse360</h2>
+        <p>
+          DataPulse360 is designed to streamline survey participation, student
+          feedback collection, and engagement analytics across Merrimack
+          College.
+        </p>
+      </div>
+
+      <input
+        type="text"
+        id="surveySearch"
+        placeholder="Search for surveys..."
+      />
+
+      <div id="dashboard">
+        <div class="card">
+          <h3>Active Surveys</h3>
+          <p class="stat">3</p>
+        </div>
+
+        <div class="card">
+          <h3>Invitations</h3>
+          <p class="stat">5</p>
+        </div>
+
+        <div class="card">
+          <h3>Completed Surveys</h3>
+          <p class="stat">2</p>
+        </div>
+      </div>
+
+      <div id="userPanel">
+        <h2>User Status</h2>
+        <p id="userStatus">Not Signed In</p>
+      </div>
+
+      <div id="activityFeed">
+        <h2>Recent Activity</h2>
+
+        <ul>
+          <li>Completed Student Satisfaction Survey</li>
+          <li>Received invitation to Campus Dining Survey</li>
+          <li>Survey results updated</li>
+          <li>Microsoft account integration configured</li>
+        </ul>
+      </div>
+
       <p id="output"></p>
     </main>
 
-    <script src="script.js"></script>
     <script>
       const msalConfig = {
         auth: {
@@ -103,6 +212,7 @@
           redirectUri: window.location.origin,
         },
       };
+
       const msalInstance = new msal.PublicClientApplication(msalConfig);
 
       document.getElementById("signIn").addEventListener("click", async () => {
@@ -110,16 +220,73 @@
           const result = await msalInstance.loginPopup({
             scopes: ["openid", "profile", "User.Read"],
           });
+
+          document.getElementById(
+            "userStatus"
+          ).innerHTML = `<strong>${result.account.name}</strong><br>
+             ${result.account.username}`;
+
+          document.getElementById(
+            "welcomeMessage"
+          ).innerHTML = `<h2>Welcome Back, ${result.account.name}</h2>
+             <p>
+                Access surveys, invitations,
+                and participation statistics below.
+             </p>`;
+
           document.getElementById("output").textContent =
-            "Welcome, " +
-            result.account.name +
-            " (" +
-            result.account.username +
-            ")";
+            "Successfully signed in.";
         } catch (err) {
           document.getElementById("output").textContent =
             "Error: " + err.message;
         }
+      });
+
+      document.getElementById("signOut").addEventListener("click", async () => {
+        try {
+          await msalInstance.logoutPopup();
+
+          document.getElementById("userStatus").textContent = "Not Signed In";
+
+          document.getElementById(
+            "welcomeMessage"
+          ).innerHTML = `<h2>Welcome to DataPulse360</h2>
+             <p>
+                DataPulse360 is designed to streamline survey participation,
+                student feedback collection, and engagement analytics.
+             </p>`;
+
+          document.getElementById("output").textContent =
+            "Successfully signed out.";
+        } catch (err) {
+          document.getElementById("output").textContent = err.message;
+        }
+      });
+
+      document.getElementById("home").addEventListener("click", () => {
+        document.getElementById("output").textContent = "Home Dashboard Loaded";
+      });
+
+      document.getElementById("SurveysBtn").addEventListener("click", () => {
+        document.getElementById("output").textContent =
+          "Viewing Available Surveys";
+      });
+
+      document.getElementById("InvitesBtn").addEventListener("click", () => {
+        document.getElementById("output").textContent =
+          "Viewing Survey Invitations";
+      });
+
+      document
+        .getElementById("PersonalResults")
+        .addEventListener("click", () => {
+          document.getElementById("output").textContent =
+            "Viewing Personal Results";
+        });
+
+      document.getElementById("signUp").addEventListener("click", () => {
+        document.getElementById("output").textContent =
+          "Sign Up Feature Under Development";
       });
     </script>
   </body>
