@@ -11,6 +11,9 @@
         margin: 0;
         padding: 0;
         background-color: #1f232d;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
       }
       header {
         background-color: #1f232d;
@@ -65,6 +68,21 @@
         align-items: center;
         justify-content:space-evenly;
       }
+      #mainPageContainer {
+        flex: 1;
+        display: flex;
+      } 
+      .my-div {
+        display:none;
+        padding:20px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        flex: 1;
+      }
+      .my-div.active {
+        display: block;
+      }
+
     </style>
     <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
     <link rel="stylesheet" href="style.css" />
@@ -85,6 +103,11 @@
       <button id="InvitesBtn">My Invites</button>
       <button id="PersonalResults">Personal Results</button>
       <button id="home">Home</button>
+    </div>
+    <div id="mainPageContainer">
+        <div class="my-div active">Content 1: First Screen</div>
+        <div class="my-div">Content 2: Second Screen</div>
+        <div class="my-div">Content 3: Third Screen</div>
     </div>
 
     <main>
@@ -121,6 +144,20 @@
             "Error: " + err.message;
         }
       });
+        
+        const divs = document.querySelectorAll('.my-div');
+const homeButton = document.getElementById('home');
+
+let currentIndex = 0;
+
+homeButton.addEventListener('click', () => {
+    divs[currentIndex].classList.remove('active');
+
+    currentIndex = (currentIndex + 1) % divs.length;
+
+    divs[currentIndex].classList.add('active');
+});
     </script>
   </body>
 </html>
+
