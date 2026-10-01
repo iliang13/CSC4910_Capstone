@@ -13,7 +13,9 @@
         padding: 0;
         font-family: Arial, sans-serif;
         background-color: #1f232d;
-        color: white;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
       }
 
       header {
@@ -132,6 +134,21 @@
         font-size: 18px;
         margin-top: 20px;
       }
+      #mainPageContainer {
+        flex: 1;
+        display: flex;
+      } 
+      .my-div {
+        display:none;
+        padding:20px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        flex: 1;
+      }
+      .my-div.active {
+        display: block;
+      }
+
     </style>
   </head>
 
@@ -149,6 +166,11 @@
       <button id="InvitesBtn">My Invites</button>
       <button id="PersonalResults">Personal Results</button>
       <button id="home">Home</button>
+    </div>
+    <div id="mainPageContainer">
+        <div class="my-div active">Content 1: First Screen</div>
+        <div class="my-div">Content 2: Second Screen</div>
+        <div class="my-div">Content 3: Third Screen</div>
     </div>
 
     <main>
@@ -241,53 +263,7 @@
             "Error: " + err.message;
         }
       });
-
-      document.getElementById("signOut").addEventListener("click", async () => {
-        try {
-          await msalInstance.logoutPopup();
-
-          document.getElementById("userStatus").textContent = "Not Signed In";
-
-          document.getElementById(
-            "welcomeMessage"
-          ).innerHTML = `<h2>Welcome to DataPulse360</h2>
-             <p>
-                DataPulse360 is designed to streamline survey participation,
-                student feedback collection, and engagement analytics.
-             </p>`;
-
-          document.getElementById("output").textContent =
-            "Successfully signed out.";
-        } catch (err) {
-          document.getElementById("output").textContent = err.message;
-        }
-      });
-
-      document.getElementById("home").addEventListener("click", () => {
-        document.getElementById("output").textContent = "Home Dashboard Loaded";
-      });
-
-      document.getElementById("SurveysBtn").addEventListener("click", () => {
-        document.getElementById("output").textContent =
-          "Viewing Available Surveys";
-      });
-
-      document.getElementById("InvitesBtn").addEventListener("click", () => {
-        document.getElementById("output").textContent =
-          "Viewing Survey Invitations";
-      });
-
-      document
-        .getElementById("PersonalResults")
-        .addEventListener("click", () => {
-          document.getElementById("output").textContent =
-            "Viewing Personal Results";
-        });
-
-      document.getElementById("signUp").addEventListener("click", () => {
-        document.getElementById("output").textContent =
-          "Sign Up Feature Under Development";
-      });
     </script>
   </body>
 </html>
+
