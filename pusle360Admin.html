@@ -59,6 +59,10 @@
 
       button:hover {
         background-color: #0e162c;
+        transform: translateY(-1px);
+      }
+      button:active {
+        transform: translateY(1px);
       }
 
       main {
@@ -145,6 +149,13 @@
       .my-div.active {
         display: block;
       }
+      .surveysDisplayDiv {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        background-color: #e3e6ed;
+      }
 
     </style>
   </head>
@@ -218,7 +229,11 @@
         id="surveySearch"
         placeholder="Search for surveys..."
           />
-          <div class="surveysDiv"> </div>
+          <div class="surveysDisplayDiv"> 
+            <div class="question">
+
+            </div>
+          </div>
           
         </div>"
 
@@ -303,7 +318,7 @@
 
       const msalConfig = {
         auth: {
-          clientId: "75b59301-f0a4-46da-85c9-d65ceb765775",
+          clientId: "e4e81184-85ff-465c-9ac8-b2765d4ff539",
           authority:
             "https://login.microsoftonline.com/57e1236c-0fa3-4739-9edf-fd0721c8744d",
           redirectUri: window.location.origin,
@@ -338,6 +353,16 @@
             "Error: " + err.message;
         }
       });
+
+
+      function addSurvey(survey) {
+        survey.classList.add("surveyDisplayDiv");
+        survey.textContent = "Test test test sahur";
+        surveysDiv.appendChild(survey);
+      }
+      const surveysTest = document.createElement("div");
+      addSurvey(surveysTest);
+
     </script>
   </body>
 </html>
