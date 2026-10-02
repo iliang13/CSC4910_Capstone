@@ -154,7 +154,35 @@
         flex-wrap: wrap;
         gap: 20px;
         justify-content: center;
-        background-color: #e3e6ed;
+        background-color: none;
+        width:100%;
+      }
+      .surveyField {
+        width:100%;
+        box-sizing: border-box;
+
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+
+        padding: 20px;
+        border: 1px solid #976d03;
+        border-radius: 10px;
+        color:#1f232d;
+        background-color:rgb(213, 224, 163);
+      }
+      .question {
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap:20px;
+        justify-content: center;
+        color: #1f232d;
+        border: 1px solid #976d03;
+        border-radius: 10px;
+        padding: 20px;
+        background-color:rgb(145, 153, 110);
       }
 
     </style>
@@ -229,11 +257,7 @@
         id="surveySearch"
         placeholder="Search for surveys..."
           />
-          <div class="surveysDisplayDiv"> 
-            <div class="question">
-
-            </div>
-          </div>
+          <div class="surveysDisplayDiv"></div>
           
         </div>"
 
@@ -271,6 +295,9 @@
       const surveysDiv = document.getElementById("surveysDiv");
       const invitesDiv = document.getElementById("invitesDiv");
       const resultsDiv = document.getElementById("resultsDiv");
+      const surveysDisplayDiv = document.createElement("div");
+      surveysDisplayDiv.classList.add("surveysDisplayDiv");
+      document.getElementById("surveysDiv").appendChild(surveysDisplayDiv);
 
       homeButton.addEventListener("click", () => {
         homeDiv.classList.add("active");
@@ -355,13 +382,41 @@
       });
 
 
-      function addSurvey(survey) {
-        survey.classList.add("surveyDisplayDiv");
-        survey.textContent = "Test test test sahur";
-        surveysDiv.appendChild(survey);
-      }
-      const surveysTest = document.createElement("div");
-      addSurvey(surveysTest);
+      class SurveyQuestion {
+        constructor(questionText, options) {
+          this.question = document.createElement("div");
+          this.question.classList.add("question");
+
+          this.label = document.createElement("label");
+          this.label.textContent = questionText;
+
+          this.fieldset = document.createElement("fieldset");
+          this.fieldset.classList.add("surveyField");
+
+          options.forEach((option) => {
+            const label = document.createElement("label");
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = questionText;
+            radio.value = option;
+            label.appendChild(radio);
+            label.appendChild(document.createTextNode(" " + option));
+            this.fieldset.appendChild(label);
+        });
+        this.question.appendChild(this.label);
+        this.question.appendChild(this.fieldset);
+    }
+}
+
+      
+function CreateSurveyQuestion() {
+  
+}
+      const question1 = new SurveyQuestion(
+        "a",
+        [1,2,3,4,5],
+      );
+      surveysDisplayDiv.appendChild(question1.question);
 
     </script>
   </body>
