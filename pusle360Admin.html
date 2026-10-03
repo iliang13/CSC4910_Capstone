@@ -38,7 +38,7 @@
 
       #buttonSection {
         display: flex;
-        justify-content: center;
+        justify-content: space-evenly;
         flex-wrap: wrap;
         gap: 10px;
         padding: 15px;
@@ -182,7 +182,26 @@
         border: 1px solid #976d03;
         border-radius: 10px;
         padding: 20px;
-        background-color:rgb(145, 153, 110);
+        background-color:rgb(214, 190, 125);
+      }
+      .questionInput {
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap:20px;
+        justify-content: center;
+        color: #1f232d;
+        border: 1px solid #976d03;
+        border-radius: 10px;
+        padding: 20px;
+        background-color:rgb(214, 190, 125);
+      } .questionInput::placeholder {
+        color: #1f232d;
+        opacity: 0.7;
+      } .questionInput:focus {
+        outline: 2px solid #d39805;
+        border: 1px solid transparent;
       }
 
     </style>
@@ -247,16 +266,16 @@
           <li>Microsoft account integration configured</li>
         </ul>
       </div>
-
-      </div>
-
-        </div>
+    </div>
+   </div>
+        
         <div id="surveysDiv" class="my-div">
           <input
         type="text"
         id="surveySearch"
         placeholder="Search for surveys..."
           />
+          <button ID="CreateSurvey()">Create New Survey</button>
           <div class="surveysDisplayDiv"></div>
           
         </div>"
@@ -296,49 +315,56 @@
       const invitesDiv = document.getElementById("invitesDiv");
       const resultsDiv = document.getElementById("resultsDiv");
       const surveysDisplayDiv = document.createElement("div");
+      const createSurveyButton = document.getElementById("CreateSurvey");
       surveysDisplayDiv.classList.add("surveysDisplayDiv");
       document.getElementById("surveysDiv").appendChild(surveysDisplayDiv);
+      
+      var potentialMainPageDivs = [homeDiv, surveysDiv, invitesDiv, resultsDiv];
 
       homeButton.addEventListener("click", () => {
+        potentialMainPageDivs.forEach((div) => {
+          div.classList.remove("active");
+        });
         homeDiv.classList.add("active");
-        surveysDiv.classList.remove("active");
-        invitesDiv.classList.remove("active");
-        resultsDiv.classList.remove("active");
       });
 
       surveysButton.addEventListener("click", () => {
+        potentialMainPageDivs.forEach((div) => {
+          div.classList.remove("active");
+        });
         surveysDiv.classList.add("active");
-        homeDiv.classList.remove("active");
-        invitesDiv.classList.remove("active");
-        resultsDiv.classList.remove("active");
       });
 
       invitesButton.addEventListener("click", () => {
+        potentialMainPageDivs.forEach((div) => {
+          div.classList.remove("active");
+        });
         invitesDiv.classList.add("active");
-        homeDiv.classList.remove("active");
-        surveysDiv.classList.remove("active");
-        resultsDiv.classList.remove("active");
+
       });
 
       personalResultsButton.addEventListener("click", () => {
+        potentialMainPageDivs.forEach((div) => {
+          div.classList.remove("active");
+        });
         resultsDiv.classList.add("active");
-        homeDiv.classList.remove("active");
-        surveysDiv.classList.remove("active");
-        invitesDiv.classList.remove("active");
+
       });
 
       homeButton.addEventListener("click", () => {
+        potentialMainPageDivs.forEach((div) => {
+          div.classList.remove("active");
+        });
         homeDiv.classList.add("active");
-        surveysDiv.classList.remove("active");
-        invitesDiv.classList.remove("active");
-        resultsDiv.classList.remove("active");
+
       });
 
       homeButton.addEventListener("click", () => {
+        potentialMainPageDivs.forEach((div) => {
+          div.classList.remove("active");
+        });
         homeDiv.classList.add("active");
-        surveysDiv.classList.remove("active");
-        invitesDiv.classList.remove("active");
-        resultsDiv.classList.remove("active");
+        
       });
 
 
@@ -402,22 +428,47 @@
             label.appendChild(radio);
             label.appendChild(document.createTextNode(" " + option));
             this.fieldset.appendChild(label);
-        });
-        this.question.appendChild(this.label);
-        this.question.appendChild(this.fieldset);
-    }
-}
+          });
+          this.question.appendChild(this.label);
+          this.question.appendChild(this.fieldset);
+        }
+      }
 
-      
-function CreateSurveyQuestion() {
-  
-}
-      const question1 = new SurveyQuestion(
+      class BlankSurveyQuestion {
+        constructor() {
+          this.question = document.createElement("div");
+          this.question.classList.add("question");
+
+          this.label = document.createElement("input");
+          this.label.type = "text";;
+          this.label.classList.add("questionInput");
+          this.label.placeholder = "enter question text here";
+
+          this.label2 = document.createElement("input");
+          this.label2.type = "number";
+          this.label2.placeholder = "number of options";
+
+          this.question.appendChild(this.label);
+          this.question.appendChild(this.label2);
+        }
+      }
+
+function CreateSurveyQuestion() { 
+  const question = new SurveyQuestion(
         "a",
         [1,2,3,4,5],
       );
-      surveysDisplayDiv.appendChild(question1.question);
+      surveysDisplayDiv.appendChild(question.question);
+}
 
+function CreateBlankSurveyQuestion() { 
+  const question = new BlankSurveyQuestion();
+      surveysDisplayDiv.appendChild(question.question);
+}
+CreateBlankSurveyQuestion();
+CreateBlankSurveyQuestion();
+CreateBlankSurveyQuestion();
+CreateBlankSurveyQuestion();
     </script>
   </body>
 </html>
