@@ -418,6 +418,39 @@ function CreateSurveyQuestion() {
       );
       surveysDisplayDiv.appendChild(question1.question);
 
+      const submitButton = document.createElement("button");
+
+      submitButton.textContent = "Submit Survey";
+
+      surveysDisplayDiv.appendChild(submitButton);
+
+      submitButton.addEventListener("click", () => {
+
+      const selected =
+        document.querySelector('input[name="a"]:checked');
+
+      const responses = {
+          answer: selected ? selected.value : null
+      };
+
+      fetch("http://localhost:3000/submitSurvey", {
+          method: "P  OST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify(responses)
+      })
+      .then(res => res.json())
+      .then(data => {
+          document.getElementById("output").textContent =
+              data.message;
+      })
+      .catch(err => {
+          console.error(err);
+      });
+
+      });
+
     </script>
   </body>
 </html>
