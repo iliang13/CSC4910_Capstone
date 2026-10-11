@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DataPulse360 Merrimack</title>
+
+    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+
+    <style>
+      :root {
+        --color-background: #1f232d;
+        --color-accent: #976d03;
+        --color-button-bg: #121d3a;
+        --color-button-hover: #0e162c;
+        --color-highlight: #ffd166;
+        --color-focus: #d39805;
+        --color-builder-bg: #e9d476;
+        --color-scrollbar-hover: #c79512;
+        --color-delete-bg: #f7120a;
+        --color-delete-hover: #bd0d07;
+        --color-survey-field: #D5E0A3;
+        --color-question-bg: #D6BE7D;
+}
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: var(--color-background);
+      }
+
+      header {
+        background-color: var(--color-background);
+        padding: 20px;
+        position: relative;
+        border-bottom: 2px solid var(--color-accent);
+      }
+
+      header img {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 50px;
+      }
+
+      header h1 {
+        text-align: center;
+        margin: 0;
+        color: white;
+      }
+
+      #buttonSection {
+        display: flex;
+        justify-content: space-evenly;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 15px;
+        border-bottom: 2px solid var(--color-accent);
+      }
+
+      button {
+        width: 190px;
+        padding: 10px;
+        border: 1px solid var(--color-accent);
+        border-radius: 10px;
+        background-color: var(--color-button-bg);
+        color: white;
+        font-size: 15px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      button:hover {
+        background-color: var(--color-button-hover);
+        transform: translateY(-1px);
+      }
+      button:active {
+        transform: translateY(1px);
+      }
+      .deleteSurveyButton {
+        padding:0;
+        width:20px;
+        height:20px;
+        border: 1px solid var(--color-accent)00;
+        border-radius: 50%;
+        background-color: var(--color-delete-bg);
+        color: white;
+        font-size: 10px;
+        cursor: pointer;
+        transition: 0.2s; 
+      } 
+      .deleteSurveyButton:hover {
+        background-color: var(--color-delete-hover);
+        transform: translateY(-1px);
+      }
+      .deleteSurveyButton:active {
+        transform: translateY(1px);
+      }
+
+
+      main {
+        padding: 25px;
+      }
+
+      #welcomeMessage {
+        background-color: var(--color-button-bg);
+        border: 2px solid var(--color-accent);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 25px;
+        text-align: center;
+      }
+
+      #dashboard {
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+      }
+
+      .card {
+        width: 230px;
+        background-color: var(--color-button-bg);
+        border: 2px solid var(--color-accent);
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .card h3 {
+        margin-top: 0;
+      }
+
+      .stat {
+        font-size: 42px;
+        color: var(--color-highlight);
+        margin: 15px 0;
+      }
+
+      #userPanel,
+      #activityFeed {
+        width: 85%;
+        margin: 20px auto;
+        background-color: var(--color-button-bg);
+        border: 2px solid var(--color-accent);
+        border-radius: 10px;
+        padding: 20px;
+      }
+
+      #activityFeed ul {
+        text-align: left;
+        line-height: 2;
+      }
+
+      #surveySearch {
+        width: 350px;
+        max-width: 90%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid var(--color-accent);
+        margin-bottom: 25px;
+      }
+
+      #output {
+        text-align: center;
+        color: var(--color-highlight);
+        font-size: 18px;
+        margin-top: 20px;
+      }
+      #mainPageContainer {
+        flex: 1;
+        display: flex;
+      } 
+      .my-div {
+        display:none;
+        padding:20px;
+        background-color: var(--color-background);
+        flex: 1;
+        color: white;
+      }
+      .my-div.active {
+        display: block;
+      }
+      .surveysDisplayDiv {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        background-color: none;
+        width:100%;
+      }
+      .surveyField {
+        width:100%;
+        box-sizing: border-box;
+
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+
+        padding: 20px;
+        border: 1px solid var(--color-accent);
+        border-radius: 10px;
+        color:var(--color-background);
+        background-color:rgb(213, 224, 163);
+      }
+      .question {
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap:20px;
+        justify-content: center;
+        color: var(--color-background);
+        border: 1px solid var(--color-accent);
+        border-radius: 10px;
+        padding: 20px;
+        background-color:rgb(214, 190, 125);
+      }
+      .horizontalDiv {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        align-items: center;
+      }
+      .questionInput {
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap:20px;
+        justify-content: center;
+        color: var(--color-background);
+        border: 1px solid var(--color-accent);
+        border-radius: 10px;
+        padding: 20px;
+        background-color:rgb(214, 190, 125);
+        resize: none;
+      } .questionInput::placeholder {
+        color: var(--color-background);
+        opacity: 0.7;
+      } .questionInput:focus {
+        outline: 2px solid var(--color-focus);
+        border: 1px solid transparent;
+      } .questionInput::-webkit-scrollbar {
+        width: 8px;
+      }
+      .questionInput::-webkit-scrollbar-track {
+        background: var(--color-builder-bg);
+        border-radius: 10px;
+      }
+      .questionInput::-webkit-scrollbar-thumb {
+        background: var(--color-accent);
+        border-radius: 10px;
+        border: 2px solid var(--color-builder-bg);
+      } 
+      .questionInput::-webkit-scrollbar-thumb:hover {
+        background: var(--color-scrollbar-hover);
+      }
+
+      .surveyBuilder {
+        display:none;
+        padding: 20px;
+        background-color: var(--color-builder-bg);
+        border: 2px solid var(--color-accent);
+        border-radius: 10px;
+        color:var(--color-background);
+        overflow-y: auto;
+        max-height: 600px;
+        gap: 100px;
+      } 
+      .surveyBuilder.active {
+        display:block;
+      } 
+      .surveyBuilder::-webkit-scrollbar {
+        width: 8px;
+      }
+      .surveyBuilder::-webkit-scrollbar-track {
+        background: var(--color-builder-bg);
+        border-radius: 10px;
+      }
+      .surveyBuilder::-webkit-scrollbar-thumb {
+        background: var(--color-accent);
+        border-radius: 10px;
+        border: 2px solid var(--color-builder-bg);
+      } 
+      .surveyBuilder::-webkit-scrollbar-thumb:hover {
+        background: var(--color-scrollbar-hover);
+      } #questionsContainer {
+        display:flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <img src="../images/logo.png" alt="DataPulse360 logo" />
+      <h1>DataPulse360 Merrimack</h1>
+    </header>
+
+    <div id="buttonSection">
+      <button id="home">Home</button>
+      <button id="SurveysBtn">View Surveys</button>
+      <button id="InvitesBtn">My Invites</button>
+      <button id="PersonalResults">Personal Results</button>
+      <button id="signUp">Sign Up</button>
+      <button id="signIn">Sign In</button>
+    </div>
+
+    <div id="mainPageContainer">
+
+        <div id="homeDiv" class="my-div active">
+          
+          <div id="welcomeMessage">
+            <h2>Welcome to DataPulse360</h2>
+            <p>
+                DataPulse360 is designed to streamline survey participation, student
+                feedback collection, and engagement analytics across Merrimack
+                College.
+          </p>
+        </div>
+  
+      <div id="dashboard">
+        <div class="card">
+          <h3>Active Surveys</h3>
+          <p class="stat">3</p>
+        </div>
+
+        <div class="card">
+          <h3>Invitations</h3>
+          <p class="stat">5</p>
+        </div>
+
+        <div class="card">
+          <h3>Completed Surveys</h3>
+          <p class="stat">2</p>
+        </div>
+
+        <div id="userPanel">
+          <h2>User Status</h2>
+          <p id="userStatus">Not Signed In</p>
+        </div>
+
+        <div id="activityFeed">
+        <h2>Recent Activity</h2>
+
+        <ul>
+          <li>Completed Student Satisfaction Survey</li>
+          <li>Received invitation to Campus Dining Survey</li>
+          <li>Survey results updated</li>
+          <li>Microsoft account integration configured</li>
+        </ul>
+      </div>
+    </div>
+   </div>
+        
+        <div id="surveysDiv" class="my-div">
+          <input
+        type="text"
+        id="surveySearch"
+        placeholder="Search for surveys..."
+          />
+
+          <button ID="CreateSurvey">Create New Survey</button>
+
+          <div id="surveyBuilder" class="surveyBuilder">
+            <div id="questionsContainer">
+
+            </div>
+
+            <button id="addQuestion">Add Question</button>
+            <button id="saveSurvey">Save Survey</button>
+
+          </div>
+
+          <div class="surveysDisplayDiv"></div>
+          
+        </div>"
+
+        </div>
+
+        <div id="invitesDiv" class="my-div">
+
+        </div>
+
+        <div id="resultsDiv" class="my-div">
+
+        </div>
+    </div>
+
+    <main>
+      
+
+      
+      
+
+      
+
+      <p id="output"></p>
+    </main>
+
+    <script>
+
+      const signUpButton = document.getElementById("signUp");
+      const signInButton = document.getElementById("signIn");
+      const surveysButton = document.getElementById("SurveysBtn");
+      const invitesButton = document.getElementById("InvitesBtn");
+      const personalResultsButton = document.getElementById("PersonalResults");
+      const homeButton = document.getElementById("home");
+      const homeDiv = document.getElementById("homeDiv");
+      const surveysDiv = document.getElementById("surveysDiv");
+      const invitesDiv = document.getElementById("invitesDiv");
+      const resultsDiv = document.getElementById("resultsDiv");
+      const surveysDisplayDiv = document.createElement("div");
+      const createSurveyButton = document.getElementById("CreateSurvey");
+      const CreateSurveyDiv = document.getElementById("createSurveyDiv");
+      const surveyBuilder = document.getElementById("surveyBuilder");
+      const addQuestionButton = document.getElementById("addQuestion");
+      surveysDisplayDiv.classList.add("surveysDisplayDiv");
+      document.getElementById("surveysDiv").appendChild(surveysDisplayDiv);
+      
+      
+      
+      var potentialMainPageDivs = [homeDiv, surveysDiv, invitesDiv, resultsDiv];
+
+      homeButton.addEventListener("click", () => {
+        potentialMainPageDivs.forEach((div) => {
+          div.classList.remove("active");
+        });
+        homeDiv.classList.add("active");
+      });
+
+      surveysButton.addEventListener("click", () => {
+        potentialMainPageDivs.forEach((div) => {
+          div.classList.remove("active");
+        });
+        surveysDiv.classList.add("active");
+      });
+
+      invitesButton.addEventListener("click", () => {
+        potentialMainPageDivs.forEach((div) => {
+          div.classList.remove("active");
+        });
+        invitesDiv.classList.add("active");
+
+      });
+
+      personalResultsButton.addEventListener("click", () => {
+        potentialMainPageDivs.forEach((div) => {
+          div.classList.remove("active");
+        });
+        resultsDiv.classList.add("active");
+
+      });
+
+      homeButton.addEventListener("click", () => {
+        potentialMainPageDivs.forEach((div) => {
+          div.classList.remove("active");
+        });
+        homeDiv.classList.add("active");
+
+      });
+
+      homeButton.addEventListener("click", () => {
+        potentialMainPageDivs.forEach((div) => {
+          div.classList.remove("active");
+        });
+        homeDiv.classList.add("active");
+    
+      });
+
+      createSurveyButton.addEventListener("click", () => {
+        const questionsContainer = document.getElementById("questionsContainer");
+        if (questionsContainer.children.length === 0) {
+          surveyBuilder.classList.add("active");
+          CreateBlankSurveyQuestion();
+        }   
+      });
+
+      addQuestionButton.addEventListener("click", () => {
+        CreateBlankSurveyQuestion();
+      })
+
+
+
+      const msalConfig = {
+        auth: {
+          clientId: "e4e81184-85ff-465c-9ac8-b2765d4ff539",
+          authority:
+            "https://login.microsoftonline.com/57e1236c-0fa3-4739-9edf-fd0721c8744d",
+          redirectUri: window.location.origin,
+        },
+      };
+
+      const msalInstance = new msal.PublicClientApplication(msalConfig);
+
+      document.getElementById("signIn").addEventListener("click", async () => {
+        try {
+          const result = await msalInstance.loginPopup({
+            scopes: ["openid", "profile", "User.Read"],
+          });
+
+          document.getElementById(
+            "userStatus"
+          ).innerHTML = `<strong>${result.account.name}</strong><br>
+             ${result.account.username}`;
+
+          document.getElementById(
+            "welcomeMessage"
+          ).innerHTML = `<h2>Welcome Back, ${result.account.name}</h2>
+             <p>
+                Access surveys, invitations,
+                and participation statistics below.
+             </p>`;
+
+          document.getElementById("output").textContent =
+            "Successfully signed in.";
+        } catch (err) {
+          document.getElementById("output").textContent =
+            "Error: " + err.message;
+        }
+      });
+
+
+      class SurveyQuestion {
+        constructor(questionText, options) {
+          this.question = document.createElement("div");
+          this.question.classList.add("question");
+
+          this.label = document.createElement("label");
+          this.label.textContent = questionText;
+
+          this.fieldset = document.createElement("fieldset");
+          this.fieldset.classList.add("surveyField");
+
+          options.forEach((option) => {
+            const label = document.createElement("label");
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = questionText;
+            radio.value = option;
+            label.appendChild(radio);
+            label.appendChild(document.createTextNode(" " + option));
+            this.fieldset.appendChild(label);
+          });
+          this.question.appendChild(this.label);
+          this.question.appendChild(this.fieldset);
+        }
+      }
+
+      class BlankSurveyQuestion {
+        constructor() {
+
+          this.question = document.createElement("div");
+          this.question.classList.add("question");
+
+          this.div = document.createElement("div");
+          this.div.classList.add("horizontalDiv");
+
+          this.label = document.createElement("textarea");
+          this.label.classList.add("questionInput");
+          this.label.placeholder = "Enter question text here:";
+
+          this.label.addEventListener("input", function() {
+            this.style.height = "auto";
+            this.style.height = (this.scrollHeight) + "px";
+          });
+
+          this.label2 = document.createElement("input");
+          this.label2.type = "number";
+          this.label2.placeholder = "Number of options";
+
+          this.button = document.createElement("button");
+          this.button.type = "button";
+          this.button.textContent = "X";
+          this.button.classList.add("deleteSurveyButton");
+
+          this.button.addEventListener("click", () => {
+            this.question.remove();
+          });
+
+          this.question.appendChild(this.div);
+          this.div.appendChild(this.label);
+          this.div.appendChild(this.button);
+          this.question.appendChild(this.label2);
+          
+        }
+      }
+
+function CreateSurveyQuestion() { 
+  const question = new SurveyQuestion(
+        "a",
+        [1,2,3,4,5],
+      );
+      surveyBuilder.appendChild(question.question);
+}
+
+function CreateBlankSurveyQuestion() { 
+  const question = new BlankSurveyQuestion();
+  document.getElementById("questionsContainer").appendChild(question.question);
+}
+
+
+
+    </script>
+  </body>
+</html>
+
