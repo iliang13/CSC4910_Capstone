@@ -222,14 +222,21 @@
         flex-direction: row;
         gap: 20px;
         align-items: center;
+        width:100%;
+      }
+      .verticalDiv {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+        flex: 1;
+        min-width: 0;
       }
       .questionInput {
         width: 100%;
         box-sizing: border-box;
         display: flex;
-        flex-direction: column;
         gap:20px;
-        justify-content: center;
         color: var(--color-background);
         border: 1px solid var(--color-accent);
         border-radius: 10px;
@@ -561,6 +568,9 @@
           this.div = document.createElement("div");
           this.div.classList.add("horizontalDiv");
 
+          this.div2 = document.createElement("div");
+          this.div2.classList.add("verticalDiv");
+
           this.label = document.createElement("textarea");
           this.label.classList.add("questionInput");
           this.label.placeholder = "Enter question text here:";
@@ -570,9 +580,18 @@
             this.style.height = (this.scrollHeight) + "px";
           });
 
-          this.label2 = document.createElement("input");
-          this.label2.type = "number";
-          this.label2.placeholder = "Number of options";
+          this.label2 = document.createElement("textarea");
+          this.label2.classList.add("questionInput");
+          this.label2.placeholder = "Enter third person text here:";
+
+          this.label2.addEventListener("input", function() {
+            this.style.height = "auto";
+            this.style.height = (this.scrollHeight) + "px";
+          });
+
+          this.label3 = document.createElement("input");
+          this.label3.type = "number";
+          this.label3.placeholder = "Number of options";
 
           this.button = document.createElement("button");
           this.button.type = "button";
@@ -584,9 +603,11 @@
           });
 
           this.question.appendChild(this.div);
-          this.div.appendChild(this.label);
+          this.div.appendChild(this.div2);
+          this.div2.appendChild(this.label);
+          this.div2.appendChild(this.label2);
           this.div.appendChild(this.button);
-          this.question.appendChild(this.label2);
+          this.question.appendChild(this.label3);
           
         }
       }
@@ -603,9 +624,6 @@ function CreateBlankSurveyQuestion() {
   const question = new BlankSurveyQuestion();
   document.getElementById("questionsContainer").appendChild(question.question);
 }
-
-
-
     </script>
   </body>
 </html>
