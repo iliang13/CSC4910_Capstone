@@ -8,18 +8,32 @@
     <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 
     <style>
+      :root {
+        --color-background: #1f232d;
+        --color-accent: #976d03;
+        --color-button-bg: #121d3a;
+        --color-button-hover: #0e162c;
+        --color-highlight: #ffd166;
+        --color-focus: #d39805;
+        --color-builder-bg: #e9d476;
+        --color-scrollbar-hover: #c79512;
+        --color-delete-bg: #f7120a;
+        --color-delete-hover: #bd0d07;
+        --color-survey-field: #D5E0A3;
+        --color-question-bg: #D6BE7D;
+}
       body {
         margin: 0;
         padding: 0;
         font-family: Arial, sans-serif;
-        background-color: #1f232d;
+        background-color: var(--color-background);
       }
 
       header {
-        background-color: #1f232d;
+        background-color: var(--color-background);
         padding: 20px;
         position: relative;
-        border-bottom: 2px solid #976d03;
+        border-bottom: 2px solid var(--color-accent);
       }
 
       header img {
@@ -42,36 +56,55 @@
         flex-wrap: wrap;
         gap: 10px;
         padding: 15px;
-        border-bottom: 2px solid #976d03;
+        border-bottom: 2px solid var(--color-accent);
       }
 
       button {
         width: 190px;
         padding: 10px;
-        border: 1px solid #976d03;
+        border: 1px solid var(--color-accent);
         border-radius: 10px;
-        background-color: #121d3a;
+        background-color: var(--color-button-bg);
         color: white;
         font-size: 15px;
         cursor: pointer;
         transition: 0.2s;
       }
-
       button:hover {
-        background-color: #0e162c;
+        background-color: var(--color-button-hover);
         transform: translateY(-1px);
       }
       button:active {
         transform: translateY(1px);
       }
+      .deleteSurveyButton {
+        padding:0;
+        width:20px;
+        height:20px;
+        border: 1px solid var(--color-accent)00;
+        border-radius: 50%;
+        background-color: var(--color-delete-bg);
+        color: white;
+        font-size: 10px;
+        cursor: pointer;
+        transition: 0.2s; 
+      } 
+      .deleteSurveyButton:hover {
+        background-color: var(--color-delete-hover);
+        transform: translateY(-1px);
+      }
+      .deleteSurveyButton:active {
+        transform: translateY(1px);
+      }
+
 
       main {
         padding: 25px;
       }
 
       #welcomeMessage {
-        background-color: #121d3a;
-        border: 2px solid #976d03;
+        background-color: var(--color-button-bg);
+        border: 2px solid var(--color-accent);
         border-radius: 10px;
         padding: 20px;
         margin-bottom: 25px;
@@ -88,8 +121,8 @@
 
       .card {
         width: 230px;
-        background-color: #121d3a;
-        border: 2px solid #976d03;
+        background-color: var(--color-button-bg);
+        border: 2px solid var(--color-accent);
         border-radius: 10px;
         padding: 20px;
         text-align: center;
@@ -101,7 +134,7 @@
 
       .stat {
         font-size: 42px;
-        color: #ffd166;
+        color: var(--color-highlight);
         margin: 15px 0;
       }
 
@@ -109,8 +142,8 @@
       #activityFeed {
         width: 85%;
         margin: 20px auto;
-        background-color: #121d3a;
-        border: 2px solid #976d03;
+        background-color: var(--color-button-bg);
+        border: 2px solid var(--color-accent);
         border-radius: 10px;
         padding: 20px;
       }
@@ -125,13 +158,13 @@
         max-width: 90%;
         padding: 12px;
         border-radius: 8px;
-        border: 1px solid #976d03;
+        border: 1px solid var(--color-accent);
         margin-bottom: 25px;
       }
 
       #output {
         text-align: center;
-        color: #ffd166;
+        color: var(--color-highlight);
         font-size: 18px;
         margin-top: 20px;
       }
@@ -142,7 +175,7 @@
       .my-div {
         display:none;
         padding:20px;
-        background-color: #1f232d;
+        background-color: var(--color-background);
         flex: 1;
         color: white;
       }
@@ -166,9 +199,9 @@
         align-items: center;
 
         padding: 20px;
-        border: 1px solid #976d03;
+        border: 1px solid var(--color-accent);
         border-radius: 10px;
-        color:#1f232d;
+        color:var(--color-background);
         background-color:rgb(213, 224, 163);
       }
       .question {
@@ -178,11 +211,17 @@
         flex-direction: column;
         gap:20px;
         justify-content: center;
-        color: #1f232d;
-        border: 1px solid #976d03;
+        color: var(--color-background);
+        border: 1px solid var(--color-accent);
         border-radius: 10px;
         padding: 20px;
         background-color:rgb(214, 190, 125);
+      }
+      .horizontalDiv {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        align-items: center;
       }
       .questionInput {
         width: 100%;
@@ -191,17 +230,67 @@
         flex-direction: column;
         gap:20px;
         justify-content: center;
-        color: #1f232d;
-        border: 1px solid #976d03;
+        color: var(--color-background);
+        border: 1px solid var(--color-accent);
         border-radius: 10px;
         padding: 20px;
         background-color:rgb(214, 190, 125);
+        resize: none;
       } .questionInput::placeholder {
-        color: #1f232d;
+        color: var(--color-background);
         opacity: 0.7;
       } .questionInput:focus {
-        outline: 2px solid #d39805;
+        outline: 2px solid var(--color-focus);
         border: 1px solid transparent;
+      } .questionInput::-webkit-scrollbar {
+        width: 8px;
+      }
+      .questionInput::-webkit-scrollbar-track {
+        background: var(--color-builder-bg);
+        border-radius: 10px;
+      }
+      .questionInput::-webkit-scrollbar-thumb {
+        background: var(--color-accent);
+        border-radius: 10px;
+        border: 2px solid var(--color-builder-bg);
+      } 
+      .questionInput::-webkit-scrollbar-thumb:hover {
+        background: var(--color-scrollbar-hover);
+      }
+
+      .surveyBuilder {
+        display:none;
+        padding: 20px;
+        background-color: var(--color-builder-bg);
+        border: 2px solid var(--color-accent);
+        border-radius: 10px;
+        color:var(--color-background);
+        overflow-y: auto;
+        max-height: 600px;
+        gap: 100px;
+      } 
+      .surveyBuilder.active {
+        display:block;
+      } 
+      .surveyBuilder::-webkit-scrollbar {
+        width: 8px;
+      }
+      .surveyBuilder::-webkit-scrollbar-track {
+        background: var(--color-builder-bg);
+        border-radius: 10px;
+      }
+      .surveyBuilder::-webkit-scrollbar-thumb {
+        background: var(--color-accent);
+        border-radius: 10px;
+        border: 2px solid var(--color-builder-bg);
+      } 
+      .surveyBuilder::-webkit-scrollbar-thumb:hover {
+        background: var(--color-scrollbar-hover);
+      } #questionsContainer {
+        display:flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
       }
 
     </style>
@@ -275,7 +364,19 @@
         id="surveySearch"
         placeholder="Search for surveys..."
           />
-          <button ID="CreateSurvey()">Create New Survey</button>
+
+          <button ID="CreateSurvey">Create New Survey</button>
+
+          <div id="surveyBuilder" class="surveyBuilder">
+            <div id="questionsContainer">
+
+            </div>
+
+            <button id="addQuestion">Add Question</button>
+            <button id="saveSurvey">Save Survey</button>
+
+          </div>
+
           <div class="surveysDisplayDiv"></div>
           
         </div>"
@@ -316,8 +417,13 @@
       const resultsDiv = document.getElementById("resultsDiv");
       const surveysDisplayDiv = document.createElement("div");
       const createSurveyButton = document.getElementById("CreateSurvey");
+      const CreateSurveyDiv = document.getElementById("createSurveyDiv");
+      const surveyBuilder = document.getElementById("surveyBuilder");
+      const addQuestionButton = document.getElementById("addQuestion");
       surveysDisplayDiv.classList.add("surveysDisplayDiv");
       document.getElementById("surveysDiv").appendChild(surveysDisplayDiv);
+      
+      
       
       var potentialMainPageDivs = [homeDiv, surveysDiv, invitesDiv, resultsDiv];
 
@@ -364,8 +470,20 @@
           div.classList.remove("active");
         });
         homeDiv.classList.add("active");
-        
+    
       });
+
+      createSurveyButton.addEventListener("click", () => {
+        const questionsContainer = document.getElementById("questionsContainer");
+        if (questionsContainer.children.length === 0) {
+          surveyBuilder.classList.add("active");
+          CreateBlankSurveyQuestion();
+        }   
+      });
+
+      addQuestionButton.addEventListener("click", () => {
+        CreateBlankSurveyQuestion();
+      })
 
 
 
@@ -436,20 +554,40 @@
 
       class BlankSurveyQuestion {
         constructor() {
+
           this.question = document.createElement("div");
           this.question.classList.add("question");
 
-          this.label = document.createElement("input");
-          this.label.type = "text";;
+          this.div = document.createElement("div");
+          this.div.classList.add("horizontalDiv");
+
+          this.label = document.createElement("textarea");
           this.label.classList.add("questionInput");
-          this.label.placeholder = "enter question text here";
+          this.label.placeholder = "Enter question text here:";
+
+          this.label.addEventListener("input", function() {
+            this.style.height = "auto";
+            this.style.height = (this.scrollHeight) + "px";
+          });
 
           this.label2 = document.createElement("input");
           this.label2.type = "number";
-          this.label2.placeholder = "number of options";
+          this.label2.placeholder = "Number of options";
 
-          this.question.appendChild(this.label);
+          this.button = document.createElement("button");
+          this.button.type = "button";
+          this.button.textContent = "X";
+          this.button.classList.add("deleteSurveyButton");
+
+          this.button.addEventListener("click", () => {
+            this.question.remove();
+          });
+
+          this.question.appendChild(this.div);
+          this.div.appendChild(this.label);
+          this.div.appendChild(this.button);
           this.question.appendChild(this.label2);
+          
         }
       }
 
@@ -458,17 +596,14 @@ function CreateSurveyQuestion() {
         "a",
         [1,2,3,4,5],
       );
-      surveysDisplayDiv.appendChild(question.question);
+      surveyBuilder.appendChild(question.question);
 }
 
 function CreateBlankSurveyQuestion() { 
   const question = new BlankSurveyQuestion();
-      surveysDisplayDiv.appendChild(question.question);
+  document.getElementById("questionsContainer").appendChild(question.question);
 }
-CreateBlankSurveyQuestion();
-CreateBlankSurveyQuestion();
-CreateBlankSurveyQuestion();
-CreateBlankSurveyQuestion();
+
     </script>
   </body>
 </html>
