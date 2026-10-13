@@ -265,7 +265,7 @@
         background: var(--color-scrollbar-hover);
       }
 
-      .surveyBuilder {
+      #surveyBuilder {
         display:none;
         padding: 20px;
         background-color: var(--color-builder-bg);
@@ -274,30 +274,34 @@
         color:var(--color-background);
         overflow-y: auto;
         max-height: 600px;
-        gap: 100px;
+        
       } 
-      .surveyBuilder.active {
+      #surveyBuilder.active {
         display:block;
       } 
-      .surveyBuilder::-webkit-scrollbar {
+      #surveyBuilder::-webkit-scrollbar {
         width: 8px;
       }
-      .surveyBuilder::-webkit-scrollbar-track {
+      #surveyBuilder::-webkit-scrollbar-track {
         background: var(--color-builder-bg);
         border-radius: 10px;
       }
-      .surveyBuilder::-webkit-scrollbar-thumb {
+      #surveyBuilder::-webkit-scrollbar-thumb {
         background: var(--color-accent);
         border-radius: 10px;
         border: 2px solid var(--color-builder-bg);
       } 
-      .surveyBuilder::-webkit-scrollbar-thumb:hover {
+      #surveyBuilder::-webkit-scrollbar-thumb:hover {
         background: var(--color-scrollbar-hover);
-      } #questionsContainer {
+      } 
+      #questionsContainer {
         display:flex;
         flex-direction: column;
         gap: 10px;
         margin-bottom: 20px;
+      } 
+      #surveyNameInput {
+       margin-bottom: 15px;
       }
 
       #authDialog {
@@ -412,6 +416,13 @@
           <button ID="CreateSurvey">Create New Survey</button>
 
           <div id="surveyBuilder" class="surveyBuilder">
+            <input 
+              type="text"
+              id="surveyNameInput"
+              placeholder="Enter survey name"
+              class = "questionInput"
+            />
+
             <div id="questionsContainer">
 
             </div>
@@ -479,6 +490,8 @@
       const CreateSurveyDiv = document.getElementById("createSurveyDiv");
       const surveyBuilder = document.getElementById("surveyBuilder");
       const addQuestionButton = document.getElementById("addQuestion");
+      const saveSurveyButton = document.getElementById("saveSurvey");
+
       surveysDisplayDiv.classList.add("surveysDisplayDiv");
       document.getElementById("surveysDiv").appendChild(surveysDisplayDiv);
       
@@ -491,6 +504,7 @@
           div.classList.remove("active");
         });
         homeDiv.classList.add("active");
+        clearSurvey()
       });
 
       surveysButton.addEventListener("click", () => {
@@ -505,7 +519,7 @@
           div.classList.remove("active");
         });
         invitesDiv.classList.add("active");
-
+        clearSurvey()
       });
 
       personalResultsButton.addEventListener("click", () => {
@@ -513,7 +527,7 @@
           div.classList.remove("active");
         });
         resultsDiv.classList.add("active");
-
+        clearSurvey()
       });
 
       homeButton.addEventListener("click", () => {
@@ -521,15 +535,7 @@
           div.classList.remove("active");
         });
         homeDiv.classList.add("active");
-
-      });
-
-      homeButton.addEventListener("click", () => {
-        potentialMainPageDivs.forEach((div) => {
-          div.classList.remove("active");
-        });
-        homeDiv.classList.add("active");
-    
+        clearSurvey()
       });
 
       createSurveyButton.addEventListener("click", () => {
@@ -544,7 +550,79 @@
         CreateBlankSurveyQuestion();
       })
 
+      saveSurveyButton.addEventListener("click", async () => { 
+        const questionElements = document.querySelectorAll("#questionsContainer .question");
+        const surveyNameInput = document.getElementById("surveyNameInput");
 
+        const questions = [];
+
+        for (const element of questionElements) {
+          const textareas = element.querySelectorAll("textarea");
+          const optionInput = element.querySelector('input[type="number"]');
+
+          
+          const questionText =  textareas[0].value.trim();
+          const thirdPersonText = textareas[1].value.trim();
+          const numberOfOptions = Number(optionInput.value);
+
+          if (!questionText || !thirdPersonText || isNaN(numberOfOptions)) {
+            document.getElementById("output").textContent = "Please fill in all fields."
+            return;
+          }
+
+          if (
+            optionInput.value.trim() === "" ||
+            !Number.isInteger(numberOfOptions) ||
+            numberOfOptions < 1
+          ) {
+            document.getElementById("output").textContent = "Please enter a whole number greater than 0.";
+            return;
+          }
+
+          questions.push({
+            questionText: questionText,
+            thirdPersonText: thirdPersonText,
+            numberOfOptions: numberOfOptions
+          });
+        }
+
+        if (questions.length === 0) {
+          document.getElementById("output").textContent = "Please add at least one question.";
+          return;
+        }
+
+        try {
+          const response = await fetch("http://localhost:3000/saveSurvey", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ 
+              surveyName: surveyNameInput.value.trim(),
+              questions: questions})
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.message || "Failed to save survey.");
+          }
+
+          document.getElementById("output").textContent = "Survey saved successfully.";
+
+        } catch (error) {
+          document.getElementById("output").textContent = "Error saving survey: " + error.message;
+        }
+      clearSurvey()
+      });
+
+      function clearSurvey() {
+        const questionsContainer = document.getElementById("questionsContainer");
+        const surveyNameInput = document.getElementById("surveyNameInput");
+        questionsContainer.innerHTML = "";
+        surveyNameInput.value = "";
+        surveyBuilder.classList.remove("active"); 
+      }
 
       const authDialog = document.getElementById("authDialog");
       const authForm = document.getElementById("authForm");

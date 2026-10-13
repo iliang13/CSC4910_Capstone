@@ -1,8 +1,10 @@
-const express = require("express");
+const express = require("express"); //node server.js
 const cors = require("cors");
 const path = require("path");
 const { createClient } = require("@supabase/supabase-js");
 require("dotenv").config();
+const fs = require("fs");
+
 
 const app = express();
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -18,63 +20,157 @@ app.use(
   cors({ origin: process.env.FRONTEND_ORIGIN || "http://localhost:3000" }),
 );
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "../Frontend")));
-app.use("/images", express.static(path.join(__dirname, "../images")));
 
-app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
-});
+const surveysDirectory = path.join(__dirname, "surveys");
 
-app.get("/api/config", (req, res) => {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return res
-      .status(503)
-      .json({ error: "Supabase is not configured on the server." });
+function generateSurveyID() {
+  let result = '';
+  for (let i = 0; i < 8; i++) {
+    result += Math.floor(Math.random() * 10);
   }
-
-  res.json({ supabaseUrl, supabaseAnonKey });
-});
-
-async function requireAuthentication(req, res, next) {
-  if (!supabaseAuthClient) {
-    return res
-      .status(503)
-      .json({ error: "Authentication is not configured on the server." });
-  }
-
-  const token = req.get("authorization")?.match(/^Bearer\s+(.+)$/i)?.[1];
-  if (!token) {
-    return res.status(401).json({ error: "Sign in to continue." });
-  }
-
-  try {
-    const { data, error } = await supabaseAuthClient.auth.getUser(token);
-    if (error || !data.user) {
-      return res
-        .status(401)
-        .json({
-          error: "Your session is invalid or expired. Please sign in again.",
-        });
-    }
-
-    req.user = { id: data.user.id, email: data.user.email };
-    next();
-  } catch (error) {
-    console.error("Supabase token validation failed:", error.message);
-    res.status(503).json({ error: "Authentication service is unavailable." });
-  }
+  return result;
 }
 
-app.get("/api/me", requireAuthentication, (req, res) => {
-  res.json({ user: req.user });
+var surveyIdLookupTable = {};
+
+function loadSurveyIDs() {
+    const files = fs.readdirSync(surveysDirectory);
+    for (const file of files) {
+        if (!file.endsWith(".json")) {
+            continue;
+        }
+
+        try {
+            const filePath = path.join(surveysDirectory, file);
+            const surveyData = JSON.parse(
+                fs.readFileSync(filePath, "utf8")
+            );
+
+            if (surveyData.surveyID) {
+                surveyIdLookupTable[surveyData.surveyID] = true;
+            }
+        } catch (error) {
+            console.error(`Error loading ${file}:`, error.message);
+        }
+    }
+}
+
+if (!fs.existsSync(surveysDirectory)) {
+  fs.mkdirSync(surveysDirectory, { recursive: true });
+}
+loadSurveyIDs();
+
+app.get("/", (req, res) => {
+  res.send("DataPulse360 Server Running");
 });
 
-app.post("/submitSurvey", requireAuthentication, (req, res) => {
+app.post("/submitSurvey", (req, res) => {
+  console.log("Survey received:");
+  console.log(req.body);
+
   res.json({
     success: true,
     message: "Survey received",
     user: req.user,
   });
+});
+
+app.post("/saveSurvey", (req, res) => {
+  try {
+    const questions = req.body.questions;
+    const surveyName = req.body.surveyName?.trim();
+
+    if (!surveyName) {
+      return res.status(400).json({
+        success: false,
+        message: "Survey name is required."
+      });
+    }
+
+    if (!Array.isArray(questions)) {
+      return res.status(400).json({
+        success: false,
+        message: "Questions must be an array."
+      });
+    }
+
+    let surveyID = generateSurveyID();
+
+    while (Object.hasOwn(surveyIdLookupTable, surveyID)) {
+      surveyID = generateSurveyID();
+    }
+
+    const fileName = surveyName.replace(/[^a-z0-9_-]/gi, "_") + ".json";
+    const surveyFile = path.join(surveysDirectory, fileName);
+      const surveyData = {surveyID, surveyName, questions};
+      surveyIdLookupTable[surveyID] = true;
+
+      fs.writeFileSync(
+        surveyFile,JSON.stringify(surveyData, null, 2),"utf8");
+
+    res.json({
+      success: true,
+      message: "Survey saved successfully.",
+      surveyName: surveyName,
+      surveyID: surveyID
+    });
+  } catch (error) {
+    console.error("Error saving survey:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to save survey."
+    });
+  }
+});
+
+app.post("/saveSurvey", (req, res) => {
+  try {
+    const questions = req.body.questions;
+    const surveyName = req.body.surveyName?.trim();
+
+    if (!surveyName) {
+      return res.status(400).json({
+        success: false,
+        message: "Survey name is required."
+      });
+    }
+
+    if (!Array.isArray(questions)) {
+      return res.status(400).json({
+        success: false,
+        message: "Questions must be an array."
+      });
+    }
+
+    let surveyID = generateSurveyID();
+
+    while (Object.hasOwn(surveyIdLookupTable, surveyID)) {
+      surveyID = generateSurveyID();
+    }
+
+    const fileName = surveyName.replace(/[^a-z0-9_-]/gi, "_") + ".json";
+    const surveyFile = path.join(surveysDirectory, fileName);
+      const surveyData = {surveyID, surveyName, questions};
+      surveyIdLookupTable[surveyID] = true;
+
+      fs.writeFileSync(
+        surveyFile,JSON.stringify(surveyData, null, 2),"utf8");
+
+    res.json({
+      success: true,
+      message: "Survey saved successfully.",
+      surveyName: surveyName,
+      surveyID: surveyID
+    });
+  } catch (error) {
+    console.error("Error saving survey:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to save survey."
+    });
+  }
 });
 
 const port = process.env.PORT || 3000;
