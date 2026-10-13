@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DataPulse360 Merrimack</title>
 
-    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
       :root {
@@ -293,6 +293,43 @@
         margin-bottom: 20px;
       }
 
+      #authDialog {
+        box-sizing: border-box;
+        width: min(420px, calc(100% - 48px));
+        border: 1px solid var(--color-accent);
+        border-radius: 8px;
+        background: var(--color-button-bg);
+        color: white;
+        padding: 24px;
+      }
+      #authDialog::backdrop {
+        background: rgb(0 0 0 / 65%);
+      }
+      #authForm {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      #authForm input {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 11px;
+        border: 1px solid var(--color-accent);
+        border-radius: 4px;
+      }
+      #authActions {
+        display: flex;
+        gap: 10px;
+      }
+      #authActions button {
+        flex: 1;
+        width: auto;
+      }
+      #authMessage {
+        min-height: 1.4em;
+        color: var(--color-highlight);
+      }
+
     </style>
   </head>
 
@@ -403,6 +440,21 @@
       <p id="output"></p>
     </main>
 
+    <dialog id="authDialog">
+      <form id="authForm">
+        <h2 id="authTitle">Sign In</h2>
+        <label for="authEmail">Email</label>
+        <input id="authEmail" type="email" autocomplete="email" required />
+        <label for="authPassword">Password</label>
+        <input id="authPassword" type="password" autocomplete="current-password" minlength="6" required />
+        <p id="authMessage" role="status"></p>
+        <div id="authActions">
+          <button id="closeAuthDialog" type="button">Cancel</button>
+          <button id="authSubmit" type="submit">Sign In</button>
+        </div>
+      </form>
+    </dialog>
+
     <script>
 
       const signUpButton = document.getElementById("signUp");
@@ -487,43 +539,97 @@
 
 
 
-      const msalConfig = {
-        auth: {
-          clientId: "e4e81184-85ff-465c-9ac8-b2765d4ff539",
-          authority:
-            "https://login.microsoftonline.com/57e1236c-0fa3-4739-9edf-fd0721c8744d",
-          redirectUri: window.location.origin,
-        },
-      };
+      const authDialog = document.getElementById("authDialog");
+      const authForm = document.getElementById("authForm");
+      const authEmail = document.getElementById("authEmail");
+      const authPassword = document.getElementById("authPassword");
+      const authTitle = document.getElementById("authTitle");
+      const authSubmit = document.getElementById("authSubmit");
+      const authMessage = document.getElementById("authMessage");
+      let supabaseClient;
+      let authMode = "signin";
 
-      const msalInstance = new msal.PublicClientApplication(msalConfig);
+      function openAuthDialog(mode) {
+        authMode = mode;
+        const isSignUp = mode === "signup";
+        authForm.reset();
+        authTitle.textContent = isSignUp ? "Create Account" : "Sign In";
+        authSubmit.textContent = isSignUp ? "Create Account" : "Sign In";
+        authPassword.autocomplete = isSignUp ? "new-password" : "current-password";
+        authMessage.textContent = supabaseClient
+          ? ""
+          : "Authentication is not configured. Set up Supabase in Backend/.env.";
+        authDialog.showModal();
+      }
 
-      document.getElementById("signIn").addEventListener("click", async () => {
+      signUpButton.addEventListener("click", () => openAuthDialog("signup"));
+      signInButton.addEventListener("click", () => openAuthDialog("signin"));
+      document.getElementById("closeAuthDialog").addEventListener("click", () => authDialog.close());
+
+      async function showAuthenticatedUser(session) {
+        if (!session) {
+          document.getElementById("userStatus").textContent = "Not Signed In";
+          return;
+        }
+
         try {
-          const result = await msalInstance.loginPopup({
-            scopes: ["openid", "profile", "User.Read"],
+          const response = await fetch("/api/me", {
+            headers: { Authorization: `Bearer ${session.access_token}` },
           });
+          const payload = await response.json();
+          if (!response.ok) throw new Error(payload.error || "Could not verify account.");
 
-          document.getElementById(
-            "userStatus"
-          ).innerHTML = `<strong>${result.account.name}</strong><br>
-             ${result.account.username}`;
-
-          document.getElementById(
-            "welcomeMessage"
-          ).innerHTML = `<h2>Welcome Back, ${result.account.name}</h2>
-             <p>
-                Access surveys, invitations,
-                and participation statistics below.
-             </p>`;
-
-          document.getElementById("output").textContent =
-            "Successfully signed in.";
+          document.getElementById("userStatus").textContent = `Signed in as ${payload.user.email}`;
+          document.getElementById("welcomeMessage").querySelector("h2").textContent =
+            `Welcome Back, ${payload.user.email}`;
+          document.getElementById("output").textContent = "Successfully signed in.";
         } catch (err) {
-          document.getElementById("output").textContent =
-            "Error: " + err.message;
+          document.getElementById("userStatus").textContent = "Not Signed In";
+          document.getElementById("output").textContent = err.message;
+        }
+      }
+
+      authForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!supabaseClient) {
+          authMessage.textContent = "Sign-in setup has not loaded. Restart the server and reload this page.";
+          return;
+        }
+        authSubmit.disabled = true;
+        authMessage.textContent = "";
+
+        try {
+          const result = authMode === "signup"
+            ? await supabaseClient.auth.signUp({ email: authEmail.value, password: authPassword.value })
+            : await supabaseClient.auth.signInWithPassword({ email: authEmail.value, password: authPassword.value });
+          if (result.error) throw result.error;
+
+          if (authMode === "signup" && !result.data.session) {
+            authMessage.textContent = "Check your email to confirm your account, then sign in.";
+            return;
+          }
+
+          await showAuthenticatedUser(result.data.session);
+          authDialog.close();
+        } catch (err) {
+          authMessage.textContent = err.message || "Authentication failed.";
+        } finally {
+          authSubmit.disabled = false;
         }
       });
+
+      fetch("/api/config")
+        .then(async (response) => {
+          const config = await response.json();
+          if (!response.ok) throw new Error(config.error || "Authentication setup is unavailable.");
+          supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+          const { data } = await supabaseClient.auth.getSession();
+          await showAuthenticatedUser(data.session);
+        })
+        .catch((err) => {
+          authMessage.textContent = `Could not load sign-in setup: ${err.message}`;
+          document.getElementById("output").textContent = err.message;
+        });
 
 
       class SurveyQuestion {
@@ -610,7 +716,7 @@ function CreateBlankSurveyQuestion() {
 
       surveysDisplayDiv.appendChild(submitButton);
 
-      submitButton.addEventListener("click", () => {
+      submitButton.addEventListener("click", async () => {
 
       const selected =
         document.querySelector('input[name="a"]:checked');
@@ -619,20 +725,33 @@ function CreateBlankSurveyQuestion() {
           answer: selected ? selected.value : null
       };
 
-      fetch("http://localhost:3000/submitSurvey", {
-          method: "P  OST",
+        if (!supabaseClient) {
+          document.getElementById("output").textContent = "Authentication is not configured.";
+          return;
+        }
+
+        const { data: sessionData } = await supabaseClient.auth.getSession();
+        if (!sessionData.session) {
+          document.getElementById("output").textContent = "Sign in before submitting a survey.";
+          return;
+        }
+
+        fetch("/submitSurvey", {
+          method: "POST",
           headers: {
-              "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${sessionData.session.access_token}`
           },
           body: JSON.stringify(responses)
       })
-      .then(res => res.json())
-      .then(data => {
-          document.getElementById("output").textContent =
-              data.message;
+        .then(async (res) => {
+          const data = await res.json();
+          document.getElementById("output").textContent = res.ok
+            ? data.message
+            : data.error || "Survey submission failed.";
       })
       .catch(err => {
-          console.error(err);
+          document.getElementById("output").textContent = err.message;
       });
 
       });
