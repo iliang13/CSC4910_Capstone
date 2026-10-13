@@ -561,6 +561,7 @@
         } catch (error) {
           document.getElementById("output").textContent = "Error saving survey: " + error.message;
         }
+      clearSurvey()
       });
 
       function clearSurvey() {
