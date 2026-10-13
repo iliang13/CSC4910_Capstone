@@ -42,8 +42,11 @@ app.post("/saveSurvey", (req, res) => {
 
     const surveyData = { questions };
 
+    const fileName = req.body.surveyName.trim().replace(/[^a-z0-9_-]/gi, "_") + ".json";
+    const surveyFile = path.join(surveysDirectory, fileName);
+
     fs.writeFileSync(
-      surveysFile,
+      surveyFile,
       JSON.stringify(surveyData, null, 2),
       "utf8"
     );
