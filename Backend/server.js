@@ -2,8 +2,8 @@ const express = require("express"); //node server.js
 const cors = require("cors");
 const path = require("path");
 const { createClient } = require("@supabase/supabase-js");
-require("dotenv").config();
 const fs = require("fs");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 
 const app = express();
@@ -61,7 +61,43 @@ if (!fs.existsSync(surveysDirectory)) {
 loadSurveyIDs();
 
 app.get("/", (req, res) => {
-  res.send("DataPulse360 Server Running");
+  res.send('DataPulse360 Server Running. <a href="/admin">Open the admin website</a>.');
+});
+
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "Frontend", "AdminWebsite.html"));
+});
+
+app.use("/images", express.static(path.join(__dirname, "..", "images")));
+
+app.get("/api/config", (req, res) => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return res.status(503).json({ error: "Supabase authentication is not configured." });
+  }
+
+  res.json({ supabaseUrl, supabaseAnonKey });
+});
+
+app.get("/api/me", async (req, res) => {
+  if (!supabaseAuthClient) {
+    return res.status(503).json({ error: "Supabase authentication is not configured." });
+  }
+
+  const authorization = req.get("authorization");
+  const accessToken = authorization?.startsWith("Bearer ")
+    ? authorization.slice("Bearer ".length)
+    : null;
+
+  if (!accessToken) {
+    return res.status(401).json({ error: "A valid sign-in session is required." });
+  }
+
+  const { data, error } = await supabaseAuthClient.auth.getUser(accessToken);
+  if (error) {
+    return res.status(401).json({ error: "The sign-in session is invalid or expired." });
+  }
+
+  res.json({ user: data.user });
 });
 
 app.post("/submitSurvey", (req, res) => {
