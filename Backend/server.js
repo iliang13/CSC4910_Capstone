@@ -9,16 +9,17 @@ require("dotenv").config({ path: path.join(__dirname, ".env") });
 const app = express();
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-const supabaseAuthClient =
-  supabaseUrl && supabaseAnonKey
-    ? createClient(supabaseUrl, supabaseAnonKey, {
-        auth: { autoRefreshToken: false, persistSession: false },
-      })
-    : null;
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    "Set SUPABASE_URL and SUPABASE_ANON_KEY in Backend/.env or the hosting environment.",
+  );
+}
 
-app.use(
-  cors({ origin: process.env.FRONTEND_ORIGIN || "http://localhost:3000" }),
-);
+const supabaseAuthClient = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: { autoRefreshToken: false, persistSession: false },
+});
+
+app.use(cors({ origin: process.env.FRONTEND_ORIGIN || false }));
 app.use(express.json());
 
 const surveysDirectory = path.join(__dirname, "surveys");
@@ -61,28 +62,24 @@ if (!fs.existsSync(surveysDirectory)) {
 loadSurveyIDs();
 
 app.get("/", (req, res) => {
-  res.send('DataPulse360 Server Running. <a href="/admin">Open the admin website</a>.');
+  res.sendFile(path.join(__dirname, "..", "Frontend", "index.html"));
 });
 
 app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "Frontend", "AdminWebsite.html"));
 });
 
+app.get("/healthz", (req, res) => {
+  res.json({ status: "ok" });
+});
+
 app.use("/images", express.static(path.join(__dirname, "..", "images")));
 
 app.get("/api/config", (req, res) => {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return res.status(503).json({ error: "Supabase authentication is not configured." });
-  }
-
   res.json({ supabaseUrl, supabaseAnonKey });
 });
 
 app.get("/api/me", async (req, res) => {
-  if (!supabaseAuthClient) {
-    return res.status(503).json({ error: "Supabase authentication is not configured." });
-  }
-
   const authorization = req.get("authorization");
   const accessToken = authorization?.startsWith("Bearer ")
     ? authorization.slice("Bearer ".length)

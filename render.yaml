@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: datapulse360
+    runtime: node
+    plan: starter
+    buildCommand: npm ci --prefix Backend
+    startCommand: npm start --prefix Backend
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false

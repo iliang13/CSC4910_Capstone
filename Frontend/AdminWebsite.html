@@ -592,7 +592,7 @@
         }
 
         try {
-          const response = await fetch("http://localhost:3000/saveSurvey", {
+          const response = await fetch("/saveSurvey", {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -811,4 +811,3 @@ function CreateBlankSurveyQuestion() {
     </script>
   </body>
 </html>
-
