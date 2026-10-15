@@ -547,7 +547,9 @@
       const authSubmit = document.getElementById("authSubmit");
       const authMessage = document.getElementById("authMessage");
       let supabaseClient;
+      let authSetupState = "loading";
       let authMode = "signin";
+      authSubmit.disabled = true;
 
       function openAuthDialog(mode) {
         authMode = mode;
@@ -556,9 +558,11 @@
         authTitle.textContent = isSignUp ? "Create Account" : "Sign In";
         authSubmit.textContent = isSignUp ? "Create Account" : "Sign In";
         authPassword.autocomplete = isSignUp ? "new-password" : "current-password";
-        authMessage.textContent = supabaseClient
+        authMessage.textContent = authSetupState === "ready"
           ? ""
-          : "Authentication is not configured. Set up Supabase in Backend/.env.";
+          : authSetupState === "loading"
+            ? "Loading secure sign-in..."
+            : "Sign-in setup could not load. Refresh the page and try again.";
         authDialog.showModal();
       }
 
@@ -592,7 +596,9 @@
       authForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         if (!supabaseClient) {
-          authMessage.textContent = "Sign-in setup has not loaded. Restart the server and reload this page.";
+          authMessage.textContent = authSetupState === "loading"
+            ? "Sign-in setup is still loading. Please wait a moment and try again."
+            : "Sign-in setup could not load. Refresh the page and try again.";
           return;
         }
         authSubmit.disabled = true;
@@ -622,12 +628,23 @@
         .then(async (response) => {
           const config = await response.json();
           if (!response.ok) throw new Error(config.error || "Authentication setup is unavailable.");
+          if (!window.supabase?.createClient) {
+            throw new Error("The sign-in library did not load.");
+          }
+          if (typeof config.supabaseUrl !== "string" || typeof config.supabaseAnonKey !== "string") {
+            throw new Error("The server returned incomplete sign-in configuration.");
+          }
           supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+          authSetupState = "ready";
+          authSubmit.disabled = false;
           const { data } = await supabaseClient.auth.getSession();
           await showAuthenticatedUser(data.session);
         })
         .catch((err) => {
-          authMessage.textContent = `Could not load sign-in setup: ${err.message}`;
+          authSetupState = "error";
+          authSubmit.disabled = true;
+          console.error("Could not initialize sign-in:", err);
+          authMessage.textContent = "Sign-in setup could not load. Refresh the page and try again.";
           document.getElementById("output").textContent = err.message;
         });
 
@@ -759,4 +776,3 @@ function CreateBlankSurveyQuestion() {
     </script>
   </body>
 </html>
-

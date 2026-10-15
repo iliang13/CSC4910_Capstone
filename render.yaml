@@ -3,8 +3,9 @@ services:
     name: datapulse360
     runtime: node
     plan: starter
-    buildCommand: npm ci --prefix Backend
-    startCommand: npm start --prefix Backend
+    rootDir: Backend
+    buildCommand: npm ci
+    startCommand: npm start
     healthCheckPath: /healthz
     envVars:
       - key: NODE_ENV
