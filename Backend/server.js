@@ -32,7 +32,7 @@ function generateSurveyID() {
   return result;
 }
 
-var surveyIdLookupTable = {};
+var surveyIDLookupTable = {};
 
 function loadSurveyIDs() {
     const files = fs.readdirSync(surveysDirectory);
@@ -48,7 +48,7 @@ function loadSurveyIDs() {
             );
 
             if (surveyData.surveyID) {
-                surveyIdLookupTable[surveyData.surveyID] = true;
+                surveyIDLookupTable[surveyData.surveyID] = true;
             }
         } catch (error) {
             console.error(`Error loading ${file}:`, error.message);
@@ -129,14 +129,14 @@ app.post("/saveSurvey", (req, res) => {
 
     let surveyID = generateSurveyID();
 
-    while (Object.hasOwn(surveyIdLookupTable, surveyID)) {
+    while (Object.hasOwn(surveyIDLookupTable, surveyID)) {
       surveyID = generateSurveyID();
     }
 
     const fileName = surveyName.replace(/[^a-z0-9_-]/gi, "_") + ".json";
     const surveyFile = path.join(surveysDirectory, fileName);
       const surveyData = {surveyID, surveyName, questions};
-      surveyIdLookupTable[surveyID] = true;
+      surveyIDLookupTable[surveyID] = true;
 
       fs.writeFileSync(
         surveyFile,JSON.stringify(surveyData, null, 2),"utf8");
@@ -157,53 +157,15 @@ app.post("/saveSurvey", (req, res) => {
   }
 });
 
-app.post("/saveSurvey", (req, res) => {
-  try {
-    const questions = req.body.questions;
-    const surveyName = req.body.surveyName?.trim();
-
-    if (!surveyName) {
-      return res.status(400).json({
-        success: false,
-        message: "Survey name is required."
-      });
-    }
-
-    if (!Array.isArray(questions)) {
-      return res.status(400).json({
-        success: false,
-        message: "Questions must be an array."
-      });
-    }
-
-    let surveyID = generateSurveyID();
-
-    while (Object.hasOwn(surveyIdLookupTable, surveyID)) {
-      surveyID = generateSurveyID();
-    }
-
-    const fileName = surveyName.replace(/[^a-z0-9_-]/gi, "_") + ".json";
-    const surveyFile = path.join(surveysDirectory, fileName);
-      const surveyData = {surveyID, surveyName, questions};
-      surveyIdLookupTable[surveyID] = true;
-
-      fs.writeFileSync(
-        surveyFile,JSON.stringify(surveyData, null, 2),"utf8");
-
-    res.json({
-      success: true,
-      message: "Survey saved successfully.",
-      surveyName: surveyName,
-      surveyID: surveyID
-    });
-  } catch (error) {
-    console.error("Error saving survey:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to save survey."
-    });
+app.post("/validateSurveyCode", (req, res) => {
+  const surveyID = req.body.surveyID?.trim().slice(1);
+  if (!surveyID) {
+    return res.status(400).json({success: false, message: "Please enter a survey code."});
   }
+  if (surveyIDLookupTable[surveyID]) {
+    return res.json({success: true, message: "Survey code is valid."});
+  }
+  return res.status(404).json({success: false, message: "Invalid Survey Code."});
 });
 
 const port = process.env.PORT || 3000;

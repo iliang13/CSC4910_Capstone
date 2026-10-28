@@ -415,6 +415,16 @@
 
           <button ID="CreateSurvey">Create New Survey</button>
 
+          <button popovertarget="surveyPopup">
+            Use Survey Code
+          </button>
+
+          <div id="surveyPopup" popover>
+            <input type="text" id="surveyCode" placeholder="Enter your invite code">
+
+            <button id="submitSurveyCode" type="button">Submit</button>
+          </div>
+
           <div id="surveyBuilder" class="surveyBuilder">
             <input 
               type="text"
@@ -491,13 +501,39 @@
       const surveyBuilder = document.getElementById("surveyBuilder");
       const addQuestionButton = document.getElementById("addQuestion");
       const saveSurveyButton = document.getElementById("saveSurvey");
+      const addSurveyCodeButton = document.getElementById("AddSurveyCode");
+      const submitSurveyCodeButton = document.getElementById("submitSurveyCode");
 
       surveysDisplayDiv.classList.add("surveysDisplayDiv");
       document.getElementById("surveysDiv").appendChild(surveysDisplayDiv);
       
-      
-      
       var potentialMainPageDivs = [homeDiv, surveysDiv, invitesDiv, resultsDiv];
+
+      submitSurveyCodeButton.addEventListener("click", async () => {
+        const inviteCode = document.getElementById("surveyCode").value.trim();
+
+        try {
+          const response = await fetch("/validateSurveyCode", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ 
+              surveyID: inviteCode
+            })
+          });
+          
+          const result = await response.json();
+          if (!response.ok) {
+            alert(result.message);
+            return;
+          }
+          alert(result.message);
+        } catch (error) {
+          console.error("Error validating survey code:", error);
+          alert("Could not contact the server");
+        }
+      });
 
       homeButton.addEventListener("click", () => {
         potentialMainPageDivs.forEach((div) => {
@@ -615,6 +651,7 @@
         }
       clearSurvey()
       });
+
 
       function clearSurvey() {
         const questionsContainer = document.getElementById("questionsContainer");
