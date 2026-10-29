@@ -362,9 +362,12 @@
         transform: translateY(1px);
       }
       #surveyAnsweringDiv {
-        display: flex;
+        display: none;
         flex-direction: column;
         gap: 20px;
+      }
+      #surveyAnsweringDiv.active {
+        display: flex;
       }
 
     </style>
