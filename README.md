@@ -22,8 +22,12 @@ they do not need to start a local server.
 ## Google sign-in
 
 The sign-in dialogs offer Google as an alternative to email and password. The
-first Google sign-in creates the user's account and does not rely on Supabase
-sending an email confirmation. To enable it:
+first Google sign-up creates the user's account and does not rely on Supabase
+sending an email confirmation. Google sessions are limited to the current
+browser tab, and the Google account chooser appears for each sign-in attempt.
+Choose **Sign Up** for a new account and **Sign In** for an existing account;
+using the wrong action returns you to the dialog without signing you in. To
+enable Google authentication:
 
 1. In Google Cloud Console, create an OAuth client ID for a web application.
 2. In its authorized redirect URIs, add the callback URL shown by Supabase under
