@@ -51,13 +51,13 @@ function loadSurveyIDs() {
       const filePath = path.join(surveysDirectory, file);
       const surveyData = JSON.parse(fs.readFileSync(filePath, "utf8"));
 
-      if (surveyData.surveyID) {
-        surveyIDLookupTable[surveyData.surveyID] = true;
-      }
-    } catch (error) {
-      console.error(`Error loading ${file}:`, error.message);
+            if (surveyData.surveyID) {
+                surveyIDLookupTable[surveyData.surveyID] = surveyData;
+            }
+        } catch (error) {
+            console.error(`Error loading ${file}:`, error.message);
+        }
     }
-  }
 }
 
 if (!fs.existsSync(surveysDirectory)) {
@@ -198,8 +198,8 @@ app.post("/saveSurvey", (req, res) => {
 
     const fileName = surveyName.replace(/[^a-z0-9_-]/gi, "_") + ".json";
     const surveyFile = path.join(surveysDirectory, fileName);
-    const surveyData = { surveyID, surveyName, questions };
-    surveyIDLookupTable[surveyID] = true;
+      const surveyData = {surveyID, surveyName, questions};
+      surveyIDLookupTable[surveyID] = surveyData;
 
     fs.writeFileSync(surveyFile, JSON.stringify(surveyData, null, 2), "utf8");
 
@@ -220,18 +220,38 @@ app.post("/saveSurvey", (req, res) => {
 });
 
 app.post("/validateSurveyCode", (req, res) => {
-  const surveyID = req.body.surveyID?.trim();
-  if (!surveyID) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Please enter a survey code." });
+  const inviteCode = req.body.surveyID?.trim();
+
+  if (!inviteCode) {
+    return res.status(400).json({
+      success:false,
+      message: "no survey code entered"
+    });
   }
-  if (surveyIDLookupTable[surveyID]) {
-    return res.json({ success: true, message: "Survey code is valid." });
+
+  //0 for 1st perosn, 1 for 2nd person
+  const pov = inviteCode[0];
+
+  if (pov !== "0" && pov !== "1") {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid survey Code."
+    });
   }
-  return res
-    .status(404)
-    .json({ success: false, message: "Invalid Survey Code." });
+  const surveyID = inviteCode.slice(1);
+  const survey = surveyIDLookupTable[surveyID];
+  if (!survey) {
+    return res.status(404).json({success: false, message: "Invalid Survey Code."
+    });
+  }
+  
+  return res.json({
+    success: true, 
+    pov: pov,
+    surveyId: survey.surveyID,
+    surveyName: survey.surveyName,
+    questions: survey.questions
+  });
 });
 
 const port = process.env.PORT || 3000;

@@ -19,8 +19,8 @@
         --color-scrollbar-hover: #c79512;
         --color-delete-bg: #f7120a;
         --color-delete-hover: #bd0d07;
-        --color-survey-field: #D5E0A3;
-        --color-question-bg: #D6BE7D;
+        --color-survey-field: #c8c5c0;
+        --color-question-bg: #dfdcd4;
 }
       body {
         margin: 0;
@@ -340,6 +340,35 @@
         min-height: 1.4em;
         color: var(--color-highlight);
       }
+      .SurveyAccessDiv {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        height: 150px;
+        width: 100%;
+        padding: 10px;
+        box-sizing:border-box;
+        min-width:0;
+
+        border: 2px solid var(--color-accent);
+        border-radius: 10px;
+        background-color: var(--color-button-bg);
+      }
+      .SurveyAccessDiv:hover {
+        background-color: var(--color-button-hover);
+        transform: translateY(-1px);
+      }
+      .SurveyAccessDiv:active {
+        transform: translateY(1px);
+      }
+      #surveyAnsweringDiv {
+        display: none;
+        flex-direction: column;
+        gap: 20px;
+      }
+      #surveyAnsweringDiv.active {
+        display: flex;
+      }
 
     </style>
   </head>
@@ -442,7 +471,7 @@
 
           </div>
 
-          <div class="surveysDisplayDiv"></div>
+          <div id="displaySurveyAccessButtons" class="surveysDisplayDiv"></div>
           
         </div>"
 
@@ -455,16 +484,13 @@
         <div id="resultsDiv" class="my-div">
 
         </div>
+
+        <div id="surveyAnsweringDiv" class="my-div">
+
+        </div>
     </div>
 
     <main>
-      
-
-      
-      
-
-      
-
       <p id="output"></p>
     </main>
 
@@ -497,19 +523,15 @@
       const surveysDiv = document.getElementById("surveysDiv");
       const invitesDiv = document.getElementById("invitesDiv");
       const resultsDiv = document.getElementById("resultsDiv");
-      const surveysDisplayDiv = document.createElement("div");
       const createSurveyButton = document.getElementById("CreateSurvey");
-      const CreateSurveyDiv = document.getElementById("createSurveyDiv");
       const surveyBuilder = document.getElementById("surveyBuilder");
       const addQuestionButton = document.getElementById("addQuestion");
       const saveSurveyButton = document.getElementById("saveSurvey");
-      const addSurveyCodeButton = document.getElementById("AddSurveyCode");
       const submitSurveyCodeButton = document.getElementById("submitSurveyCode");
+      const surveyAccessDisplay = document.getElementById("displaySurveyAccessButtons");
+      const surveyAnsweringDiv = document.getElementById("surveyAnsweringDiv");
 
-      surveysDisplayDiv.classList.add("surveysDisplayDiv");
-      document.getElementById("surveysDiv").appendChild(surveysDisplayDiv);
-      
-      var potentialMainPageDivs = [homeDiv, surveysDiv, invitesDiv, resultsDiv];
+      var potentialMainPageDivs = [homeDiv, surveysDiv, invitesDiv, resultsDiv, surveyAnsweringDiv];
 
       submitSurveyCodeButton.addEventListener("click", async () => {
         const inviteCode = document.getElementById("surveyCode").value.trim();
@@ -526,23 +548,17 @@
           });
           
           const result = await response.json();
+          
           if (!response.ok) {
             alert(result.message);
             return;
           }
-          alert(result.message);
+          createSurveyAccessButton(result.surveyName, result.surveyId, result.pov, false, result.questions); //title, ID, pov, answered, questionsList
+          alert("Survey Added Successfully");
         } catch (error) {
           console.error("Error validating survey code:", error);
           alert("Could not contact the server");
         }
-      });
-
-      homeButton.addEventListener("click", () => {
-        potentialMainPageDivs.forEach((div) => {
-          div.classList.remove("active");
-        });
-        homeDiv.classList.add("active");
-        clearSurvey()
       });
 
       surveysButton.addEventListener("click", () => {
@@ -929,7 +945,6 @@
 
       class BlankSurveyQuestion {
         constructor() {
-
           this.question = document.createElement("div");
           this.question.classList.add("question");
 
@@ -979,19 +994,79 @@
           
         }
       }
+      
+      function CreateSurveyQuestion(questionText, numAnswers) { 
+        const answers = [];
+        for (let i = 0; i < numAnswers; i++) {
+          answers.push(i+1);
+        }
+        const question = new SurveyQuestion(
+          questionText,
+          answers,
+        );
+        return question;
+      }
 
-function CreateSurveyQuestion() { 
-  const question = new SurveyQuestion(
-        "a",
-        [1,2,3,4,5],
-      );
-      surveyBuilder.appendChild(question.question);
-}
+      function CreateBlankSurveyQuestion() { 
+        const question = new BlankSurveyQuestion();
+          document.getElementById("questionsContainer").appendChild(question.question);
+      }
+      
+      class surveyAccessButton {
+        constructor(title, ID, pov, answered, questionsList) {
+          this.div = document.createElement("div");
+          this.div.classList.add("SurveyAccessDiv");
 
-function CreateBlankSurveyQuestion() { 
-  const question = new BlankSurveyQuestion();
-  document.getElementById("questionsContainer").appendChild(question.question);
-}
+          this.nameLabel = document.createElement("label");
+          this.nameLabel.textContent = title;
+
+          this.IDLabel = document.createElement("label");
+          this.IDLabel.textContent = ID;
+
+          this.answeredLabel = document.createElement("label");
+          if (answered === true) {
+            this.answeredLabel.textContent = "This survey has been completed.";
+          } else {
+            this.answeredLabel.textContent = "This survey has NOT been completed.";
+          }
+
+          this.div.appendChild(this.nameLabel);
+          this.div.appendChild(this.IDLabel);
+          this.div.appendChild(this.answeredLabel);
+
+          this.div.addEventListener("click", async () => {
+            potentialMainPageDivs.forEach((div) => {
+              div.classList.remove("active");
+            });
+            surveyAnsweringDiv.classList.add("active");
+            clearSurvey()
+            console.log("POV:", pov, typeof pov);
+            console.log("Questions:", questionsList);
+            surveyAnsweringDiv.replaceChildren();
+            for (let i = 0; i < questionsList.length; i++) {
+              if (pov === "1") {
+                surveyAnsweringDiv.appendChild(
+                  CreateSurveyQuestion(
+                    questionsList[i].questionText,
+                    questionsList[i].numberOfOptions
+                  ).question
+                );
+              }
+              else if (pov === "0") {
+                surveyAnsweringDiv.appendChild(CreateSurveyQuestion(questionsList[i].thirdPersonText, questionsList[i].numberOfOptions).question);
+              }
+            }
+          });
+
+        }
+      }
+      
+      function createSurveyAccessButton(title, ID, pov, answered, questionsList) {
+        const tempSurveyAccessButton = new surveyAccessButton(title, ID, pov, answered, questionsList);
+        surveyAccessDisplay.appendChild(tempSurveyAccessButton.div);
+      }
+      
+
     </script>
   </body>
 </html>
