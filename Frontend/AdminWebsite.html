@@ -471,6 +471,8 @@
     <dialog id="authDialog">
       <form id="authForm">
         <h2 id="authTitle">Sign In</h2>
+        <button id="googleAuthButton" type="button">Continue with Google</button>
+        <p>Google sign-in creates your account the first time you use it.</p>
         <label for="authEmail">Email</label>
         <input id="authEmail" type="email" autocomplete="email" required />
         <label for="authPassword">Password</label>
@@ -667,11 +669,13 @@
       const authPassword = document.getElementById("authPassword");
       const authTitle = document.getElementById("authTitle");
       const authSubmit = document.getElementById("authSubmit");
+      const googleAuthButton = document.getElementById("googleAuthButton");
       const authMessage = document.getElementById("authMessage");
       let supabaseClient;
       let authSetupState = "loading";
       let authMode = "signin";
       authSubmit.disabled = true;
+      googleAuthButton.disabled = true;
 
       function openAuthDialog(mode) {
         authMode = mode;
@@ -691,6 +695,28 @@
       signUpButton.addEventListener("click", () => openAuthDialog("signup"));
       signInButton.addEventListener("click", () => openAuthDialog("signin"));
       document.getElementById("closeAuthDialog").addEventListener("click", () => authDialog.close());
+
+      googleAuthButton.addEventListener("click", async () => {
+        if (!supabaseClient) {
+          authMessage.textContent = "Sign-in setup could not load. Refresh the page and try again.";
+          return;
+        }
+
+        googleAuthButton.disabled = true;
+        authMessage.textContent = "";
+        try {
+          const { error } = await supabaseClient.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+              redirectTo: `${window.location.origin}${window.location.pathname}`,
+            },
+          });
+          if (error) throw error;
+        } catch (err) {
+          authMessage.textContent = err.message || "Google sign-in failed.";
+          googleAuthButton.disabled = false;
+        }
+      });
 
       async function showAuthenticatedUser(session) {
         if (!session) {
@@ -728,12 +754,23 @@
 
         try {
           const result = authMode === "signup"
-            ? await supabaseClient.auth.signUp({ email: authEmail.value, password: authPassword.value })
-            : await supabaseClient.auth.signInWithPassword({ email: authEmail.value, password: authPassword.value });
+            ? await supabaseClient.auth.signUp({
+                email: authEmail.value.trim(),
+                password: authPassword.value,
+                options: {
+                  emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
+                },
+              })
+            : await supabaseClient.auth.signInWithPassword({
+                email: authEmail.value.trim(),
+                password: authPassword.value,
+              });
           if (result.error) throw result.error;
 
           if (authMode === "signup" && !result.data.session) {
-            authMessage.textContent = "Check your email to confirm your account, then sign in.";
+            authMessage.textContent =
+              `We sent a confirmation link to ${authEmail.value.trim()}. ` +
+              "Open it to verify your email, then sign in.";
             return;
           }
 
@@ -759,12 +796,14 @@
           supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
           authSetupState = "ready";
           authSubmit.disabled = false;
+          googleAuthButton.disabled = false;
           const { data } = await supabaseClient.auth.getSession();
           await showAuthenticatedUser(data.session);
         })
         .catch((err) => {
           authSetupState = "error";
           authSubmit.disabled = true;
+          googleAuthButton.disabled = true;
           console.error("Could not initialize sign-in:", err);
           authMessage.textContent = "Sign-in setup could not load. Refresh the page and try again.";
           document.getElementById("output").textContent = err.message;
