@@ -10,9 +10,12 @@ From `Backend/`, run `npm start`; the server loads Supabase settings from
 
 The repository includes a paid, always-on Render Blueprint in `render.yaml`.
 Create a new Blueprint from this repository and provide `SUPABASE_URL` and
-`SUPABASE_ANON_KEY` when prompted. These are the Supabase project URL and the
-publishable/anon client key; never use a service-role or secret key. Render
-shows the current monthly cost before you confirm the service.
+`SUPABASE_ANON_KEY` when prompted. The server also requires
+`SUPABASE_SERVICE_ROLE_KEY` for its database operations. Set all three in the
+Render service's environment settings using the values from Supabase
+**Project Settings > API**. Keep the service-role key only in Render's backend
+environment; never put it in frontend code or commit it to the repository.
+Render shows the current monthly cost before you confirm the service.
 
 After the service is deployed, add its `onrender.com` URL to Supabase
 Authentication's Site URL and allowed redirect URLs. After this one-time

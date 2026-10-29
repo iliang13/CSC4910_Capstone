@@ -8,9 +8,15 @@ require("dotenv").config({ path: path.join(__dirname, ".env") });
 const app = express();
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error(
     "Set SUPABASE_URL and SUPABASE_ANON_KEY in Backend/.env or the hosting environment."
+  );
+}
+if (!supabaseServiceRoleKey) {
+  throw new Error(
+    "Set SUPABASE_SERVICE_ROLE_KEY in Backend/.env or the hosting environment."
   );
 }
 
@@ -21,8 +27,8 @@ const supabaseAuthClient = createClient(supabaseUrl, supabaseAnonKey, {
   },
 });
 const supabaseServiceClient = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  supabaseUrl,
+  supabaseServiceRoleKey
 );
 
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || false }));
