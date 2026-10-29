@@ -5,19 +5,25 @@ const { createClient } = require("@supabase/supabase-js");
 const fs = require("fs");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
 
-
 const app = express();
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error(
-    "Set SUPABASE_URL and SUPABASE_ANON_KEY in Backend/.env or the hosting environment.",
+    "Set SUPABASE_URL and SUPABASE_ANON_KEY in Backend/.env or the hosting environment."
   );
 }
 
 const supabaseAuthClient = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+  },
 });
+const supabaseServiceClient = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || false }));
 app.use(express.json());
@@ -25,7 +31,7 @@ app.use(express.json());
 const surveysDirectory = path.join(__dirname, "surveys");
 
 function generateSurveyID() {
-  let result = '';
+  let result = "";
   for (let i = 0; i < 8; i++) {
     result += Math.floor(Math.random() * 10);
   }
@@ -35,25 +41,23 @@ function generateSurveyID() {
 var surveyIDLookupTable = {};
 
 function loadSurveyIDs() {
-    const files = fs.readdirSync(surveysDirectory);
-    for (const file of files) {
-        if (!file.endsWith(".json")) {
-            continue;
-        }
-
-        try {
-            const filePath = path.join(surveysDirectory, file);
-            const surveyData = JSON.parse(
-                fs.readFileSync(filePath, "utf8")
-            );
-
-            if (surveyData.surveyID) {
-                surveyIDLookupTable[surveyData.surveyID] = true;
-            }
-        } catch (error) {
-            console.error(`Error loading ${file}:`, error.message);
-        }
+  const files = fs.readdirSync(surveysDirectory);
+  for (const file of files) {
+    if (!file.endsWith(".json")) {
+      continue;
     }
+
+    try {
+      const filePath = path.join(surveysDirectory, file);
+      const surveyData = JSON.parse(fs.readFileSync(filePath, "utf8"));
+
+      if (surveyData.surveyID) {
+        surveyIDLookupTable[surveyData.surveyID] = true;
+      }
+    } catch (error) {
+      console.error(`Error loading ${file}:`, error.message);
+    }
+  }
 }
 
 if (!fs.existsSync(surveysDirectory)) {
@@ -86,26 +90,85 @@ app.get("/api/me", async (req, res) => {
     : null;
 
   if (!accessToken) {
-    return res.status(401).json({ error: "A valid sign-in session is required." });
+    return res
+      .status(401)
+      .json({ error: "A valid sign-in session is required." });
   }
 
   const { data, error } = await supabaseAuthClient.auth.getUser(accessToken);
   if (error) {
-    return res.status(401).json({ error: "The sign-in session is invalid or expired." });
+    return res
+      .status(401)
+      .json({ error: "The sign-in session is invalid or expired." });
   }
 
   res.json({ user: data.user });
 });
 
-app.post("/submitSurvey", (req, res) => {
-  console.log("Survey received:");
-  console.log(req.body);
+app.post("/submitSurvey", async (req, res) => {
+  try {
+    const authorization = req.get("authorization");
 
-  res.json({
-    success: true,
-    message: "Survey received",
-    user: req.user,
-  });
+    const accessToken = authorization?.startsWith("Bearer ")
+      ? authorization.slice("Bearer ".length)
+      : null;
+
+    if (!accessToken) {
+      return res.status(401).json({
+        success: false,
+        error: "Authentication required.",
+      });
+    }
+
+    const { data, error } = await supabaseAuthClient.auth.getUser(accessToken);
+
+    if (error || !data.user) {
+      return res.status(401).json({
+        success: false,
+        error: "Invalid session.",
+      });
+    }
+
+    const user = data.user;
+
+    const { surveyID, responses } = req.body;
+
+    console.log("User:", user.id);
+    console.log("Survey:", surveyID);
+    console.log("Responses:", responses);
+
+    console.log("Survey submission received:");
+    console.log(req.body);
+
+    const { error: insertError } = await supabaseServiceClient
+      .from("survey_responses")
+      .insert({
+        survey_id: surveyID,
+        user_id: user.id,
+        response_data: responses,
+      });
+
+    if (insertError) {
+      console.error(insertError);
+
+      return res.status(500).json({
+        success: false,
+        error: insertError.message,
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Survey submitted successfully.",
+    });
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      error: "Could not save survey response.",
+    });
+  }
 });
 
 app.post("/saveSurvey", (req, res) => {
@@ -116,14 +179,14 @@ app.post("/saveSurvey", (req, res) => {
     if (!surveyName) {
       return res.status(400).json({
         success: false,
-        message: "Survey name is required."
+        message: "Survey name is required.",
       });
     }
 
     if (!Array.isArray(questions)) {
       return res.status(400).json({
         success: false,
-        message: "Questions must be an array."
+        message: "Questions must be an array.",
       });
     }
 
@@ -135,37 +198,40 @@ app.post("/saveSurvey", (req, res) => {
 
     const fileName = surveyName.replace(/[^a-z0-9_-]/gi, "_") + ".json";
     const surveyFile = path.join(surveysDirectory, fileName);
-      const surveyData = {surveyID, surveyName, questions};
-      surveyIDLookupTable[surveyID] = true;
+    const surveyData = { surveyID, surveyName, questions };
+    surveyIDLookupTable[surveyID] = true;
 
-      fs.writeFileSync(
-        surveyFile,JSON.stringify(surveyData, null, 2),"utf8");
+    fs.writeFileSync(surveyFile, JSON.stringify(surveyData, null, 2), "utf8");
 
     res.json({
       success: true,
       message: "Survey saved successfully.",
       surveyName: surveyName,
-      surveyID: surveyID
+      surveyID: surveyID,
     });
   } catch (error) {
     console.error("Error saving survey:", error);
 
     res.status(500).json({
       success: false,
-      message: "Failed to save survey."
+      message: "Failed to save survey.",
     });
   }
 });
 
 app.post("/validateSurveyCode", (req, res) => {
-  const surveyID = req.body.surveyID?.trim().slice(1);
+  const surveyID = req.body.surveyID?.trim();
   if (!surveyID) {
-    return res.status(400).json({success: false, message: "Please enter a survey code."});
+    return res
+      .status(400)
+      .json({ success: false, message: "Please enter a survey code." });
   }
   if (surveyIDLookupTable[surveyID]) {
-    return res.json({success: true, message: "Survey code is valid."});
+    return res.json({ success: true, message: "Survey code is valid." });
   }
-  return res.status(404).json({success: false, message: "Invalid Survey Code."});
+  return res
+    .status(404)
+    .json({ success: false, message: "Invalid Survey Code." });
 });
 
 const port = process.env.PORT || 3000;
