@@ -798,7 +798,7 @@ function CreateBlankSurveyQuestion() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${sessionData.session.access_token}`
           },
-          body: JSON.stringify(responses)
+          body: JSON.stringify({surveyID: currentSurveyID, responses: responses})
       })
         .then(async (res) => {
           const data = await res.json();

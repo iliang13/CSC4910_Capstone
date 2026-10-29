@@ -133,6 +133,13 @@ app.post("/submitSurvey", async (req, res) => {
 
     const { surveyID, responses } = req.body;
 
+    console.log("User:", user.id);
+    console.log("Survey:", surveyID);
+    console.log("Responses:", responses);
+
+    console.log("Survey submission received:");
+    console.log(req.body);
+
     const { error: insertError } = await supabaseServiceClient
       .from("survey_responses")
       .insert({
