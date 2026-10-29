@@ -774,6 +774,8 @@ function CreateBlankSurveyQuestion() {
 
       submitButton.addEventListener("click", async () => {
 
+        console.log("Submit button clicked");
+
       const selected =
         document.querySelector('input[name="a"]:checked');
 
@@ -798,7 +800,7 @@ function CreateBlankSurveyQuestion() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${sessionData.session.access_token}`
           },
-          body: JSON.stringify({surveyID: currentSurveyID, responses: responses})
+          body: JSON.stringify({surveyID: "12345678", responses: responses})
       })
         .then(async (res) => {
           const data = await res.json();
