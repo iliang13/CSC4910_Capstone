@@ -672,11 +672,17 @@
       const googleAuthButton = document.getElementById("googleAuthButton");
       const authMessage = document.getElementById("authMessage");
       const googleAuthAttemptKey = "googleAuthAttempt";
+      const authStorageKey = "datapulse360-auth";
       let supabaseClient;
       let authSetupState = "loading";
       let authMode = "signin";
       authSubmit.disabled = true;
       googleAuthButton.disabled = true;
+
+      window.addEventListener("pagehide", () => {
+        if (sessionStorage.getItem(googleAuthAttemptKey)) return;
+        sessionStorage.removeItem(authStorageKey);
+      });
 
       function openAuthDialog(mode) {
         authMode = mode;
@@ -868,7 +874,10 @@
             throw new Error("The server returned incomplete sign-in configuration.");
           }
           supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
-            auth: { storage: window.sessionStorage },
+            auth: {
+              storage: window.sessionStorage,
+              storageKey: authStorageKey,
+            },
           });
           authSetupState = "ready";
           authSubmit.disabled = false;
