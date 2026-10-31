@@ -310,6 +310,26 @@ app.post("/validateSurveyCode", async (req, res) => {
   });
 });
 
+app.get("/admin/surveys", async (req, res) => {
+  try {
+    const {data, error } = await supabase
+    .from("surveys").select("survey_id, title, questions");
+
+    if (error) {
+      console.error("Supabase error:", error);
+      return res.status(500).json({
+        message: "Failed to load surveys"
+      });
+    }
+
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server error"
+    });
+  }
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

@@ -69,6 +69,7 @@
         font-size: 15px;
         cursor: pointer;
         transition: 0.2s;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.50);
       }
       button:hover {
         background-color: var(--color-button-hover);
@@ -369,6 +370,26 @@
       #surveyAnsweringDiv.active {
         display: flex;
       }
+      #surveyPopup {
+        gap: 5px;
+        padding: 10px;
+        width: 15%;
+        border: none;
+        border-radius: 12px;
+        background-color: white;
+        color: var(--color-accent);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+
+        display:flex; 
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        height: fit-content;
+      }
+      #surveyPopup:not(:popover-open) {
+        display: none;
+      }
 
     </style>
   </head>
@@ -530,6 +551,7 @@
       const submitSurveyCodeButton = document.getElementById("submitSurveyCode");
       const surveyAccessDisplay = document.getElementById("displaySurveyAccessButtons");
       const surveyAnsweringDiv = document.getElementById("surveyAnsweringDiv");
+      const popup = document.getElementById("surveyPopup");
 
       var potentialMainPageDivs = [homeDiv, surveysDiv, invitesDiv, resultsDiv, surveyAnsweringDiv];
 
@@ -559,6 +581,7 @@
           console.error("Error validating survey code:", error);
           alert("Could not contact the server");
         }
+        popup.hidePopover();
       });
 
       surveysButton.addEventListener("click", () => {
@@ -1066,6 +1089,38 @@
         surveyAccessDisplay.appendChild(tempSurveyAccessButton.div);
       }
       
+      //Populate Admin Website with all surveys.
+      const mySurveys = document.getElementById("mySurveys");
+
+      async function loadSurveys() {
+        try {
+          const response = await fetch("/admin/surveys");
+
+          if (!response.ok) {
+            throw new Error("Failed to load surveys");
+          }
+          const surveys = await response.json();
+          mySurveys.replaceChildren();
+
+          surveys.forEach((survey) => {
+            const surveyDiv = document.createElement("div");
+            surveyDiv.classList.add("surveyField");
+
+            const title = document.createElemet("h3");
+            title.textContent = survey.title;
+
+            const id = document.createElement("p");
+            id.textContent = `Survey ID ${survey.survey_id}`;
+
+            surveyDiv.append(title, id);
+            mySurveys.appendChild(surveyDiv);
+          });
+        } catch (error) {
+          console.error("Error loading surveys:", error);
+          mySurveys.textContent = "Unable to load surveys.";
+        }
+      }
+      document.addEventListener("DomContentLoaded", loadSurveys);
 
     </script>
   </body>
