@@ -20,6 +20,85 @@ if (!supabaseServiceRoleKey) {
   );
 }
 
+app.get("/mySurveys", async (req, res) => {
+  try {
+    const authorization = req.get("authorization");
+    const accessToken = authorization?.startsWith("Bearer ")
+      ? authorization.slice("Bearer ".length)
+      : null;
+
+    if (!accessToken) {
+      return res.status(401).json({
+        success: false,
+        error: "Authentication required."
+      });
+    }
+
+    // Identify the logged-in user
+    const { data: authData, error: authError } =
+      await supabaseAuthClient.auth.getUser(accessToken);
+
+    if (authError || !authData.user) {
+      return res.status(401).json({
+        success: false,
+        error: "Invalid session."
+      });
+    }
+
+    const userId = authData.user.id;
+
+    // Get surveys assigned to this user
+    const { data: assignments, error: assignmentError } =
+      await supabaseServiceClient
+        .from("user_surveys")
+        .select("survey_id")
+        .eq("user_id", userId);
+
+    if (assignmentError) {
+      throw assignmentError;
+    }
+
+    // Get surveys this user has submitted
+    const { data: responses, error: responseError } =
+      await supabaseServiceClient
+        .from("survey_responses")
+        .select("survey_id")
+        .eq("user_id", userId);
+
+    if (responseError) {
+      throw responseError;
+    }
+
+    const completedSurveyIDs = [
+      ...new Set(responses.map(row => row.survey_id))
+    ];
+
+    const completedSet = new Set(completedSurveyIDs);
+
+    const availableSurveyIDs = [
+      ...new Set(
+        assignments
+          .map(row => row.survey_id)
+          .filter(id => !completedSet.has(id))
+      )
+    ];
+
+    res.json({
+      success: true,
+      availableSurveyIDs,
+      completedSurveyIDs
+    });
+
+  } catch (error) {
+    console.error("Error retrieving user surveys:", error);
+
+    res.status(500).json({
+      success: false,
+      error: "Failed to retrieve surveys."
+    });
+  }
+});
+
 const supabaseAuthClient = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: false,
