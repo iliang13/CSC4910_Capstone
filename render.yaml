@@ -3,9 +3,10 @@ services:
     name: datapulse360
     runtime: node
     plan: starter
-    rootDir: Backend
-    buildCommand: npm ci
-    startCommand: npm start
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci --prefix Backend
+    startCommand: npm start --prefix Backend
     healthCheckPath: /healthz
     envVars:
       - key: NODE_ENV

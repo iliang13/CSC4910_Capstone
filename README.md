@@ -16,6 +16,8 @@ Render service's environment settings using the values from Supabase
 **Project Settings > API**. Keep the service-role key only in Render's backend
 environment; never put it in frontend code or commit it to the repository.
 Render shows the current monthly cost before you confirm the service.
+The Blueprint deploys commits from `main`; its root directory is the repository
+root so changes to either `Backend/` or `Frontend/` trigger a deployment.
 
 After the service is deployed, add its `onrender.com` URL to Supabase
 Authentication's Site URL and allowed redirect URLs. After this one-time
