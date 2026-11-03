@@ -557,13 +557,13 @@
 
       submitSurveyCodeButton.addEventListener("click", async () => {
         const inviteCode = document.getElementById("surveyCode").value.trim();
-        const surveyButtons = surveyAccessDisplay.querySelectorAll(".tempSurveyAccessButton");
-        surveyButtons.forEach((button) => {
-          if (inviteCode == button.dataset.surveyID) {
-            alert("Survey already added");
-            return;
-          }
+        const alreadyAdded = Array.from(surveyButtons).some((button) => {
+          return inviteCode === button.dataset.surveyID;
         });
+        if (alreadyAdded) {
+          alert("Survey already added");
+          return;
+        }
         try {
           const response = await fetch("/validateSurveyCode", {
             method: "POST",
