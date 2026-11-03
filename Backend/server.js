@@ -312,7 +312,7 @@ app.post("/validateSurveyCode", async (req, res) => {
 
 app.get("/admin/surveys", async (req, res) => {
   try {
-    const {data, error } = await supabase
+    const {data, error } = await supabaseServiceClient
     .from("surveys").select("survey_id, title, questions");
 
     if (error) {
