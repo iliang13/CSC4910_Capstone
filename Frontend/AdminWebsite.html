@@ -1102,18 +1102,8 @@
           const surveys = await response.json();
           surveyAccessDisplay.replaceChildren();
 
-          surveys.forEach((survey) => {
-            const surveyDiv = document.createElement("div");
-            surveyDiv.classList.add("surveyField");
-
-            const title = document.createElement("h3");
-            title.textContent = survey.title;
-
-            const id = document.createElement("p");
-            id.textContent = `Survey ID ${survey.survey_id}`;
-
-            surveyDiv.append(title, id);
-            surveyAccessDisplay.appendChild(surveyDiv);
+          surveys.forEach((survey) => { //createSurveyAccessButton(title, ID, pov, answered, questionsList)
+            createSurveyAccessButton(survey.title, survey.survey_id, "0", false, survey.questions);
           });
         } catch (error) {
           console.error("Error loading surveys:", error);
