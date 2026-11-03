@@ -316,7 +316,12 @@ app.get("/admin/surveys", async (req, res) => {
     .from("surveys").select("survey_id, title, questions");
 
     if (error) {
-      console.error("Supabase error:", error);
+      console.error("Supabase error:", {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
       return res.status(500).json({
         message: "Failed to load surveys"
       });
