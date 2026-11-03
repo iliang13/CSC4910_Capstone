@@ -1090,7 +1090,7 @@
       }
       
       //Populate Admin Website with all surveys.
-      const mySurveys = document.getElementById("mySurveys");
+      //surveyAccessDisplay
 
       async function loadSurveys() {
         try {
@@ -1100,27 +1100,27 @@
             throw new Error("Failed to load surveys");
           }
           const surveys = await response.json();
-          mySurveys.replaceChildren();
+          surveyAccessDisplay.replaceChildren();
 
           surveys.forEach((survey) => {
             const surveyDiv = document.createElement("div");
             surveyDiv.classList.add("surveyField");
 
-            const title = document.createElemet("h3");
+            const title = document.createElement("h3");
             title.textContent = survey.title;
 
             const id = document.createElement("p");
             id.textContent = `Survey ID ${survey.survey_id}`;
 
             surveyDiv.append(title, id);
-            mySurveys.appendChild(surveyDiv);
+            surveyAccessDisplay.appendChild(surveyDiv);
           });
         } catch (error) {
           console.error("Error loading surveys:", error);
-          mySurveys.textContent = "Unable to load surveys.";
+          surveyAccessDisplay.textContent = "Unable to load surveys.";
         }
       }
-      document.addEventListener("DomContentLoaded", loadSurveys);
+      document.addEventListener("DOMContentLoaded", loadSurveys);
 
     </script>
   </body>
