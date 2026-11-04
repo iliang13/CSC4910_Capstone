@@ -558,10 +558,11 @@
       submitSurveyCodeButton.addEventListener("click", async () => {
         const inviteCode = document.getElementById("surveyCode").value.trim();
         const alreadyAdded = Array.from(surveyButtons).some((button) => {
-          return inviteCode === button.dataset.surveyID;
+          return inviteCode.slice(1) === button.dataset.surveyID;
         });
         if (alreadyAdded) {
           alert("Survey already added");
+          popup.hidePopover();
           return;
         }
         try {
