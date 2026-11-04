@@ -557,7 +557,7 @@
 
       submitSurveyCodeButton.addEventListener("click", async () => {
         const inviteCode = document.getElementById("surveyCode").value.trim();
-        const alreadyAdded = Array.from(surveyButtons).some((button) => {
+        const alreadyAdded = Array.from(document.querySelectorAll(".SurveyAccessDiv")).some((button) => {
           return inviteCode.slice(1) === button.dataset.surveyID;
         });
         if (alreadyAdded) {
@@ -1044,8 +1044,13 @@
       
       class surveyAccessButton {
         constructor(title, ID, pov, answered, questionsList) {
+          
           this.div = document.createElement("div");
           this.div.classList.add("SurveyAccessDiv");
+          this.div.dataset.surveyID = ID;
+          this.div.dataset.pov = pov;
+          this.div.dataset.answered = answered;
+          this.div.dataset.questions = questionsList;
 
           this.nameLabel = document.createElement("label");
           this.nameLabel.textContent = title;
