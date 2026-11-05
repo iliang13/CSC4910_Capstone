@@ -481,6 +481,7 @@
       const addQuestionButton = document.getElementById("addQuestion");
       surveysDisplayDiv.classList.add("surveysDisplayDiv");
       document.getElementById("surveysDiv").appendChild(surveysDisplayDiv);
+      loadSurveys();
       
       let currentSurveyID = null;
 
@@ -766,6 +767,69 @@
         }
       });
 
+      function createSurveyAccessButton(title, surveyID, questions) {
+
+      const button = document.createElement("button");
+
+      button.textContent = `${title} (${surveyID})`;
+
+      button.addEventListener("click", () => {
+
+        console.log("FULL SURVEY DATA:", questions);
+
+          currentSurveyID = surveyID;
+
+          document.getElementById("output").textContent =
+              `Selected: ${title}`;
+
+          document
+              .querySelectorAll(".surveyQuestionDisplay")
+              .forEach(el => el.remove());
+
+          questions.forEach(question => {
+
+              const questionDiv =
+                  document.createElement("div");
+
+              questionDiv.classList.add(
+                  "question",
+                  "surveyQuestionDisplay"
+              );
+
+              questionDiv.innerHTML =
+                  `<label>${question.questionText}</label>`;
+
+              surveysDiv.appendChild(questionDiv);
+          });
+      });
+
+      surveysDisplayDiv.appendChild(button);
+      }
+          async function loadSurveys() {
+          try {
+              const response = await fetch("/admin/surveys");
+
+              if (!response.ok) {
+                  throw new Error("Failed to load surveys");
+              }
+
+              const surveys = await response.json();
+
+              surveysDisplayDiv.innerHTML = "";
+
+              surveys.forEach((survey) => {
+                  createSurveyAccessButton(
+                      survey.title,
+                      survey.survey_id,
+                      survey.questions
+                  );
+              });
+
+          } catch (err) {
+              console.error(err);
+          }
+      }
+      document.addEventListener("DOMContentLoaded", loadSurveys);
       fetch("/api/config")
         .then(async (response) => {
           const config = await response.json();
