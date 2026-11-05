@@ -495,7 +495,7 @@
 
           <div id="displaySurveyAccessButtons" class="surveysDisplayDiv"></div>
           
-        </div>"
+        </div>
 
         </div>
 
@@ -1132,7 +1132,7 @@
               return;
             }
             try {
-              const response = await fetch("/invite", {
+              const response = await fetch("/admin/invite", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -1157,7 +1157,7 @@
             }
             this.popup.hidePopover();
           });
-          
+
           this.viewButton.addEventListener("click", async () => {
             currentSurveyID = ID;
             potentialMainPageDivs.forEach((div) => {
@@ -1182,7 +1182,7 @@
               }
             }
             const submitButton = document.createElement("button");
-            
+
             submitButton.textContent = "Submit Survey";
 
             submitButton.addEventListener("click", async () => {
