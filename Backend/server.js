@@ -170,6 +170,8 @@ app.post("/submitSurvey", async (req, res) => {
 
     const { surveyID, responses, pov } = req.body;
 
+    console.log("POV received:", pov);
+
     console.log("Survey ID:", surveyID);
     console.log("POV:", pov);
     console.log("Responses:", responses);
@@ -183,6 +185,7 @@ app.post("/submitSurvey", async (req, res) => {
           survey_id: surveyID,
           user_id: user.id,
           response_data: responses,
+          pov: Number(pov),
         });
 
       insertError = error;
@@ -193,6 +196,7 @@ app.post("/submitSurvey", async (req, res) => {
           survey_id: surveyID,
           user_id: user.id,
           response_data: responses,
+          pov: Number(pov),
         });
 
       insertError = error;

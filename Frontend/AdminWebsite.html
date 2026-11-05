@@ -1,1275 +1,1316 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DataPulse360 Merrimack</title>
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>DataPulse360 Merrimack</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <style>
-      :root {
-        --color-background: #1f232d; /*1f232d*/
-        --color-accent: #976d03;
-        --color-button-bg: #121d3a;
-        --color-button-hover: #0e162c;
-        --color-highlight: #ffd166;
-        --color-focus: #d39805;
-        --color-builder-bg: #e9d476;
-        --color-scrollbar-hover: #c79512;
-        --color-delete-bg: #f7120a;
-        --color-delete-hover: #bd0d07;
-        --color-survey-field: #c8c5c0;
-        --color-question-bg: #dfdcd4;
-}
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-        background-color: var(--color-background);
-      }
+      <style>
+        :root {
+          --color-background: #1f232d; /*1f232d*/
+          --color-accent: #976d03;
+          --color-button-bg: #121d3a;
+          --color-button-hover: #0e162c;
+          --color-highlight: #ffd166;
+          --color-focus: #d39805;
+          --color-builder-bg: #e9d476;
+          --color-scrollbar-hover: #c79512;
+          --color-delete-bg: #f7120a;
+          --color-delete-hover: #bd0d07;
+          --color-survey-field: #c8c5c0;
+          --color-question-bg: #dfdcd4;
+  }
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: Arial, sans-serif;
+          background-color: var(--color-background);
+        }
 
-      header {
-        background-color: var(--color-background);
-        padding: 20px;
-        position: relative;
-        border-bottom: 2px solid var(--color-accent);
-      }
+        header {
+          background-color: var(--color-background);
+          padding: 20px;
+          position: relative;
+          border-bottom: 2px solid var(--color-accent);
+        }
 
-      header img {
-        position: absolute;
-        left: 20px;
-        top: 50%;
-        transform: translateY(-50%);
-        height: 50px;
-      }
+        header img {
+          position: absolute;
+          left: 20px;
+          top: 50%;
+          transform: translateY(-50%);
+          height: 50px;
+        }
 
-      header h1 {
-        text-align: center;
-        margin: 0;
-        color: white;
-      }
+        header h1 {
+          text-align: center;
+          margin: 0;
+          color: white;
+        }
 
-      #buttonSection {
-        display: flex;
-        justify-content: space-evenly;
-        flex-wrap: wrap;
-        gap: 10px;
-        padding: 15px;
-        border-bottom: 2px solid var(--color-accent);
-      }
+        #buttonSection {
+          display: flex;
+          justify-content: space-evenly;
+          flex-wrap: wrap;
+          gap: 10px;
+          padding: 15px;
+          border-bottom: 2px solid var(--color-accent);
+        }
 
-      button {
-        width: 190px;
-        padding: 10px;
-        border: 1px solid var(--color-accent);
-        border-radius: 10px;
-        background-color: var(--color-button-bg);
-        color: white;
-        font-size: 15px;
-        cursor: pointer;
-        transition: 0.2s;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.50);
-      }
-      button:hover {
-        background-color: var(--color-button-hover);
-        transform: translateY(-1px);
-      }
-      button:active {
-        transform: translateY(1px);
-      }
-      .deleteSurveyButton {
-        padding:0;
-        width:20px;
-        height:20px;
-        border: 1px solid var(--color-accent)00;
-        border-radius: 50%;
-        background-color: var(--color-delete-bg);
-        color: white;
-        font-size: 10px;
-        cursor: pointer;
-        transition: 0.2s; 
-      } 
-      .deleteSurveyButton:hover {
-        background-color: var(--color-delete-hover);
-        transform: translateY(-1px);
-      }
-      .deleteSurveyButton:active {
-        transform: translateY(1px);
-      }
+        button {
+          width: 190px;
+          padding: 10px;
+          border: 1px solid var(--color-accent);
+          border-radius: 10px;
+          background-color: var(--color-button-bg);
+          color: white;
+          font-size: 15px;
+          cursor: pointer;
+          transition: 0.2s;
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.50);
+        }
+        button:hover {
+          background-color: var(--color-button-hover);
+          transform: translateY(-1px);
+        }
+        button:active {
+          transform: translateY(1px);
+        }
+        .deleteSurveyButton {
+          padding:0;
+          width:20px;
+          height:20px;
+          border: 1px solid var(--color-accent)00;
+          border-radius: 50%;
+          background-color: var(--color-delete-bg);
+          color: white;
+          font-size: 10px;
+          cursor: pointer;
+          transition: 0.2s; 
+        } 
+        .deleteSurveyButton:hover {
+          background-color: var(--color-delete-hover);
+          transform: translateY(-1px);
+        }
+        .deleteSurveyButton:active {
+          transform: translateY(1px);
+        }
 
 
-      main {
-        padding: 25px;
-      }
+        main {
+          padding: 25px;
+        }
 
-      #welcomeMessage {
-        background-color: var(--color-button-bg);
-        border: 2px solid var(--color-accent);
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 25px;
-        text-align: center;
-      }
+        #welcomeMessage {
+          background-color: var(--color-button-bg);
+          border: 2px solid var(--color-accent);
+          border-radius: 10px;
+          padding: 20px;
+          margin-bottom: 25px;
+          text-align: center;
+        }
 
-      #dashboard {
-        display: flex;
-        justify-content: center;
-        gap: 25px;
-        flex-wrap: wrap;
-        margin-bottom: 25px;
-      }
+        #dashboard {
+          display: flex;
+          justify-content: center;
+          gap: 25px;
+          flex-wrap: wrap;
+          margin-bottom: 25px;
+        }
 
-      .card {
-        width: 230px;
-        background-color: var(--color-button-bg);
-        border: 2px solid var(--color-accent);
-        border-radius: 10px;
-        padding: 20px;
-        text-align: center;
-      }
+        .card {
+          width: 230px;
+          background-color: var(--color-button-bg);
+          border: 2px solid var(--color-accent);
+          border-radius: 10px;
+          padding: 20px;
+          text-align: center;
+        }
 
-      .card h3 {
-        margin-top: 0;
-      }
+        .card h3 {
+          margin-top: 0;
+        }
 
-      .stat {
-        font-size: 42px;
-        color: var(--color-highlight);
-        margin: 15px 0;
-      }
+        .stat {
+          font-size: 42px;
+          color: var(--color-highlight);
+          margin: 15px 0;
+        }
 
-      #userPanel,
-      #activityFeed {
-        width: 85%;
-        margin: 20px auto;
-        background-color: var(--color-button-bg);
-        border: 2px solid var(--color-accent);
-        border-radius: 10px;
-        padding: 20px;
-      }
+        #userPanel,
+        #activityFeed {
+          width: 85%;
+          margin: 20px auto;
+          background-color: var(--color-button-bg);
+          border: 2px solid var(--color-accent);
+          border-radius: 10px;
+          padding: 20px;
+        }
 
-      #activityFeed ul {
-        text-align: left;
-        line-height: 2;
-      }
+        #activityFeed ul {
+          text-align: left;
+          line-height: 2;
+        }
 
-      #surveySearch {
-        width: 350px;
-        max-width: 90%;
-        padding: 12px;
-        border-radius: 8px;
-        border: 1px solid var(--color-accent);
-        margin-bottom: 25px;
-      }
+        #surveySearch {
+          width: 350px;
+          max-width: 90%;
+          padding: 12px;
+          border-radius: 8px;
+          border: 1px solid var(--color-accent);
+          margin-bottom: 25px;
+        }
 
-      #output {
-        text-align: center;
-        color: var(--color-highlight);
-        font-size: 18px;
-        margin-top: 20px;
-      }
-      #mainPageContainer {
-        flex: 1;
-        display: flex;
-      } 
-      .my-div {
-        display:none;
-        padding:20px;
-        background-color: var(--color-background);
-        flex: 1;
-        color: white;
-      }
-      .my-div.active {
-        display: block;
-      }
-      .surveysDisplayDiv {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        justify-content: center;
-        background-color: none;
-        width:100%;
-      }
-      .surveyField {
-        width:100%;
-        box-sizing: border-box;
+        #output {
+          text-align: center;
+          color: var(--color-highlight);
+          font-size: 18px;
+          margin-top: 20px;
+        }
+        #mainPageContainer {
+          flex: 1;
+          display: flex;
+        } 
+        .my-div {
+          display:none;
+          padding:20px;
+          background-color: var(--color-background);
+          flex: 1;
+          color: white;
+        }
+        .my-div.active {
+          display: block;
+        }
+        .surveysDisplayDiv {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 20px;
+          justify-content: center;
+          background-color: none;
+          width:100%;
+        }
+        .surveyField {
+          width:100%;
+          box-sizing: border-box;
 
-        display: flex;
-        justify-content: space-evenly;
-        align-items: center;
+          display: flex;
+          justify-content: space-evenly;
+          align-items: center;
 
-        padding: 20px;
-        border: 1px solid var(--color-accent);
-        border-radius: 10px;
-        color:var(--color-background);
-        background-color:rgb(213, 224, 163);
-      }
-      .question {
-        width: 100%;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        gap:20px;
-        justify-content: center;
-        color: var(--color-background);
-        border: 1px solid var(--color-accent);
-        border-radius: 10px;
-        padding: 20px;
-        background-color:rgb(214, 190, 125);
-      }
-      .horizontalDiv {
-        display: flex;
-        flex-direction: row;
-        gap: 20px;
-        align-items: stretch;
-        flex: 1;
-        width:100%;
-      }
-      .verticalDiv {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        align-items: center;
-        flex: 1;
-        min-width: 0;
-      }
-      .questionInput {
-        width: 100%;
-        box-sizing: border-box;
-        display: flex;
-        gap:20px;
-        color: var(--color-background);
-        border: 1px solid var(--color-accent);
-        border-radius: 10px;
-        padding: 20px;
-        background-color:rgb(214, 190, 125);
-        resize: none;
-      } .questionInput::placeholder {
-        color: var(--color-background);
-        opacity: 0.7;
-      } .questionInput:focus {
-        outline: 2px solid var(--color-focus);
-        border: 1px solid transparent;
-      } .questionInput::-webkit-scrollbar {
-        width: 8px;
-      }
-      .questionInput::-webkit-scrollbar-track {
-        background: var(--color-builder-bg);
-        border-radius: 10px;
-      }
-      .questionInput::-webkit-scrollbar-thumb {
-        background: var(--color-accent);
-        border-radius: 10px;
-        border: 2px solid var(--color-builder-bg);
-      } 
-      .questionInput::-webkit-scrollbar-thumb:hover {
-        background: var(--color-scrollbar-hover);
-      }
+          padding: 20px;
+          border: 1px solid var(--color-accent);
+          border-radius: 10px;
+          color:var(--color-background);
+          background-color:rgb(213, 224, 163);
+        }
+        .question {
+          width: 100%;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          gap:20px;
+          justify-content: center;
+          color: var(--color-background);
+          border: 1px solid var(--color-accent);
+          border-radius: 10px;
+          padding: 20px;
+          background-color:rgb(214, 190, 125);
+        }
+        .horizontalDiv {
+          display: flex;
+          flex-direction: row;
+          gap: 20px;
+          align-items: stretch;
+          flex: 1;
+          width:100%;
+        }
+        .verticalDiv {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          align-items: center;
+          flex: 1;
+          min-width: 0;
+        }
+        .questionInput {
+          width: 100%;
+          box-sizing: border-box;
+          display: flex;
+          gap:20px;
+          color: var(--color-background);
+          border: 1px solid var(--color-accent);
+          border-radius: 10px;
+          padding: 20px;
+          background-color:rgb(214, 190, 125);
+          resize: none;
+        } .questionInput::placeholder {
+          color: var(--color-background);
+          opacity: 0.7;
+        } .questionInput:focus {
+          outline: 2px solid var(--color-focus);
+          border: 1px solid transparent;
+        } .questionInput::-webkit-scrollbar {
+          width: 8px;
+        }
+        .questionInput::-webkit-scrollbar-track {
+          background: var(--color-builder-bg);
+          border-radius: 10px;
+        }
+        .questionInput::-webkit-scrollbar-thumb {
+          background: var(--color-accent);
+          border-radius: 10px;
+          border: 2px solid var(--color-builder-bg);
+        } 
+        .questionInput::-webkit-scrollbar-thumb:hover {
+          background: var(--color-scrollbar-hover);
+        }
 
-      #surveyBuilder {
-        display:none;
-        padding: 20px;
-        background-color: var(--color-builder-bg);
-        border: 2px solid var(--color-accent);
-        border-radius: 10px;
-        color:var(--color-background);
-        overflow-y: auto;
-        max-height: 600px;
-        
-      } 
-      #surveyBuilder.active {
-        display:block;
-      } 
-      #surveyBuilder::-webkit-scrollbar {
-        width: 8px;
-      }
-      #surveyBuilder::-webkit-scrollbar-track {
-        background: var(--color-builder-bg);
-        border-radius: 10px;
-      }
-      #surveyBuilder::-webkit-scrollbar-thumb {
-        background: var(--color-accent);
-        border-radius: 10px;
-        border: 2px solid var(--color-builder-bg);
-      } 
-      #surveyBuilder::-webkit-scrollbar-thumb:hover {
-        background: var(--color-scrollbar-hover);
-      } 
-      #questionsContainer {
-        display:flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-bottom: 20px;
-      } 
-      #surveyNameInput {
-       margin-bottom: 15px;
-      }
-
-      #authDialog {
-        box-sizing: border-box;
-        width: min(420px, calc(100% - 48px));
-        border: 1px solid var(--color-accent);
-        border-radius: 8px;
-        background: var(--color-button-bg);
-        color: white;
-        padding: 24px;
-      }
-      #authDialog::backdrop {
-        background: rgb(0 0 0 / 65%);
-      }
-      #authForm {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-      }
-      #authForm input {
-        box-sizing: border-box;
-        width: 100%;
-        padding: 11px;
-        border: 1px solid var(--color-accent);
-        border-radius: 4px;
-      }
-      #authActions {
-        display: flex;
-        gap: 10px;
-      }
-      #authActions button {
-        flex: 1;
-        width: auto;
-      }
-      #authMessage {
-        min-height: 1.4em;
-        color: var(--color-highlight);
-      }
-      .SurveyAccessDiv {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        height: 150px;
-        width: 100%;
-        padding: 10px;
-        box-sizing:border-box;
-        min-width:0;
-
-        border: 2px solid var(--color-accent);
-        border-radius: 10px;
-        background-color: var(--color-button-bg);
-      }
-      .SurveyAccessDiv:hover {
-        background-color: var(--color-button-hover);
-        transform: translateY(-1px);
-      }
-      .SurveyAccessDiv:active {
-        transform: translateY(1px);
-      }
-      #surveyAnsweringDiv {
-        display: none;
-        flex-direction: column;
-        gap: 20px;
-      }
-      #surveyAnsweringDiv.active {
-        display: flex;
-      }
-      .surveyPopup {
-        gap: 5px;
-        padding: 10px;
-        width: 15%;
-        border: none;
-        border-radius: 12px;
-        background-color: white;
-        color: var(--color-accent);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-
-        display:flex; 
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-
-        height: fit-content;
-      }
-      .surveyPopup:not(:popover-open) {
-        display: none;
-      }
-
-    </style>
-  </head>
-
-  <body>
-    <header>
-      <img src="../images/logo.png" alt="DataPulse360 logo" />
-      <h1>DataPulse360 Merrimack</h1>
-    </header>
-
-    <div id="buttonSection">
-      <button id="home">Home</button>
-      <button id="SurveysBtn">View Surveys</button>
-      <button id="InvitesBtn">My Invites</button>
-      <button id="PersonalResults">Personal Results</button>
-      <button id="signUp">Sign Up</button>
-      <button id="signIn">Sign In</button>
-    </div>
-
-    <div id="mainPageContainer">
-
-        <div id="homeDiv" class="my-div active">
+        #surveyBuilder {
+          display:none;
+          padding: 20px;
+          background-color: var(--color-builder-bg);
+          border: 2px solid var(--color-accent);
+          border-radius: 10px;
+          color:var(--color-background);
+          overflow-y: auto;
+          max-height: 600px;
           
-          <div id="welcomeMessage">
-            <h2>Welcome to DataPulse360</h2>
-            <p>
-                DataPulse360 is designed to streamline survey participation, student
-                feedback collection, and engagement analytics across Merrimack
-                College.
-          </p>
-        </div>
-  
-      <div id="dashboard">
-        <div class="card">
-          <h3>Active Surveys</h3>
-          <p class="stat">3</p>
-        </div>
+        } 
+        #surveyBuilder.active {
+          display:block;
+        } 
+        #surveyBuilder::-webkit-scrollbar {
+          width: 8px;
+        }
+        #surveyBuilder::-webkit-scrollbar-track {
+          background: var(--color-builder-bg);
+          border-radius: 10px;
+        }
+        #surveyBuilder::-webkit-scrollbar-thumb {
+          background: var(--color-accent);
+          border-radius: 10px;
+          border: 2px solid var(--color-builder-bg);
+        } 
+        #surveyBuilder::-webkit-scrollbar-thumb:hover {
+          background: var(--color-scrollbar-hover);
+        } 
+        #questionsContainer {
+          display:flex;
+          flex-direction: column;
+          gap: 10px;
+          margin-bottom: 20px;
+        } 
+        #surveyNameInput {
+        margin-bottom: 15px;
+        }
 
-        <div class="card">
-          <h3>Invitations</h3>
-          <p class="stat">5</p>
-        </div>
+        #authDialog {
+          box-sizing: border-box;
+          width: min(420px, calc(100% - 48px));
+          border: 1px solid var(--color-accent);
+          border-radius: 8px;
+          background: var(--color-button-bg);
+          color: white;
+          padding: 24px;
+        }
+        #authDialog::backdrop {
+          background: rgb(0 0 0 / 65%);
+        }
+        #authForm {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        #authForm input {
+          box-sizing: border-box;
+          width: 100%;
+          padding: 11px;
+          border: 1px solid var(--color-accent);
+          border-radius: 4px;
+        }
+        #authActions {
+          display: flex;
+          gap: 10px;
+        }
+        #authActions button {
+          flex: 1;
+          width: auto;
+        }
+        #authMessage {
+          min-height: 1.4em;
+          color: var(--color-highlight);
+        }
+        .SurveyAccessDiv {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          height: 150px;
+          width: 100%;
+          padding: 10px;
+          box-sizing:border-box;
+          min-width:0;
 
-        <div class="card">
-          <h3>Completed Surveys</h3>
-          <p class="stat">2</p>
-        </div>
+          border: 2px solid var(--color-accent);
+          border-radius: 10px;
+          background-color: var(--color-button-bg);
+        }
+        .SurveyAccessDiv:hover {
+          background-color: var(--color-button-hover);
+          transform: translateY(-1px);
+        }
+        .SurveyAccessDiv:active {
+          transform: translateY(1px);
+        }
+        #surveyAnsweringDiv {
+          display: none;
+          flex-direction: column;
+          gap: 20px;
+        }
+        #surveyAnsweringDiv.active {
+          display: flex;
+        }
+        .surveyPopup {
+          gap: 5px;
+          padding: 10px;
+          width: 15%;
+          border: none;
+          border-radius: 12px;
+          background-color: white;
+          color: var(--color-accent);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
 
-        <div id="userPanel">
-          <h2>User Status</h2>
-          <p id="userStatus">Not Signed In</p>
-        </div>
+          display:flex; 
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
 
-        <div id="activityFeed">
-        <h2>Recent Activity</h2>
+          height: fit-content;
+        }
+        .surveyPopup:not(:popover-open) {
+          display: none;
+        }
 
-        <ul>
-          <li>Completed Student Satisfaction Survey</li>
-          <li>Received invitation to Campus Dining Survey</li>
-          <li>Survey results updated</li>
-          <li>Microsoft account integration configured</li>
-        </ul>
+      </style>
+    </head>
+
+    <body>
+      <header>
+        <img src="../images/logo.png" alt="DataPulse360 logo" />
+        <h1>DataPulse360 Merrimack</h1>
+      </header>
+
+      <div id="buttonSection">
+        <button id="home">Home</button>
+        <button id="SurveysBtn">View Surveys</button>
+        <button id="InvitesBtn">My Invites</button>
+        <button id="PersonalResults">Personal Results</button>
+        <button id="signUp">Sign Up</button>
+        <button id="signIn">Sign In</button>
       </div>
-    </div>
-   </div>
-        
-        <div id="surveysDiv" class="my-div">
-          <input
-        type="text"
-        id="surveySearch"
-        placeholder="Search for surveys..."
-          />
 
-          <button ID="CreateSurvey">Create New Survey</button>
+      <div id="mainPageContainer">
 
-          <button popovertarget="codePopup">
-            Use Survey Code
-          </button>
-
-          <div id="codePopup" class="surveyPopup" popover>
-            <input type="text" id="surveyCode" placeholder="Enter your invite code">
-
-            <button id="submitSurveyCode" type="button">Submit</button>
+          <div id="homeDiv" class="my-div active">
+            
+            <div id="welcomeMessage">
+              <h2>Welcome to DataPulse360</h2>
+              <p>
+                  DataPulse360 is designed to streamline survey participation, student
+                  feedback collection, and engagement analytics across Merrimack
+                  College.
+            </p>
+          </div>
+    
+        <div id="dashboard">
+          <div class="card">
+            <h3>Active Surveys</h3>
+            <p class="stat">3</p>
           </div>
 
-          <div id="surveyBuilder" class="surveyBuilder">
-            <input 
-              type="text"
-              id="surveyNameInput"
-              placeholder="Enter survey name"
-              class = "questionInput"
+          <div class="card">
+            <h3>Invitations</h3>
+            <p class="stat">5</p>
+          </div>
+
+          <div class="card">
+            <h3>Completed Surveys</h3>
+            <p class="stat">2</p>
+          </div>
+
+          <div id="userPanel">
+            <h2>User Status</h2>
+            <p id="userStatus">Not Signed In</p>
+          </div>
+
+          <div id="activityFeed">
+          <h2>Recent Activity</h2>
+
+          <ul>
+            <li>Completed Student Satisfaction Survey</li>
+            <li>Received invitation to Campus Dining Survey</li>
+            <li>Survey results updated</li>
+            <li>Microsoft account integration configured</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+          
+          <div id="surveysDiv" class="my-div">
+            <input
+          type="text"
+          id="surveySearch"
+          placeholder="Search for surveys..."
             />
 
-            <div id="questionsContainer">
+            <button ID="CreateSurvey">Create New Survey</button>
+
+            <button popovertarget="codePopup">
+              Use Survey Code
+            </button>
+
+            <div id="codePopup" class="surveyPopup" popover>
+              <input type="text" id="surveyCode" placeholder="Enter your invite code">
+
+              <button id="submitSurveyCode" type="button">Submit</button>
+            </div>
+
+            <div id="surveyBuilder" class="surveyBuilder">
+              <input 
+                type="text"
+                id="surveyNameInput"
+                placeholder="Enter survey name"
+                class = "questionInput"
+              />
+
+              <div id="questionsContainer">
+
+              </div>
+
+              <button id="addQuestion">Add Question</button>
+              <button id="saveSurvey">Save Survey</button>
 
             </div>
 
-            <button id="addQuestion">Add Question</button>
-            <button id="saveSurvey">Save Survey</button>
+            <div id="displaySurveyAccessButtons" class="surveysDisplayDiv"></div>
+            
+          </div>
 
           </div>
 
-          <div id="displaySurveyAccessButtons" class="surveysDisplayDiv"></div>
-          
-        </div>
+          <div id="invitesDiv" class="my-div">
 
-        </div>
+          </div>
 
-        <div id="invitesDiv" class="my-div">
+          <div id="resultsDiv" class="my-div">
 
-        </div>
+          </div>
 
-        <div id="resultsDiv" class="my-div">
+          <div id="surveyAnsweringDiv" class="my-div">
 
-        </div>
+          </div>
+      </div>
 
-        <div id="surveyAnsweringDiv" class="my-div">
+      <main>
+        <p id="output"></p>
+      </main>
 
-        </div>
-    </div>
+      <dialog id="authDialog">
+        <form id="authForm">
+          <h2 id="authTitle">Sign In</h2>
+          <button id="googleAuthButton" type="button">Continue with Google</button>
+          <p>Google sign-in creates your account the first time you use it.</p>
+          <label for="authEmail">Email</label>
+          <input id="authEmail" type="email" autocomplete="email" required />
+          <label for="authPassword">Password</label>
+          <input id="authPassword" type="password" autocomplete="current-password" minlength="6" required />
+          <p id="authMessage" role="status"></p>
+          <div id="authActions">
+            <button id="closeAuthDialog" type="button">Cancel</button>
+            <button id="authSubmit" type="submit">Sign In</button>
+          </div>
+        </form>
+      </dialog>
 
-    <main>
-      <p id="output"></p>
-    </main>
+      <script>
 
-    <dialog id="authDialog">
-      <form id="authForm">
-        <h2 id="authTitle">Sign In</h2>
-        <button id="googleAuthButton" type="button">Continue with Google</button>
-        <p>Google sign-in creates your account the first time you use it.</p>
-        <label for="authEmail">Email</label>
-        <input id="authEmail" type="email" autocomplete="email" required />
-        <label for="authPassword">Password</label>
-        <input id="authPassword" type="password" autocomplete="current-password" minlength="6" required />
-        <p id="authMessage" role="status"></p>
-        <div id="authActions">
-          <button id="closeAuthDialog" type="button">Cancel</button>
-          <button id="authSubmit" type="submit">Sign In</button>
-        </div>
-      </form>
-    </dialog>
+        const signUpButton = document.getElementById("signUp");
+        const signInButton = document.getElementById("signIn");
+        const surveysButton = document.getElementById("SurveysBtn");
+        const invitesButton = document.getElementById("InvitesBtn");
+        const personalResultsButton = document.getElementById("PersonalResults");
+        const homeButton = document.getElementById("home");
+        const homeDiv = document.getElementById("homeDiv");
+        const surveysDiv = document.getElementById("surveysDiv");
+        const invitesDiv = document.getElementById("invitesDiv");
+        const resultsDiv = document.getElementById("resultsDiv");
+        const createSurveyButton = document.getElementById("CreateSurvey");
+        const surveyBuilder = document.getElementById("surveyBuilder");
+        const addQuestionButton = document.getElementById("addQuestion");
+        const saveSurveyButton = document.getElementById("saveSurvey");
+        const submitSurveyCodeButton = document.getElementById("submitSurveyCode");
+        const surveyAccessDisplay = document.getElementById("displaySurveyAccessButtons");
+        const surveyAnsweringDiv = document.getElementById("surveyAnsweringDiv");
+        const popup = document.getElementById("codePopup");
 
-    <script>
+        let currentSurveyID = null;
 
-      const signUpButton = document.getElementById("signUp");
-      const signInButton = document.getElementById("signIn");
-      const surveysButton = document.getElementById("SurveysBtn");
-      const invitesButton = document.getElementById("InvitesBtn");
-      const personalResultsButton = document.getElementById("PersonalResults");
-      const homeButton = document.getElementById("home");
-      const homeDiv = document.getElementById("homeDiv");
-      const surveysDiv = document.getElementById("surveysDiv");
-      const invitesDiv = document.getElementById("invitesDiv");
-      const resultsDiv = document.getElementById("resultsDiv");
-      const createSurveyButton = document.getElementById("CreateSurvey");
-      const surveyBuilder = document.getElementById("surveyBuilder");
-      const addQuestionButton = document.getElementById("addQuestion");
-      const saveSurveyButton = document.getElementById("saveSurvey");
-      const submitSurveyCodeButton = document.getElementById("submitSurveyCode");
-      const surveyAccessDisplay = document.getElementById("displaySurveyAccessButtons");
-      const surveyAnsweringDiv = document.getElementById("surveyAnsweringDiv");
-      const popup = document.getElementById("codePopup");
+        let currentPOV = null;
 
-      let currentSurveyID = null;
+        var potentialMainPageDivs = [homeDiv, surveysDiv, invitesDiv, resultsDiv, surveyAnsweringDiv];
 
-      let currentPOV = null;
-
-      var potentialMainPageDivs = [homeDiv, surveysDiv, invitesDiv, resultsDiv, surveyAnsweringDiv];
-
-      submitSurveyCodeButton.addEventListener("click", async () => {
-        const inviteCode = document.getElementById("surveyCode").value.trim();
-        const alreadyAdded = Array.from(document.querySelectorAll(".SurveyAccessDiv")).some((button) => {
-          return inviteCode.slice(1) === button.dataset.surveyID;
-        });
-        if (alreadyAdded) {
-          alert("Survey already added");
-          popup.hidePopover();
-          return;
-        }
-        try {
-          const response = await fetch("/validateSurveyCode", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ 
-              surveyID: inviteCode
-            })
+        submitSurveyCodeButton.addEventListener("click", async () => {
+          const inviteCode = document.getElementById("surveyCode").value.trim();
+          const alreadyAdded = Array.from(document.querySelectorAll(".SurveyAccessDiv")).some((button) => {
+            return inviteCode.slice(1) === button.dataset.surveyID;
           });
-          
-          const result = await response.json();
-          
-          if (!response.ok) {
-            alert(result.message);
+          if (alreadyAdded) {
+            alert("Survey already added");
+            popup.hidePopover();
             return;
           }
-          createSurveyAccessButton(result.surveyName, result.surveyId, result.pov, false, result.questions); //title, ID, pov, answered, questionsList
-          alert("Survey Added Successfully");
-        } catch (error) {
-          console.error("Error validating survey code:", error);
-          alert("Could not contact the server");
-        }
-        popup.hidePopover();
-      });
-
-      surveysButton.addEventListener("click", () => {
-        potentialMainPageDivs.forEach((div) => {
-          div.classList.remove("active");
+          try {
+            const response = await fetch("/validateSurveyCode", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ 
+                surveyID: inviteCode
+              })
+            });
+            
+            const result = await response.json();
+            
+            if (!response.ok) {
+              alert(result.message);
+              return;
+            }
+            createSurveyAccessButton(result.surveyName, result.surveyId, result.pov, false, result.questions); //title, ID, pov, answered, questionsList
+            alert("Survey Added Successfully");
+          } catch (error) {
+            console.error("Error validating survey code:", error);
+            alert("Could not contact the server");
+          }
+          popup.hidePopover();
         });
-        surveysDiv.classList.add("active");
-      });
 
-      invitesButton.addEventListener("click", () => {
-        potentialMainPageDivs.forEach((div) => {
-          div.classList.remove("active");
+        surveysButton.addEventListener("click", () => {
+          potentialMainPageDivs.forEach((div) => {
+            div.classList.remove("active");
+          });
+          surveysDiv.classList.add("active");
         });
-        invitesDiv.classList.add("active");
-        clearSurvey()
-      });
 
-      personalResultsButton.addEventListener("click", () => {
-        potentialMainPageDivs.forEach((div) => {
-          div.classList.remove("active");
+        invitesButton.addEventListener("click", () => {
+          potentialMainPageDivs.forEach((div) => {
+            div.classList.remove("active");
+          });
+          invitesDiv.classList.add("active");
+          clearSurvey()
         });
-        resultsDiv.classList.add("active");
-        clearSurvey()
-      });
 
-      homeButton.addEventListener("click", () => {
-        potentialMainPageDivs.forEach((div) => {
-          div.classList.remove("active");
+        personalResultsButton.addEventListener("click", () => {
+          potentialMainPageDivs.forEach((div) => {
+            div.classList.remove("active");
+          });
+          resultsDiv.classList.add("active");
+          clearSurvey()
         });
-        homeDiv.classList.add("active");
-        clearSurvey()
-      });
 
-      createSurveyButton.addEventListener("click", () => {
-        const questionsContainer = document.getElementById("questionsContainer");
-        if (questionsContainer.children.length === 0) {
-          surveyBuilder.classList.add("active");
+        homeButton.addEventListener("click", () => {
+          potentialMainPageDivs.forEach((div) => {
+            div.classList.remove("active");
+          });
+          homeDiv.classList.add("active");
+          clearSurvey()
+        });
+
+        createSurveyButton.addEventListener("click", () => {
+          const questionsContainer = document.getElementById("questionsContainer");
+          if (questionsContainer.children.length === 0) {
+            surveyBuilder.classList.add("active");
+            CreateBlankSurveyQuestion();
+          }   
+        });
+
+        addQuestionButton.addEventListener("click", () => {
           CreateBlankSurveyQuestion();
-        }   
-      });
+        })
 
-      addQuestionButton.addEventListener("click", () => {
-        CreateBlankSurveyQuestion();
-      })
+        saveSurveyButton.addEventListener("click", async () => { 
+          const questionElements = document.querySelectorAll("#questionsContainer .question");
+          const surveyNameInput = document.getElementById("surveyNameInput");
 
-      saveSurveyButton.addEventListener("click", async () => { 
-        const questionElements = document.querySelectorAll("#questionsContainer .question");
-        const surveyNameInput = document.getElementById("surveyNameInput");
+          const questions = [];
 
-        const questions = [];
+          for (const element of questionElements) {
+            const textareas = element.querySelectorAll("textarea");
+            const optionInput = element.querySelector('input[type="number"]');
 
-        for (const element of questionElements) {
-          const textareas = element.querySelectorAll("textarea");
-          const optionInput = element.querySelector('input[type="number"]');
+            
+            const questionText =  textareas[0].value.trim();
+            const thirdPersonText = textareas[1].value.trim();
+            const numberOfOptions = Number(optionInput.value);
 
-          
-          const questionText =  textareas[0].value.trim();
-          const thirdPersonText = textareas[1].value.trim();
-          const numberOfOptions = Number(optionInput.value);
+            if (!questionText || !thirdPersonText || isNaN(numberOfOptions)) {
+              document.getElementById("output").textContent = "Please fill in all fields."
+              return;
+            }
 
-          if (!questionText || !thirdPersonText || isNaN(numberOfOptions)) {
-            document.getElementById("output").textContent = "Please fill in all fields."
+            if (
+              optionInput.value.trim() === "" ||
+              !Number.isInteger(numberOfOptions) ||
+              numberOfOptions < 1
+            ) {
+              document.getElementById("output").textContent = "Please enter a whole number greater than 0.";
+              return;
+            }
+
+            questions.push({
+              questionText: questionText,
+              thirdPersonText: thirdPersonText,
+              numberOfOptions: numberOfOptions
+            });
+          }
+
+          if (questions.length === 0) {
+            document.getElementById("output").textContent = "Please add at least one question.";
             return;
+          }
+
+          try {
+            const response = await fetch("/saveSurvey", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ 
+                surveyName: surveyNameInput.value.trim(),
+                questions: questions})
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+              throw new Error(result.message || "Failed to save survey.");
+            }
+
+            document.getElementById("output").textContent = "Survey saved successfully.";
+
+          } catch (error) {
+            document.getElementById("output").textContent = "Error saving survey: " + error.message;
+          }
+        clearSurvey()
+        });
+
+
+        function clearSurvey() {
+          const questionsContainer = document.getElementById("questionsContainer");
+          const surveyNameInput = document.getElementById("surveyNameInput");
+          questionsContainer.innerHTML = "";
+          surveyNameInput.value = "";
+          surveyBuilder.classList.remove("active"); 
+        }
+
+        const authDialog = document.getElementById("authDialog");
+        const authForm = document.getElementById("authForm");
+        const authEmail = document.getElementById("authEmail");
+        const authPassword = document.getElementById("authPassword");
+        const authTitle = document.getElementById("authTitle");
+        const authSubmit = document.getElementById("authSubmit");
+        const googleAuthButton = document.getElementById("googleAuthButton");
+        const authMessage = document.getElementById("authMessage");
+        const googleAuthAttemptKey = "googleAuthAttempt";
+        const authStorageKey = "datapulse360-auth";
+        let supabaseClient;
+        let authSetupState = "loading";
+        let authMode = "signin";
+        authSubmit.disabled = true;
+        googleAuthButton.disabled = true;
+
+        window.addEventListener("pagehide", () => {
+          if (sessionStorage.getItem(googleAuthAttemptKey)) return;
+          sessionStorage.removeItem(authStorageKey);
+        });
+
+        function openAuthDialog(mode) {
+          authMode = mode;
+          const isSignUp = mode === "signup";
+          authForm.reset();
+          authTitle.textContent = isSignUp ? "Create Account" : "Sign In";
+          authSubmit.textContent = isSignUp ? "Create Account" : "Sign In";
+          googleAuthButton.textContent = isSignUp ? "Sign up with Google" : "Sign in with Google";
+          authPassword.autocomplete = isSignUp ? "new-password" : "current-password";
+          authMessage.textContent = authSetupState === "ready"
+            ? ""
+            : authSetupState === "loading"
+              ? "Loading secure sign-in..."
+              : "Sign-in setup could not load. Refresh the page and try again.";
+          authDialog.showModal();
+        }
+
+        signUpButton.addEventListener("click", () => openAuthDialog("signup"));
+        signInButton.addEventListener("click", () => openAuthDialog("signin"));
+        document.getElementById("closeAuthDialog").addEventListener("click", () => authDialog.close());
+
+        async function signOutCurrentSession() {
+          const { error } = await supabaseClient.auth.signOut({ scope: "local" });
+          if (error) throw error;
+          document.getElementById("userStatus").textContent = "Not Signed In";
+        }
+
+        googleAuthButton.addEventListener("click", async () => {
+          if (!supabaseClient) {
+            authMessage.textContent = "Sign-in setup could not load. Refresh the page and try again.";
+            return;
+          }
+
+          googleAuthButton.disabled = true;
+          authMessage.textContent = "";
+          try {
+            if (authMode === "signup") {
+              await signOutCurrentSession();
+            }
+            sessionStorage.setItem(googleAuthAttemptKey, JSON.stringify({
+              mode: authMode,
+              startedAt: Math.floor(Date.now() / 1000) * 1000,
+            }));
+            const { error } = await supabaseClient.auth.signInWithOAuth({
+              provider: "google",
+              options: {
+                redirectTo: `${window.location.origin}${window.location.pathname}`,
+                queryParams: { prompt: "select_account" },
+              },
+            });
+            if (error) throw error;
+          } catch (err) {
+            sessionStorage.removeItem(googleAuthAttemptKey);
+            authMessage.textContent = err.message || "Google sign-in failed.";
+            googleAuthButton.disabled = false;
+          }
+        });
+
+        async function showAuthenticatedUser(session) {
+          if (!session) {
+            document.getElementById("userStatus").textContent = "Not Signed In";
+            return;
+          }
+
+          try {
+            const response = await fetch("/api/me", {
+              headers: { Authorization: `Bearer ${session.access_token}` },
+            });
+            const payload = await response.json();
+            if (!response.ok) throw new Error(payload.error || "Could not verify account.");
+
+            document.getElementById("userStatus").textContent = `Signed in as ${payload.user.email}`;
+            document.getElementById("welcomeMessage").querySelector("h2").textContent =
+              `Welcome Back, ${payload.user.email}`;
+            document.getElementById("output").textContent = "Successfully signed in.";
+          } catch (err) {
+            document.getElementById("userStatus").textContent = "Not Signed In";
+            document.getElementById("output").textContent = err.message;
+          }
+        }
+
+        async function handleGoogleAuthSession(session) {
+          const savedAttempt = sessionStorage.getItem(googleAuthAttemptKey);
+          if (!savedAttempt) {
+            await showAuthenticatedUser(session);
+            return;
+          }
+
+          sessionStorage.removeItem(googleAuthAttemptKey);
+          let attempt;
+          try {
+            attempt = JSON.parse(savedAttempt);
+          } catch {
+            await supabaseClient.auth.signOut();
+            throw new Error("Could not verify the Google sign-in request. Please try again.");
           }
 
           if (
-            optionInput.value.trim() === "" ||
-            !Number.isInteger(numberOfOptions) ||
-            numberOfOptions < 1
+            !attempt ||
+            !["signup", "signin"].includes(attempt.mode) ||
+            !Number.isFinite(attempt.startedAt)
           ) {
-            document.getElementById("output").textContent = "Please enter a whole number greater than 0.";
+            await supabaseClient.auth.signOut();
+            throw new Error("Could not verify the Google sign-in request. Please try again.");
+          }
+
+          if (!session) {
+            openAuthDialog(attempt.mode);
+            authMessage.textContent = "No sign-in session was created. Please try again.";
             return;
           }
 
-          questions.push({
-            questionText: questionText,
-            thirdPersonText: thirdPersonText,
-            numberOfOptions: numberOfOptions
-          });
-        }
-
-        if (questions.length === 0) {
-          document.getElementById("output").textContent = "Please add at least one question.";
-          return;
-        }
-
-        try {
-          const response = await fetch("/saveSurvey", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ 
-              surveyName: surveyNameInput.value.trim(),
-              questions: questions})
-          });
-
-          const result = await response.json();
-
-          if (!response.ok) {
-            throw new Error(result.message || "Failed to save survey.");
+          const createdAt = Date.parse(session.user.created_at);
+          if (!Number.isFinite(createdAt)) {
+            await supabaseClient.auth.signOut();
+            throw new Error("Could not verify when this Google account was created. Please try again.");
           }
 
-          document.getElementById("output").textContent = "Survey saved successfully.";
-
-        } catch (error) {
-          document.getElementById("output").textContent = "Error saving survey: " + error.message;
-        }
-      clearSurvey()
-      });
-
-
-      function clearSurvey() {
-        const questionsContainer = document.getElementById("questionsContainer");
-        const surveyNameInput = document.getElementById("surveyNameInput");
-        questionsContainer.innerHTML = "";
-        surveyNameInput.value = "";
-        surveyBuilder.classList.remove("active"); 
-      }
-
-      const authDialog = document.getElementById("authDialog");
-      const authForm = document.getElementById("authForm");
-      const authEmail = document.getElementById("authEmail");
-      const authPassword = document.getElementById("authPassword");
-      const authTitle = document.getElementById("authTitle");
-      const authSubmit = document.getElementById("authSubmit");
-      const googleAuthButton = document.getElementById("googleAuthButton");
-      const authMessage = document.getElementById("authMessage");
-      const googleAuthAttemptKey = "googleAuthAttempt";
-      const authStorageKey = "datapulse360-auth";
-      let supabaseClient;
-      let authSetupState = "loading";
-      let authMode = "signin";
-      authSubmit.disabled = true;
-      googleAuthButton.disabled = true;
-
-      window.addEventListener("pagehide", () => {
-        if (sessionStorage.getItem(googleAuthAttemptKey)) return;
-        sessionStorage.removeItem(authStorageKey);
-      });
-
-      function openAuthDialog(mode) {
-        authMode = mode;
-        const isSignUp = mode === "signup";
-        authForm.reset();
-        authTitle.textContent = isSignUp ? "Create Account" : "Sign In";
-        authSubmit.textContent = isSignUp ? "Create Account" : "Sign In";
-        googleAuthButton.textContent = isSignUp ? "Sign up with Google" : "Sign in with Google";
-        authPassword.autocomplete = isSignUp ? "new-password" : "current-password";
-        authMessage.textContent = authSetupState === "ready"
-          ? ""
-          : authSetupState === "loading"
-            ? "Loading secure sign-in..."
-            : "Sign-in setup could not load. Refresh the page and try again.";
-        authDialog.showModal();
-      }
-
-      signUpButton.addEventListener("click", () => openAuthDialog("signup"));
-      signInButton.addEventListener("click", () => openAuthDialog("signin"));
-      document.getElementById("closeAuthDialog").addEventListener("click", () => authDialog.close());
-
-      async function signOutCurrentSession() {
-        const { error } = await supabaseClient.auth.signOut({ scope: "local" });
-        if (error) throw error;
-        document.getElementById("userStatus").textContent = "Not Signed In";
-      }
-
-      googleAuthButton.addEventListener("click", async () => {
-        if (!supabaseClient) {
-          authMessage.textContent = "Sign-in setup could not load. Refresh the page and try again.";
-          return;
-        }
-
-        googleAuthButton.disabled = true;
-        authMessage.textContent = "";
-        try {
-          if (authMode === "signup") {
-            await signOutCurrentSession();
+          const isNewAccount = createdAt >= attempt.startedAt;
+          if (attempt.mode === "signup" && !isNewAccount) {
+            await supabaseClient.auth.signOut();
+            openAuthDialog("signup");
+            authMessage.textContent = "This Google account already exists. Please click Sign In.";
+            return;
           }
-          sessionStorage.setItem(googleAuthAttemptKey, JSON.stringify({
-            mode: authMode,
-            startedAt: Math.floor(Date.now() / 1000) * 1000,
-          }));
-          const { error } = await supabaseClient.auth.signInWithOAuth({
-            provider: "google",
-            options: {
-              redirectTo: `${window.location.origin}${window.location.pathname}`,
-              queryParams: { prompt: "select_account" },
-            },
-          });
-          if (error) throw error;
-        } catch (err) {
-          sessionStorage.removeItem(googleAuthAttemptKey);
-          authMessage.textContent = err.message || "Google sign-in failed.";
-          googleAuthButton.disabled = false;
-        }
-      });
+          if (attempt.mode === "signin" && isNewAccount) {
+            await supabaseClient.auth.signOut();
+            openAuthDialog("signin");
+            authMessage.textContent = "This Google account is new. Please click Sign Up.";
+            return;
+          }
 
-      async function showAuthenticatedUser(session) {
-        if (!session) {
-          document.getElementById("userStatus").textContent = "Not Signed In";
-          return;
-        }
-
-        try {
-          const response = await fetch("/api/me", {
-            headers: { Authorization: `Bearer ${session.access_token}` },
-          });
-          const payload = await response.json();
-          if (!response.ok) throw new Error(payload.error || "Could not verify account.");
-
-          document.getElementById("userStatus").textContent = `Signed in as ${payload.user.email}`;
-          document.getElementById("welcomeMessage").querySelector("h2").textContent =
-            `Welcome Back, ${payload.user.email}`;
-          document.getElementById("output").textContent = "Successfully signed in.";
-        } catch (err) {
-          document.getElementById("userStatus").textContent = "Not Signed In";
-          document.getElementById("output").textContent = err.message;
-        }
-      }
-
-      async function handleGoogleAuthSession(session) {
-        const savedAttempt = sessionStorage.getItem(googleAuthAttemptKey);
-        if (!savedAttempt) {
           await showAuthenticatedUser(session);
-          return;
         }
 
-        sessionStorage.removeItem(googleAuthAttemptKey);
-        let attempt;
-        try {
-          attempt = JSON.parse(savedAttempt);
-        } catch {
-          await supabaseClient.auth.signOut();
-          throw new Error("Could not verify the Google sign-in request. Please try again.");
-        }
-
-        if (
-          !attempt ||
-          !["signup", "signin"].includes(attempt.mode) ||
-          !Number.isFinite(attempt.startedAt)
-        ) {
-          await supabaseClient.auth.signOut();
-          throw new Error("Could not verify the Google sign-in request. Please try again.");
-        }
-
-        if (!session) {
-          openAuthDialog(attempt.mode);
-          authMessage.textContent = "No sign-in session was created. Please try again.";
-          return;
-        }
-
-        const createdAt = Date.parse(session.user.created_at);
-        if (!Number.isFinite(createdAt)) {
-          await supabaseClient.auth.signOut();
-          throw new Error("Could not verify when this Google account was created. Please try again.");
-        }
-
-        const isNewAccount = createdAt >= attempt.startedAt;
-        if (attempt.mode === "signup" && !isNewAccount) {
-          await supabaseClient.auth.signOut();
-          openAuthDialog("signup");
-          authMessage.textContent = "This Google account already exists. Please click Sign In.";
-          return;
-        }
-        if (attempt.mode === "signin" && isNewAccount) {
-          await supabaseClient.auth.signOut();
-          openAuthDialog("signin");
-          authMessage.textContent = "This Google account is new. Please click Sign Up.";
-          return;
-        }
-
-        await showAuthenticatedUser(session);
-      }
-
-      authForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        if (!supabaseClient) {
-          authMessage.textContent = authSetupState === "loading"
-            ? "Sign-in setup is still loading. Please wait a moment and try again."
-            : "Sign-in setup could not load. Refresh the page and try again.";
-          return;
-        }
-        authSubmit.disabled = true;
-        authMessage.textContent = "";
-
-        try {
-          if (authMode === "signup") {
-            await signOutCurrentSession();
-          }
-          const result = authMode === "signup"
-            ? await supabaseClient.auth.signUp({
-                email: authEmail.value.trim(),
-                password: authPassword.value,
-                options: {
-                  emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
-                },
-              })
-            : await supabaseClient.auth.signInWithPassword({
-                email: authEmail.value.trim(),
-                password: authPassword.value,
-              });
-          if (result.error) throw result.error;
-
-          if (authMode === "signup" && !result.data.session) {
-            authMessage.textContent =
-              `We sent a confirmation link to ${authEmail.value.trim()}. ` +
-              "Open it to verify your email, then sign in.";
+        authForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          if (!supabaseClient) {
+            authMessage.textContent = authSetupState === "loading"
+              ? "Sign-in setup is still loading. Please wait a moment and try again."
+              : "Sign-in setup could not load. Refresh the page and try again.";
             return;
           }
+          authSubmit.disabled = true;
+          authMessage.textContent = "";
 
-          await showAuthenticatedUser(result.data.session);
-          authDialog.close();
-        } catch (err) {
-          authMessage.textContent = err.message || "Authentication failed.";
-        } finally {
-          authSubmit.disabled = false;
-        }
-      });
-
-      fetch("/api/config")
-        .then(async (response) => {
-          const config = await response.json();
-          if (!response.ok) throw new Error(config.error || "Authentication setup is unavailable.");
-          if (!window.supabase?.createClient) {
-            throw new Error("The sign-in library did not load.");
-          }
-          if (typeof config.supabaseUrl !== "string" || typeof config.supabaseAnonKey !== "string") {
-            throw new Error("The server returned incomplete sign-in configuration.");
-          }
-          supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
-            auth: {
-              storage: window.sessionStorage,
-              storageKey: authStorageKey,
-            },
-          });
-          authSetupState = "ready";
-          authSubmit.disabled = false;
-          googleAuthButton.disabled = false;
-          const { data } = await supabaseClient.auth.getSession();
           try {
-            await handleGoogleAuthSession(data.session);
+            if (authMode === "signup") {
+              await signOutCurrentSession();
+            }
+            const result = authMode === "signup"
+              ? await supabaseClient.auth.signUp({
+                  email: authEmail.value.trim(),
+                  password: authPassword.value,
+                  options: {
+                    emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
+                  },
+                })
+              : await supabaseClient.auth.signInWithPassword({
+                  email: authEmail.value.trim(),
+                  password: authPassword.value,
+                });
+            if (result.error) throw result.error;
+
+            if (authMode === "signup" && !result.data.session) {
+              authMessage.textContent =
+                `We sent a confirmation link to ${authEmail.value.trim()}. ` +
+                "Open it to verify your email, then sign in.";
+              return;
+            }
+
+            await showAuthenticatedUser(result.data.session);
+            authDialog.close();
           } catch (err) {
-            authMessage.textContent = err.message || "Google sign-in failed.";
+            authMessage.textContent = err.message || "Authentication failed.";
+          } finally {
+            authSubmit.disabled = false;
+          }
+        });
+
+        fetch("/api/config")
+          .then(async (response) => {
+            const config = await response.json();
+            if (!response.ok) throw new Error(config.error || "Authentication setup is unavailable.");
+            if (!window.supabase?.createClient) {
+              throw new Error("The sign-in library did not load.");
+            }
+            if (typeof config.supabaseUrl !== "string" || typeof config.supabaseAnonKey !== "string") {
+              throw new Error("The server returned incomplete sign-in configuration.");
+            }
+            supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
+              auth: {
+                storage: window.sessionStorage,
+                storageKey: authStorageKey,
+              },
+            });
+            authSetupState = "ready";
             authSubmit.disabled = false;
             googleAuthButton.disabled = false;
-          }
-        })
-        .catch((err) => {
-          authSetupState = "error";
-          authSubmit.disabled = true;
-          googleAuthButton.disabled = true;
-          console.error("Could not initialize sign-in:", err);
-          authMessage.textContent = "Sign-in setup could not load. Refresh the page and try again.";
-          document.getElementById("output").textContent = err.message;
-        });
-
-
-      class SurveyQuestion {
-        constructor(questionText, options) {
-          this.question = document.createElement("div");
-          this.question.classList.add("question");
-
-          this.label = document.createElement("label");
-          this.label.textContent = questionText;
-
-          this.fieldset = document.createElement("fieldset");
-          this.fieldset.classList.add("surveyField");
-
-          options.forEach((option) => {
-            const label = document.createElement("label");
-            const radio = document.createElement("input");
-            radio.type = "radio";
-            radio.name = questionText;
-            radio.value = option;
-            label.appendChild(radio);
-            label.appendChild(document.createTextNode(" " + option));
-            this.fieldset.appendChild(label);
-          });
-          this.question.appendChild(this.label);
-          this.question.appendChild(this.fieldset);
-        }
-      }
-
-      class BlankSurveyQuestion {
-        constructor() {
-          this.question = document.createElement("div");
-          this.question.classList.add("question");
-
-          this.div = document.createElement("div");
-          this.div.classList.add("horizontalDiv");
-
-          this.div2 = document.createElement("div");
-          this.div2.classList.add("verticalDiv");
-
-          this.label = document.createElement("textarea");
-          this.label.classList.add("questionInput");
-          this.label.placeholder = "Enter question text here:";
-
-          this.label.addEventListener("input", function() {
-            this.style.height = "auto";
-            this.style.height = (this.scrollHeight) + "px";
-          });
-
-          this.label2 = document.createElement("textarea");
-          this.label2.classList.add("questionInput");
-          this.label2.placeholder = "Enter third person text here:";
-
-          this.label2.addEventListener("input", function() {
-            this.style.height = "auto";
-            this.style.height = (this.scrollHeight) + "px";
-          });
-
-          this.label3 = document.createElement("input");
-          this.label3.type = "number";
-          this.label3.placeholder = "Number of options";
-
-          this.button = document.createElement("button");
-          this.button.type = "button";
-          this.button.textContent = "X";
-          this.button.classList.add("deleteSurveyButton");
-
-          this.button.addEventListener("click", () => {
-            this.question.remove();
-          });
-
-          this.question.appendChild(this.div);
-          this.div.appendChild(this.div2);
-          this.div2.appendChild(this.label);
-          this.div2.appendChild(this.label2);
-          this.div.appendChild(this.button);
-          this.question.appendChild(this.label3);
-          
-        }
-      }
-      
-      function CreateSurveyQuestion(questionText, numAnswers) { 
-        const answers = [];
-        for (let i = 0; i < numAnswers; i++) {
-          answers.push(i+1);
-        }
-        const question = new SurveyQuestion(
-          questionText,
-          answers,
-        );
-        return question;
-      }
-
-      function CreateBlankSurveyQuestion() { 
-        const question = new BlankSurveyQuestion();
-          document.getElementById("questionsContainer").appendChild(question.question);
-      }
-      
-      class surveyAccessButton {
-        constructor(title, ID, pov, answered, questionsList) {
-          
-          this.div = document.createElement("div");
-          this.div.classList.add("SurveyAccessDiv");
-          this.div.dataset.surveyID = ID;
-          this.div.dataset.pov = pov;
-          this.div.dataset.answered = answered;
-          this.div.dataset.questions = questionsList;
-
-          this.nameLabel = document.createElement("label");
-          this.nameLabel.textContent = title;
-
-          this.IDLabel = document.createElement("label");
-          this.IDLabel.textContent = `Survey ID: ${ID}`;
-
-          this.answeredLabel = document.createElement("label");
-          if (answered === true) {
-            this.answeredLabel.textContent = "This survey has been completed.";
-          } else {
-            this.answeredLabel.textContent = "This survey has not been completed.";
-          }
-
-          this.inviteButton = document.createElement("button");
-          this.inviteButton.textContent = "Invite Participants";
-          this.inviteButton.classList.add("inviteButton");
-
-          this.viewButton = document.createElement("button");
-          this.viewButton.textContent = "View Survey";
-
-          this.horizontalDiv = document.createElement("div");
-          this.horizontalDiv.classList.add("horizontalDiv");
-
-          this.verticalDiv1 = document.createElement("div");
-          this.verticalDiv1.classList.add("verticalDiv");
-          
-          this.verticalDiv2 = document.createElement("div");
-          this.verticalDiv2.classList.add("verticalDiv");
-          
-          this.div.appendChild(this.horizontalDiv);
-          this.horizontalDiv.appendChild(this.verticalDiv1);
-          this.horizontalDiv.appendChild(this.verticalDiv2);
-          
-          this.verticalDiv1.appendChild(this.nameLabel);
-          this.verticalDiv1.appendChild(this.IDLabel);
-          this.verticalDiv1.appendChild(this.answeredLabel);
-          this.verticalDiv1.style.alignItems = "flex-start";
-          this.verticalDiv1.style.justifyContent = "center";
-          this.verticalDiv1.style.paddingLeft = "10px";
-
-
-          this.verticalDiv2.appendChild(this.viewButton);
-          this.verticalDiv2.appendChild(this.inviteButton);
-          this.verticalDiv2.style.alignItems = "flex-end";
-          this.verticalDiv2.style.justifyContent = "center";
-          this.verticalDiv2.style.paddingRight = "10px";
-
-          this.emailInput = document.createElement("input");
-          this.popup = document.createElement("div");
-          this.popup.classList.add("surveyPopup");
-          this.popup.setAttribute("popover", "manual");
-          
-          this.submitButton = document.createElement("button");
-          this.submitButton.textContent = "Invite";
-          
-          this.inviteButton.addEventListener("click", () => {
-            const surveyCode = `S${ID}`;
-
-            this.popup.textContent = "Invitees Email Address: ";
-            this.popup.appendChild(this.emailInput);
-            this.popup.appendChild(this.submitButton);
-            document.body.appendChild(this.popup);
-            this.popup.showPopover();
-          });
-
-          this.submitButton.addEventListener("click", async () => {
-            const email = this.emailInput.value.trim();
-            if (!email) {
-              alert("Please enter an email address.");
-              return;
-            }
-            const { data: { session }, error } = await supabaseClient.auth.getSession();
-            if (error || !session) {
-              alert("Please sign in to proceed.");
-              return;
-            }
+            const { data } = await supabaseClient.auth.getSession();
             try {
-              const response = await fetch("/admin/invite", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": `Bearer ${session.access_token}`
-                },
-                body: JSON.stringify({ 
-                  surveyID: ID,
-                  email: email
-                })
-              });
-              
-              const result = await response.json();
-              
-              if (!response.ok) {
-                alert(result.message);
+              await handleGoogleAuthSession(data.session);
+            } catch (err) {
+              authMessage.textContent = err.message || "Google sign-in failed.";
+              authSubmit.disabled = false;
+              googleAuthButton.disabled = false;
+            }
+          })
+          .catch((err) => {
+            authSetupState = "error";
+            authSubmit.disabled = true;
+            googleAuthButton.disabled = true;
+            console.error("Could not initialize sign-in:", err);
+            authMessage.textContent = "Sign-in setup could not load. Refresh the page and try again.";
+            document.getElementById("output").textContent = err.message;
+          });
+
+
+        class SurveyQuestion {
+          constructor(questionText, options) {
+            this.question = document.createElement("div");
+            this.question.classList.add("question");
+
+            this.label = document.createElement("label");
+            this.label.textContent = questionText;
+
+            this.fieldset = document.createElement("fieldset");
+            this.fieldset.classList.add("surveyField");
+
+            options.forEach((option) => {
+              const label = document.createElement("label");
+              const radio = document.createElement("input");
+              radio.type = "radio";
+              radio.name = questionText;
+              radio.value = option;
+              label.appendChild(radio);
+              label.appendChild(document.createTextNode(" " + option));
+              this.fieldset.appendChild(label);
+            });
+            this.question.appendChild(this.label);
+            this.question.appendChild(this.fieldset);
+          }
+        }
+
+        class BlankSurveyQuestion {
+          constructor() {
+            this.question = document.createElement("div");
+            this.question.classList.add("question");
+
+            this.div = document.createElement("div");
+            this.div.classList.add("horizontalDiv");
+
+            this.div2 = document.createElement("div");
+            this.div2.classList.add("verticalDiv");
+
+            this.label = document.createElement("textarea");
+            this.label.classList.add("questionInput");
+            this.label.placeholder = "Enter question text here:";
+
+            this.label.addEventListener("input", function() {
+              this.style.height = "auto";
+              this.style.height = (this.scrollHeight) + "px";
+            });
+
+            this.label2 = document.createElement("textarea");
+            this.label2.classList.add("questionInput");
+            this.label2.placeholder = "Enter third person text here:";
+
+            this.label2.addEventListener("input", function() {
+              this.style.height = "auto";
+              this.style.height = (this.scrollHeight) + "px";
+            });
+
+            this.label3 = document.createElement("input");
+            this.label3.type = "number";
+            this.label3.placeholder = "Number of options";
+
+            this.button = document.createElement("button");
+            this.button.type = "button";
+            this.button.textContent = "X";
+            this.button.classList.add("deleteSurveyButton");
+
+            this.button.addEventListener("click", () => {
+              this.question.remove();
+            });
+
+            this.question.appendChild(this.div);
+            this.div.appendChild(this.div2);
+            this.div2.appendChild(this.label);
+            this.div2.appendChild(this.label2);
+            this.div.appendChild(this.button);
+            this.question.appendChild(this.label3);
+            
+          }
+        }
+        
+        function CreateSurveyQuestion(questionText, numAnswers) { 
+          const answers = [];
+          for (let i = 0; i < numAnswers; i++) {
+            answers.push(i+1);
+          }
+          const question = new SurveyQuestion(
+            questionText,
+            answers,
+          );
+          return question;
+        }
+
+        function CreateBlankSurveyQuestion() { 
+          const question = new BlankSurveyQuestion();
+            document.getElementById("questionsContainer").appendChild(question.question);
+        }
+        
+        class surveyAccessButton {
+          constructor(title, ID, pov, answered, questionsList) {
+            
+            this.div = document.createElement("div");
+            this.div.classList.add("SurveyAccessDiv");
+            this.div.dataset.surveyID = ID;
+            this.div.dataset.pov = pov;
+            this.div.dataset.answered = answered;
+            this.div.dataset.questions = questionsList;
+
+            this.nameLabel = document.createElement("label");
+            this.nameLabel.textContent = title;
+
+            this.IDLabel = document.createElement("label");
+            this.IDLabel.textContent = `Survey ID: ${ID}`;
+
+            this.answeredLabel = document.createElement("label");
+            if (answered === true) {
+              this.answeredLabel.textContent = "This survey has been completed.";
+            } else {
+              this.answeredLabel.textContent = "This survey has not been completed.";
+            }
+
+            this.inviteButton = document.createElement("button");
+            this.inviteButton.textContent = "Invite Participants";
+            this.inviteButton.classList.add("inviteButton");
+
+            this.viewButton = document.createElement("button");
+            this.viewButton.textContent = "View Survey";
+
+            this.horizontalDiv = document.createElement("div");
+            this.horizontalDiv.classList.add("horizontalDiv");
+
+            this.verticalDiv1 = document.createElement("div");
+            this.verticalDiv1.classList.add("verticalDiv");
+            
+            this.verticalDiv2 = document.createElement("div");
+            this.verticalDiv2.classList.add("verticalDiv");
+            
+            this.div.appendChild(this.horizontalDiv);
+            this.horizontalDiv.appendChild(this.verticalDiv1);
+            this.horizontalDiv.appendChild(this.verticalDiv2);
+            
+            this.verticalDiv1.appendChild(this.nameLabel);
+            this.verticalDiv1.appendChild(this.IDLabel);
+            this.verticalDiv1.appendChild(this.answeredLabel);
+            this.verticalDiv1.style.alignItems = "flex-start";
+            this.verticalDiv1.style.justifyContent = "center";
+            this.verticalDiv1.style.paddingLeft = "10px";
+
+
+            this.verticalDiv2.appendChild(this.viewButton);
+            this.verticalDiv2.appendChild(this.inviteButton);
+            this.verticalDiv2.style.alignItems = "flex-end";
+            this.verticalDiv2.style.justifyContent = "center";
+            this.verticalDiv2.style.paddingRight = "10px";
+
+            this.emailInput = document.createElement("input");
+            this.popup = document.createElement("div");
+            this.popup.classList.add("surveyPopup");
+            this.popup.setAttribute("popover", "manual");
+            
+            this.submitButton = document.createElement("button");
+            this.submitButton.textContent = "Invite";
+            
+            this.inviteButton.addEventListener("click", () => {
+              const surveyCode = `S${ID}`;
+
+              this.popup.textContent = "Invitees Email Address: ";
+              this.popup.appendChild(this.emailInput);
+              this.popup.appendChild(this.submitButton);
+              document.body.appendChild(this.popup);
+              this.popup.showPopover();
+            });
+
+            this.submitButton.addEventListener("click", async () => {
+              const email = this.emailInput.value.trim();
+              if (!email) {
+                alert("Please enter an email address.");
                 return;
               }
-              alert("Invitation sent successfully.");
-            } catch (error) {
-              console.error("Error sending invitation:", error);
-              alert("Could not contact the server");
-            }
-            this.popup.hidePopover();
-          });
-
-          this.viewButton.addEventListener("click", async () => {
-            currentSurveyID = ID;
-            currentPOV = pov;
-            potentialMainPageDivs.forEach((div) => {
-              div.classList.remove("active");
-            });
-            surveyAnsweringDiv.classList.add("active");
-            clearSurvey()
-            console.log("POV:", pov, typeof pov);
-            console.log("Questions:", questionsList);
-            surveyAnsweringDiv.replaceChildren();
-            for (let i = 0; i < questionsList.length; i++) {
-              if (pov === "1") {
-                surveyAnsweringDiv.appendChild(
-                  CreateSurveyQuestion(
-                    questionsList[i].questionText,
-                    questionsList[i].numberOfOptions
-                  ).question
-                );
+              const { data: { session }, error } = await supabaseClient.auth.getSession();
+              if (error || !session) {
+                alert("Please sign in to proceed.");
+                return;
               }
-              else if (pov === "0") {
-                surveyAnsweringDiv.appendChild(CreateSurveyQuestion(questionsList[i].thirdPersonText, questionsList[i].numberOfOptions).question);
-              }
-            }
-            const submitButton = document.createElement("button");
-
-            submitButton.textContent = "Submit Survey";
-
-            submitButton.addEventListener("click", async () => {
-
-                console.log("Submit clicked");
-
-                const responses = {};
-
-                document
-                  .querySelectorAll("#surveyAnsweringDiv .question")
-                  .forEach((question, index) => {
-
-                    const selected =
-                      question.querySelector(
-                        'input[type="radio"]:checked'
-                      );
-
-                    responses[`question_${index + 1}`] =
-                      selected ? selected.value : null;
-                  });
-
-                const unanswered =
-                  Object.values(responses).some(
-                    answer => answer === null
-                  );
-
-                if (unanswered) {
-                  document.getElementById("output").textContent =
-                    "Please answer all questions.";
+              try {
+                const response = await fetch("/admin/invite", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${session.access_token}`
+                  },
+                  body: JSON.stringify({ 
+                    surveyID: ID,
+                    email: email
+                  })
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                  alert(result.message);
                   return;
                 }
-
-                console.log("Survey:", currentSurveyID);
-                console.log("POV:", pov);
-                console.log("Responses:", responses);
-
+                alert("Invitation sent successfully.");
+              } catch (error) {
+                console.error("Error sending invitation:", error);
+                alert("Could not contact the server");
+              }
+              this.popup.hidePopover();
             });
 
-            surveyAnsweringDiv.appendChild(submitButton);
-          });
-        }
-      }
-      
-      function createSurveyAccessButton(title, ID, pov, answered, questionsList) {
-        const tempSurveyAccessButton = new surveyAccessButton(title, ID, pov, answered, questionsList);
-        surveyAccessDisplay.appendChild(tempSurveyAccessButton.div);
-      }
-      
-      async function loadSurveys() {
-        try {
-          const response = await fetch("/admin/surveys");
+            this.viewButton.addEventListener("click", async () => {
+              currentSurveyID = ID;
+              currentPOV = pov;
+              potentialMainPageDivs.forEach((div) => {
+                div.classList.remove("active");
+              });
+              surveyAnsweringDiv.classList.add("active");
+              clearSurvey()
+              console.log("POV:", pov, typeof pov);
+              console.log("Questions:", questionsList);
+              surveyAnsweringDiv.replaceChildren();
+              for (let i = 0; i < questionsList.length; i++) {
+                if (pov === "1") {
+                  surveyAnsweringDiv.appendChild(
+                    CreateSurveyQuestion(
+                      questionsList[i].questionText,
+                      questionsList[i].numberOfOptions
+                    ).question
+                  );
+                }
+                else if (pov === "0") {
+                  surveyAnsweringDiv.appendChild(CreateSurveyQuestion(questionsList[i].thirdPersonText, questionsList[i].numberOfOptions).question);
+                }
+              }
+              const submitButton = document.createElement("button");
 
-          if (!response.ok) {
-            throw new Error("Failed to load surveys");
+              submitButton.textContent = "Submit Survey";
+
+              submitButton.addEventListener("click", async () => {
+
+                  console.log("Submit clicked");
+
+                  const responses = {};
+
+                  document
+                    .querySelectorAll("#surveyAnsweringDiv .question")
+                    .forEach((question, index) => {
+
+                      const selected =
+                        question.querySelector(
+                          'input[type="radio"]:checked'
+                        );
+
+                      responses[`question_${index + 1}`] =
+                        selected ? selected.value : null;
+                    });
+
+                  const unanswered =
+                    Object.values(responses).some(
+                      answer => answer === null
+                    );
+
+                  if (unanswered) {
+                    document.getElementById("output").textContent =
+                      "Please answer all questions.";
+                    return;
+                  }
+
+                  console.log("Survey:", currentSurveyID);
+                  console.log("POV:", pov);
+                  console.log("Responses:", responses);
+
+                  if (!supabaseClient) {
+                    document.getElementById("output").textContent =
+                        "Authentication is not configured.";
+                    return;
+                }
+
+                const { data: sessionData } =
+                    await supabaseClient.auth.getSession();
+
+                if (!sessionData.session) {
+                    document.getElementById("output").textContent =
+                        "Sign in before submitting a survey.";
+                    return;
+                }
+
+                fetch("/submitSurvey", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization:
+                            `Bearer ${sessionData.session.access_token}`
+                    },
+                    body: JSON.stringify({
+                        surveyID: currentSurveyID,
+                        pov: currentPOV,
+                        responses: responses
+                    })
+                })
+                .then(async (res) => {
+                    const data = await res.json();
+
+                    document.getElementById("output").textContent =
+                        res.ok
+                            ? data.message
+                            : data.error;
+                })
+                .catch((err) => {
+                    document.getElementById("output").textContent =
+                        err.message;
+                });
+
+              });
+
+              surveyAnsweringDiv.appendChild(submitButton);
+            });
           }
-          const surveys = await response.json();
-          surveyAccessDisplay.replaceChildren();
-
-          surveys.forEach((survey) => { //createSurveyAccessButton(title, ID, pov, answered, questionsList)
-            createSurveyAccessButton(survey.title, survey.survey_id, "0", false, survey.questions);
-          });
-        } catch (error) {
-          console.error("Error loading surveys:", error);
-          surveyAccessDisplay.textContent = "Unable to load surveys.";
         }
-      }
-      document.addEventListener("DOMContentLoaded", loadSurveys);
-      //createSurveyAccessButton("A", 12345, "0", false, []);
+        
+        function createSurveyAccessButton(title, ID, pov, answered, questionsList) {
+          const tempSurveyAccessButton = new surveyAccessButton(title, ID, pov, answered, questionsList);
+          surveyAccessDisplay.appendChild(tempSurveyAccessButton.div);
+        }
+        
+        async function loadSurveys() {
+          try {
+            const response = await fetch("/admin/surveys");
 
-      document.addEventListener("click", (event) => {
-        const popups = document.querySelectorAll(".surveyPopup:popover-open");
-        popups.forEach((popup) => {
-          // Check whether the click was inside the popup
-          if (popup.contains(event.target)) {
-          return;
+            if (!response.ok) {
+              throw new Error("Failed to load surveys");
+            }
+            const surveys = await response.json();
+            surveyAccessDisplay.replaceChildren();
+
+            surveys.forEach((survey) => { //createSurveyAccessButton(title, ID, pov, answered, questionsList)
+              createSurveyAccessButton(survey.title, survey.survey_id, "0", false, survey.questions);
+            });
+          } catch (error) {
+            console.error("Error loading surveys:", error);
+            surveyAccessDisplay.textContent = "Unable to load surveys.";
           }
-          // Check whether the click was on a button that opens a popup
-          if (submitSurveyCodeButton.contains(event.target) || event.target.closest(".inviteButton")) {
+        }
+        document.addEventListener("DOMContentLoaded", loadSurveys);
+        //createSurveyAccessButton("A", 12345, "0", false, []);
+
+        document.addEventListener("click", (event) => {
+          const popups = document.querySelectorAll(".surveyPopup:popover-open");
+          popups.forEach((popup) => {
+            // Check whether the click was inside the popup
+            if (popup.contains(event.target)) {
             return;
-          }
-          popup.hidePopover();
+            }
+            // Check whether the click was on a button that opens a popup
+            if (submitSurveyCodeButton.contains(event.target) || event.target.closest(".inviteButton")) {
+              return;
+            }
+            popup.hidePopover();
+          });
         });
-      });
 
-    </script>
-  </body>
-</html>
+      </script>
+    </body>
+  </html>
