@@ -109,6 +109,10 @@ app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "Frontend", "AdminWebsite.html"));
 });
 
+app.get("/user", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "Frontend", "UserCopy.html"));
+});
+
 app.get("/healthz", (req, res) => {
   res.json({ status: "ok" });
 });
@@ -321,6 +325,67 @@ app.get("/admin/surveys", async (req, res) => {
         details: error.details,
         hint: error.hint,
         code: error.code
+      });
+      return res.status(500).json({
+        message: "Failed to load surveys"
+      });
+    }
+
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server error"
+    });
+  }
+});
+
+app.get("/user/surveys", async (req, res) => {
+  try {
+    const authorization = req.get("authorization");
+
+    const accessToken = authorization?.startsWith("Bearer ")
+    ? authorization.slice("Bearer ".length)
+    : null;
+
+    if (!accessToken) {
+      return res.status(401).json({error: "Authentication required."});
+    }
+    const { data: authData, error: authError } = await supabaseAuthClient.auth.getUser(accessToken);
+
+    if (authError || !authData.user) {
+     return res.status(401).json({error: "Invalid session."});
+    }
+
+    const user = authData.user;
+
+    const {data:SurveyList, error: surveyListError } = await supabaseServiceClient
+    .from("user_surveys").select("survey_id").eq("user_id", user.id);;
+
+    if (surveyListError) {
+      console.error("Supabase error:", {
+        message: surveyListError.message,
+        details: surveyListError.details,
+        hint: surveyListError.hint,
+        code: surveyListError.code
+      });
+      return res.status(500).json({
+        message: "Failed to load surveys"
+      });
+    }
+
+    const surveyIDs = SurveyList.map(survey => survey.survey_id);
+    if (surveyIDs.length === 0) {
+      return res.json([]);
+    }
+    const {data, error: surveyError } = await supabaseServiceClient
+    .from("surveys").select("survey_id, title, questions").in("survey_id", surveyIDs);
+
+    if (surveyError) {
+      console.error("Supabase error:", {
+        message: surveyError.message,
+        details: surveyError.details,
+        hint: surveyError.hint,
+        code: surveyError.code
       });
       return res.status(500).json({
         message: "Failed to load surveys"
