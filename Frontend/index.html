@@ -332,7 +332,11 @@
         min-height: 1.4em;
         color: var(--color-highlight);
       }
-
+      .submitContainer {
+        display: flex;
+        justify-content: center;
+        margin-top: 30px 0;
+      }
     </style>
   </head>
 
@@ -840,9 +844,14 @@
               });
               if (!document.getElementById("submitSurveyButton")) {
 
+              const submitContainer = document.createElement("div");
+              submitContainer.classList.add("submitContainer");
+
               submitButton.id = "submitSurveyButton";
 
-              surveysDiv.appendChild(submitButton);
+              submitContainer.appendChild(submitButton);
+
+              surveysDiv.appendChild(submitContainer);
 }
 
     });
