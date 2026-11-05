@@ -370,7 +370,7 @@
       #surveyAnsweringDiv.active {
         display: flex;
       }
-      #surveyPopup {
+      .surveyPopup {
         gap: 5px;
         padding: 10px;
         width: 15%;
@@ -387,7 +387,7 @@
 
         height: fit-content;
       }
-      #surveyPopup:not(:popover-open) {
+      .surveyPopup:not(:popover-open) {
         display: none;
       }
 
@@ -465,11 +465,11 @@
 
           <button ID="CreateSurvey">Create New Survey</button>
 
-          <button popovertarget="surveyPopup">
+          <button popovertarget="codePopup">
             Use Survey Code
           </button>
 
-          <div id="surveyPopup" popover>
+          <div id="codePopup" class="surveyPopup" popover>
             <input type="text" id="surveyCode" placeholder="Enter your invite code">
 
             <button id="submitSurveyCode" type="button">Submit</button>
@@ -551,7 +551,7 @@
       const submitSurveyCodeButton = document.getElementById("submitSurveyCode");
       const surveyAccessDisplay = document.getElementById("displaySurveyAccessButtons");
       const surveyAnsweringDiv = document.getElementById("surveyAnsweringDiv");
-      const popup = document.getElementById("surveyPopup");
+      const popup = document.getElementById("codePopup");
 
       var potentialMainPageDivs = [homeDiv, surveysDiv, invitesDiv, resultsDiv, surveyAnsweringDiv];
 
@@ -1069,7 +1069,12 @@
           this.div.appendChild(this.IDLabel);
           this.div.appendChild(this.answeredLabel);
 
-          this.div.addEventListener("click", async () => {
+          this.inviteButton = document.createElement("button");
+          this.inviteButton.textContent = "Invite Participants";
+          this.viewButton = document.createElement("button");
+          this.viewButton.textContent = "View Survey";
+
+          this.viewButton.addEventListener("click", async () => {
             potentialMainPageDivs.forEach((div) => {
               div.classList.remove("active");
             });
@@ -1091,6 +1096,17 @@
                 surveyAnsweringDiv.appendChild(CreateSurveyQuestion(questionsList[i].thirdPersonText, questionsList[i].numberOfOptions).question);
               }
             }
+          });
+
+          const popup = document.createElement("div");
+          popup.classList.add("surveyPopup");
+          popup.appendChild(viewButton);
+          popup.appendChild(inviteButton);
+          this.div.appendChild(popup);
+          popup.style.display = "none";
+
+          this.div.addEventListener("click", async () => {
+            popup.style.display = "flex";
           });
 
         }
@@ -1119,7 +1135,9 @@
           surveyAccessDisplay.textContent = "Unable to load surveys.";
         }
       }
-      document.addEventListener("DOMContentLoaded", loadSurveys);
+      createSurveyAccessButton("Test Survey", "1", "0", false, []);
+      
+      
 
     </script>
   </body>
