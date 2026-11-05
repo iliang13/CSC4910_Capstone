@@ -222,7 +222,8 @@
         display: flex;
         flex-direction: row;
         gap: 20px;
-        align-items: center;
+        align-items: stretch;
+        flex: 1;
         width:100%;
       }
       .verticalDiv {
@@ -1056,24 +1057,99 @@
           this.nameLabel.textContent = title;
 
           this.IDLabel = document.createElement("label");
-          this.IDLabel.textContent = ID;
+          this.IDLabel.textContent = `Survey ID: ${ID}`;
 
           this.answeredLabel = document.createElement("label");
           if (answered === true) {
             this.answeredLabel.textContent = "This survey has been completed.";
           } else {
-            this.answeredLabel.textContent = "This survey has NOT been completed.";
+            this.answeredLabel.textContent = "This survey has not been completed.";
           }
-
-          this.div.appendChild(this.nameLabel);
-          this.div.appendChild(this.IDLabel);
-          this.div.appendChild(this.answeredLabel);
 
           this.inviteButton = document.createElement("button");
           this.inviteButton.textContent = "Invite Participants";
+          this.inviteButton.classList.add("inviteButton");
+
           this.viewButton = document.createElement("button");
           this.viewButton.textContent = "View Survey";
 
+          this.horizontalDiv = document.createElement("div");
+          this.horizontalDiv.classList.add("horizontalDiv");
+
+          this.verticalDiv1 = document.createElement("div");
+          this.verticalDiv1.classList.add("verticalDiv");
+          
+          this.verticalDiv2 = document.createElement("div");
+          this.verticalDiv2.classList.add("verticalDiv");
+          
+          this.div.appendChild(this.horizontalDiv);
+          this.horizontalDiv.appendChild(this.verticalDiv1);
+          this.horizontalDiv.appendChild(this.verticalDiv2);
+          
+          this.verticalDiv1.appendChild(this.nameLabel);
+          this.verticalDiv1.appendChild(this.IDLabel);
+          this.verticalDiv1.appendChild(this.answeredLabel);
+          this.verticalDiv1.style.alignItems = "flex-start";
+          this.verticalDiv1.style.justifyContent = "center";
+          this.verticalDiv1.style.paddingLeft = "10px";
+
+
+          this.verticalDiv2.appendChild(this.viewButton);
+          this.verticalDiv2.appendChild(this.inviteButton);
+          this.verticalDiv2.style.alignItems = "flex-end";
+          this.verticalDiv2.style.justifyContent = "center";
+          this.verticalDiv2.style.paddingRight = "10px";
+
+          this.emailInput = document.createElement("input");
+          this.popup = document.createElement("div");
+          this.popup.classList.add("surveyPopup");
+          this.popup.setAttribute("popover", "manual");
+          
+          this.submitButton = document.createElement("button");
+          this.submitButton.textContent = "Invite";
+          
+          this.inviteButton.addEventListener("click", () => {
+            const surveyCode = `S${ID}`;
+
+            this.popup.textContent = "Invitees Email Address: ";
+            this.popup.appendChild(this.emailInput);
+            this.popup.appendChild(this.submitButton);
+            document.body.appendChild(this.popup);
+            this.popup.showPopover();
+          });
+
+          this.submitButton.addEventListener("click", async () => {
+            const email = this.emailInput.value.trim();
+            if (!email) {
+              alert("Please enter an email address.");
+              return;
+            }
+            try {
+              const response = await fetch("invite", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ 
+                  surveyID: ID,
+                  email: email
+                })
+              });
+              
+              const result = await response.json();
+              
+              if (!response.ok) {
+                alert(result.message);
+                return;
+              }
+              alert("Invitation sent successfully.");
+            } catch (error) {
+              console.error("Error sending invitation:", error);
+              alert("Could not contact the server");
+            }
+            this.popup.hidePopover();
+          });
+          
           this.viewButton.addEventListener("click", async () => {
             potentialMainPageDivs.forEach((div) => {
               div.classList.remove("active");
@@ -1096,17 +1172,6 @@
                 surveyAnsweringDiv.appendChild(CreateSurveyQuestion(questionsList[i].thirdPersonText, questionsList[i].numberOfOptions).question);
               }
             }
-          });
-
-          const popup = document.createElement("div");
-          popup.classList.add("surveyPopup");
-          popup.appendChild(this.viewButton);
-          popup.appendChild(this.inviteButton);
-          this.div.appendChild(popup);
-          popup.style.display = "none";
-
-          this.div.addEventListener("click", async () => {
-            popup.style.display = "flex";
           });
 
         }
@@ -1136,6 +1201,22 @@
         }
       }
       document.addEventListener("DOMContentLoaded", loadSurveys);
+      //createSurveyAccessButton("A", 12345, "0", false, []);
+
+      document.addEventListener("click", (event) => {
+        const popups = document.querySelectorAll(".surveyPopup:popover-open");
+        popups.forEach((popup) => {
+          // Check whether the click was inside the popup
+          if (popup.contains(event.target)) {
+          return;
+          }
+          // Check whether the click was on a button that opens a popup
+          if (submitSurveyCodeButton.contains(event.target) || event.target.closest(".inviteButton")) {
+            return;
+          }
+          popup.hidePopover();
+        });
+      });
 
     </script>
   </body>
