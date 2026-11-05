@@ -554,6 +554,8 @@
       const surveyAnsweringDiv = document.getElementById("surveyAnsweringDiv");
       const popup = document.getElementById("codePopup");
 
+      let currentSurveyID = null;
+
       var potentialMainPageDivs = [homeDiv, surveysDiv, invitesDiv, resultsDiv, surveyAnsweringDiv];
 
       submitSurveyCodeButton.addEventListener("click", async () => {
@@ -1151,6 +1153,8 @@
           });
           
           this.viewButton.addEventListener("click", async () => {
+
+            currentSurveyID = ID;
             potentialMainPageDivs.forEach((div) => {
               div.classList.remove("active");
             });

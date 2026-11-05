@@ -477,7 +477,7 @@
       surveysDisplayDiv.classList.add("surveysDisplayDiv");
       document.getElementById("surveysDiv").appendChild(surveysDisplayDiv);
       
-      
+      let currentSurveyID = null;
       
       var potentialMainPageDivs = [homeDiv, surveysDiv, invitesDiv, resultsDiv];
 
@@ -869,10 +869,33 @@ function CreateBlankSurveyQuestion() {
 
       const selected =
         document.querySelector('input[name="a"]:checked');
+        const responses = {};
 
-      const responses = {
-          answer: selected ? selected.value : null
-      };
+        document
+          .querySelectorAll(".question")
+          .forEach((question, index) => {
+
+            const selected =
+              question.querySelector(
+                'input[type="radio"]:checked'
+              );
+
+            responses[`question_${index + 1}`] =
+              selected ? selected.value : null;
+          });
+
+        const unanswered =
+          Object.values(responses).some(
+            answer => answer === null
+          );
+
+        if (unanswered) {
+
+          document.getElementById("output").textContent =
+            "Please answer all questions.";
+
+          return;
+        }
 
         if (!supabaseClient) {
           document.getElementById("output").textContent = "Authentication is not configured.";
@@ -885,13 +908,22 @@ function CreateBlankSurveyQuestion() {
           return;
         }
 
+        if (!currentSurveyID) {
+          document.getElementById("output").textContent =
+        "No survey selected.";
+          return;
+      }
+
+        console.log("Submitting survey:", currentSurveyID);
+        console.log("Responses:", responses);
+        
         fetch("/submitSurvey", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${sessionData.session.access_token}`
           },
-          body: JSON.stringify({surveyID: "12345678", responses: responses})
+          body: JSON.stringify({surveyID: currentSurveyID, responses: responses})
       })
         .then(async (res) => {
           const data = await res.json();
