@@ -70,6 +70,9 @@
         cursor: pointer;
         transition: 0.2s;
       }
+      button[hidden] {
+        display: none;
+      }
       button:hover {
         background-color: var(--color-button-hover);
         transform: translateY(-1px);
@@ -346,6 +349,7 @@
       <button id="PersonalResults">Personal Results</button>
       <button id="signUp">Sign Up</button>
       <button id="signIn">Sign In</button>
+      <button id="signOut" type="button" hidden>Log Out</button>
     </div>
 
     <div id="mainPageContainer">
@@ -461,6 +465,7 @@
 
       const signUpButton = document.getElementById("signUp");
       const signInButton = document.getElementById("signIn");
+      const signOutButton = document.getElementById("signOut");
       const surveysButton = document.getElementById("SurveysBtn");
       const invitesButton = document.getElementById("InvitesBtn");
       const personalResultsButton = document.getElementById("PersonalResults");
@@ -586,7 +591,23 @@
         const { error } = await supabaseClient.auth.signOut({ scope: "local" });
         if (error) throw error;
         document.getElementById("userStatus").textContent = "Not Signed In";
+        document.getElementById("welcomeMessage").querySelector("h2").textContent =
+          "Welcome to DataPulse360";
+        signOutButton.hidden = true;
       }
+
+      signOutButton.addEventListener("click", async () => {
+        signOutButton.disabled = true;
+        try {
+          await signOutCurrentSession();
+          document.getElementById("output").textContent = "Successfully signed out.";
+        } catch (err) {
+          document.getElementById("output").textContent =
+            err.message || "Could not sign out. Please try again.";
+        } finally {
+          signOutButton.disabled = false;
+        }
+      });
 
       googleAuthButton.addEventListener("click", async () => {
         if (!supabaseClient) {
@@ -622,9 +643,11 @@
       async function showAuthenticatedUser(session) {
         if (!session) {
           document.getElementById("userStatus").textContent = "Not Signed In";
+          signOutButton.hidden = true;
           return;
         }
 
+        signOutButton.hidden = false;
         try {
           const response = await fetch("/api/me", {
             headers: { Authorization: `Bearer ${session.access_token}` },
