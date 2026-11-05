@@ -483,8 +483,7 @@
       const surveyBuilder = document.getElementById("surveyBuilder");
       const addQuestionButton = document.getElementById("addQuestion");
       const surveysDisplayDiv = document.querySelector(".surveysDisplayDiv");
-      surveysDisplayDiv.classList.add("surveysDisplayDiv");
-      document.getElementById("surveysDiv").appendChild(surveysDisplayDiv);
+
       loadSurveys();
       let currentSurveyID = null;
 
@@ -781,6 +780,17 @@
         console.log("FULL SURVEY DATA:", questions);
 
           currentSurveyID = surveyID;
+
+          document
+              .querySelectorAll(".surveyQuestionDisplay")
+              .forEach(el => el.remove());
+
+          const oldSubmitButton =
+              document.getElementById("submitSurveyButton");
+
+          if (oldSubmitButton) {
+              oldSubmitButton.parentElement.remove();
+          }
 
           document.getElementById("output").textContent =
               `Selected: ${title}`;
