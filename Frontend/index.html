@@ -483,6 +483,8 @@
       document.getElementById("surveysDiv").appendChild(surveysDisplayDiv);
       
       let currentSurveyID = null;
+
+      let currentPOV = null;
       
       var potentialMainPageDivs = [homeDiv, surveysDiv, invitesDiv, resultsDiv];
 
@@ -946,7 +948,7 @@ function CreateBlankSurveyQuestion() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${sessionData.session.access_token}`
           },
-          body: JSON.stringify({surveyID: currentSurveyID, responses: responses})
+          body: JSON.stringify({surveyID: currentSurveyID, pov: currentPOV, responses: responses})
       })
         .then(async (res) => {
           const data = await res.json();

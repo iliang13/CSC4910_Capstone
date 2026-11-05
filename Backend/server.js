@@ -26,42 +26,39 @@ const supabaseAuthClient = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: false,
   },
 });
-const supabaseServiceClient = createClient(
-  supabaseUrl,
-  supabaseServiceRoleKey
-);
+const supabaseServiceClient = createClient(supabaseUrl, supabaseServiceRoleKey);
 
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || false }));
 app.use(express.json());
 
 app.get("/testSurvey/:id", async (req, res) => {
-    try {
-        const { data, error } = await supabaseServiceClient
-            .from("surveys")
-            .select("*")
-            .eq("survey_id", req.params.id)
-            .maybeSingle();
+  try {
+    const { data, error } = await supabaseServiceClient
+      .from("surveys")
+      .select("*")
+      .eq("survey_id", req.params.id)
+      .maybeSingle();
 
-        if (error) {
-            console.error("Supabase error:", error.message);
-            return res.status(500).json({
-                error: "Failed to retrieve survey"
-            });
-        }
-
-        if (!data) {
-            return res.status(404).json({
-                error: "Survey not found"
-            });
-        }
-
-        res.json(data);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            error: "Server error"
-        });
+    if (error) {
+      console.error("Supabase error:", error.message);
+      return res.status(500).json({
+        error: "Failed to retrieve survey",
+      });
     }
+
+    if (!data) {
+      return res.status(404).json({
+        error: "Survey not found",
+      });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Server error",
+    });
+  }
 });
 
 const surveysDirectory = path.join(__dirname, "surveys");
@@ -87,13 +84,13 @@ function loadSurveyIDs() {
       const filePath = path.join(surveysDirectory, file);
       const surveyData = JSON.parse(fs.readFileSync(filePath, "utf8"));
 
-            if (surveyData.surveyID) {
-                surveyIDLookupTable[surveyData.surveyID] = surveyData;
-            }
-        } catch (error) {
-            console.error(`Error loading ${file}:`, error.message);
-        }
+      if (surveyData.surveyID) {
+        surveyIDLookupTable[surveyData.surveyID] = surveyData;
+      }
+    } catch (error) {
+      console.error(`Error loading ${file}:`, error.message);
     }
+  }
 }
 
 if (!fs.existsSync(surveysDirectory)) {
@@ -171,22 +168,40 @@ app.post("/submitSurvey", async (req, res) => {
 
     const user = data.user;
 
-    const { surveyID, responses } = req.body;
+    const { surveyID, responses, pov } = req.body;
 
-    console.log("User:", user.id);
-    console.log("Survey:", surveyID);
+    console.log("Survey ID:", surveyID);
+    console.log("POV:", pov);
     console.log("Responses:", responses);
 
-    console.log("Survey submission received:");
-    console.log(req.body);
+    let insertError;
 
-    const { error: insertError } = await supabaseServiceClient
-      .from("survey_responses")
-      .insert({
-        survey_id: surveyID,
-        user_id: user.id,
-        response_data: responses,
+    if (Number(pov) === 0) {
+      const { error } = await supabaseServiceClient
+        .from("survey_responses")
+        .insert({
+          survey_id: surveyID,
+          user_id: user.id,
+          response_data: responses,
+        });
+
+      insertError = error;
+    } else if (Number(pov) === 1) {
+      const { error } = await supabaseServiceClient
+        .from("user_surveys")
+        .insert({
+          survey_id: surveyID,
+          user_id: user.id,
+          response_data: responses,
+        });
+
+      insertError = error;
+    } else {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid POV value.",
       });
+    }
 
     if (insertError) {
       console.error(insertError);
@@ -236,19 +251,17 @@ app.post("/saveSurvey", async (req, res) => {
       surveyID = generateSurveyID();
     }
 
-    const {error} = await supabaseServiceClient
-    .from("surveys")
-    .insert({
+    const { error } = await supabaseServiceClient.from("surveys").insert({
       survey_id: surveyID,
       title: surveyName,
-      questions: questions
+      questions: questions,
     });
 
     if (error) {
       console.error("Supabase insert error:", error.message);
       return res.status(500).json({
         success: false,
-        message: "Failed to save survey."
+        message: "Failed to save survey.",
       });
     }
 
@@ -273,8 +286,8 @@ app.post("/validateSurveyCode", async (req, res) => {
 
   if (!inviteCode) {
     return res.status(400).json({
-      success:false,
-      message: "no survey code entered"
+      success: false,
+      message: "no survey code entered",
     });
   }
 
@@ -284,57 +297,59 @@ app.post("/validateSurveyCode", async (req, res) => {
   if (pov !== "0" && pov !== "1") {
     return res.status(400).json({
       success: false,
-      message: "Invalid survey Code."
+      message: "Invalid survey Code.",
     });
   }
   const surveyID = inviteCode.slice(1);
-  const {data: survey, error} = await supabaseServiceClient
-  .from("surveys")
-  .select("survey_id, title, questions")
-  .eq("survey_id", surveyID)
-  .maybeSingle();
+  const { data: survey, error } = await supabaseServiceClient
+    .from("surveys")
+    .select("survey_id, title, questions")
+    .eq("survey_id", surveyID)
+    .maybeSingle();
   if (error) {
     console.error("Supabase error:", error.message);
     return res.status(500).json({
       success: false,
-      message: "Failed to retrieve survey."
+      message: "Failed to retrieve survey.",
     });
   }
   if (!survey) {
-    return res.status(404).json({success: false, message: "Invalid Survey Code."
-    });
+    return res
+      .status(404)
+      .json({ success: false, message: "Invalid Survey Code." });
   }
-  
+
   return res.json({
-    success: true, 
+    success: true,
     pov: pov,
     surveyId: survey.survey_id,
     surveyName: survey.title,
-    questions: survey.questions
+    questions: survey.questions,
   });
 });
 
 app.get("/admin/surveys", async (req, res) => {
   try {
-    const {data, error } = await supabaseServiceClient
-    .from("surveys").select("survey_id, title, questions");
+    const { data, error } = await supabaseServiceClient
+      .from("surveys")
+      .select("survey_id, title, questions");
 
     if (error) {
       console.error("Supabase error:", {
         message: error.message,
         details: error.details,
         hint: error.hint,
-        code: error.code
+        code: error.code,
       });
       return res.status(500).json({
-        message: "Failed to load surveys"
+        message: "Failed to load surveys",
       });
     }
 
     res.json(data);
   } catch (error) {
     res.status(500).json({
-      message: "Internal server error"
+      message: "Internal server error",
     });
   }
 });
@@ -344,58 +359,65 @@ app.get("/user/surveys", async (req, res) => {
     const authorization = req.get("authorization");
 
     const accessToken = authorization?.startsWith("Bearer ")
-    ? authorization.slice("Bearer ".length)
-    : null;
+      ? authorization.slice("Bearer ".length)
+      : null;
 
     if (!accessToken) {
-      return res.status(401).json({error: "Authentication required."});
+      return res.status(401).json({ error: "Authentication required." });
     }
-    const { data: authData, error: authError } = await supabaseAuthClient.auth.getUser(accessToken);
+    const { data: authData, error: authError } =
+      await supabaseAuthClient.auth.getUser(accessToken);
 
     if (authError || !authData.user) {
-     return res.status(401).json({error: "Invalid session."});
+      return res.status(401).json({ error: "Invalid session." });
     }
 
     const user = authData.user;
 
-    const {data:SurveyList, error: surveyListError } = await supabaseServiceClient
-    .from("user_surveys").select("survey_id").eq("user_id", user.id);;
+    const { data: SurveyList, error: surveyListError } =
+      await supabaseServiceClient
+        .from("user_surveys")
+        .select("survey_id")
+        .eq("user_id", user.id)
+        .eq("pov", 1);
 
     if (surveyListError) {
       console.error("Supabase error:", {
         message: surveyListError.message,
         details: surveyListError.details,
         hint: surveyListError.hint,
-        code: surveyListError.code
+        code: surveyListError.code,
       });
       return res.status(500).json({
-        message: "Failed to load surveys"
+        message: "Failed to load surveys",
       });
     }
 
-    const surveyIDs = SurveyList.map(survey => survey.survey_id);
+    const surveyIDs = SurveyList.map((survey) => survey.survey_id);
     if (surveyIDs.length === 0) {
       return res.json([]);
     }
-    const {data, error: surveyError } = await supabaseServiceClient
-    .from("surveys").select("survey_id, title, questions").in("survey_id", surveyIDs);
+    const { data, error: surveyError } = await supabaseServiceClient
+      .from("surveys")
+      .select("survey_id, title, questions")
+      .in("survey_id", surveyIDs);
 
     if (surveyError) {
       console.error("Supabase error:", {
         message: surveyError.message,
         details: surveyError.details,
         hint: surveyError.hint,
-        code: surveyError.code
+        code: surveyError.code,
       });
       return res.status(500).json({
-        message: "Failed to load surveys"
+        message: "Failed to load surveys",
       });
     }
 
     res.json(data);
   } catch (error) {
     res.status(500).json({
-      message: "Internal server error"
+      message: "Internal server error",
     });
   }
 });
@@ -404,16 +426,16 @@ app.post("/admin/invite", async (req, res) => {
   const authorization = req.get("authorization");
 
   const accessToken = authorization?.startsWith("Bearer ")
-  ? authorization.slice("Bearer ".length)
-  : null;
+    ? authorization.slice("Bearer ".length)
+    : null;
 
   if (!accessToken) {
-    return res.status(401).json({error: "Authentication required."});
+    return res.status(401).json({ error: "Authentication required." });
   }
   const { data, error } = await supabaseAuthClient.auth.getUser(accessToken);
 
   if (error || !data.user) {
-     return res.status(401).json({error: "Invalid session."});
+    return res.status(401).json({ error: "Invalid session." });
   }
 
   const user = data.user;
@@ -423,33 +445,34 @@ app.post("/admin/invite", async (req, res) => {
     return res.status(400).json({ error: "Missing surveyID or email" });
   }
 
-  const { data:userList, error:userListError } = await supabaseServiceClient.auth.admin.listUsers();
+  const { data: userList, error: userListError } =
+    await supabaseServiceClient.auth.admin.listUsers();
   if (userListError) {
     console.error("Supabase error:", userListError.message);
     return res.status(500).json({ error: "Failed to retrieve user list" });
   }
   const recipient = userList.users.find(
-  user => user.email?.toLowerCase() === email.toLowerCase()
+    (user) => user.email?.toLowerCase() === email.toLowerCase()
   );
   if (!recipient) {
     return res.status(404).json({ error: "Recipient not found" });
   }
   const recipientID = recipient.id;
-  const {error: surveyError } = await supabaseServiceClient
+  const { error: surveyError } = await supabaseServiceClient
     .from("user_surveys")
     .insert({
       user_id: recipientID,
       survey_id: surveyID,
-      POV: 0
+      pov: 0,
     });
   if (surveyError) {
     console.error("Supabase error:", surveyError.message);
     return res.status(500).json({ error: "Failed to create survey" });
   }
-  
+
   return res.json({
     success: true,
-    message: "Invitation sent successfully."
+    message: "Invitation sent successfully.",
   });
 });
 
@@ -457,16 +480,16 @@ app.post("/user/invite", async (req, res) => {
   const authorization = req.get("authorization");
 
   const accessToken = authorization?.startsWith("Bearer ")
-  ? authorization.slice("Bearer ".length)
-  : null;
+    ? authorization.slice("Bearer ".length)
+    : null;
 
   if (!accessToken) {
-    return res.status(401).json({error: "Authentication required."});
+    return res.status(401).json({ error: "Authentication required." });
   }
   const { data, error } = await supabaseAuthClient.auth.getUser(accessToken);
 
   if (error || !data.user) {
-     return res.status(401).json({error: "Invalid session."});
+    return res.status(401).json({ error: "Invalid session." });
   }
 
   const user = data.user;
@@ -476,33 +499,34 @@ app.post("/user/invite", async (req, res) => {
     return res.status(400).json({ error: "Missing surveyID or email" });
   }
 
-  const { data:userList, error:userListError } = await supabaseServiceClient.auth.admin.listUsers();
+  const { data: userList, error: userListError } =
+    await supabaseServiceClient.auth.admin.listUsers();
   if (userListError) {
     console.error("Supabase error:", userListError.message);
     return res.status(500).json({ error: "Failed to retrieve user list" });
   }
   const recipient = userList.users.find(
-  user => user.email?.toLowerCase() === email.toLowerCase()
+    (user) => user.email?.toLowerCase() === email.toLowerCase()
   );
   if (!recipient) {
     return res.status(404).json({ error: "Recipient not found" });
   }
   const recipientID = recipient.id;
-  const {error: surveyError } = await supabaseServiceClient
+  const { error: surveyError } = await supabaseServiceClient
     .from("user_surveys")
     .insert({
       user_id: recipientID,
       survey_id: surveyID,
-      POV: 1
+      pov: 1,
     });
   if (surveyError) {
     console.error("Supabase error:", surveyError.message);
     return res.status(500).json({ error: "Failed to create survey" });
   }
-  
+
   return res.json({
     success: true,
-    message: "Invitation sent successfully."
+    message: "Invitation sent successfully.",
   });
 });
 

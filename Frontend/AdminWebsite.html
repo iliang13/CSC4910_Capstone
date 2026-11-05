@@ -556,6 +556,8 @@
 
       let currentSurveyID = null;
 
+      let currentPOV = null;
+
       var potentialMainPageDivs = [homeDiv, surveysDiv, invitesDiv, resultsDiv, surveyAnsweringDiv];
 
       submitSurveyCodeButton.addEventListener("click", async () => {
@@ -1160,6 +1162,7 @@
 
           this.viewButton.addEventListener("click", async () => {
             currentSurveyID = ID;
+            currentPOV = pov;
             potentialMainPageDivs.forEach((div) => {
               div.classList.remove("active");
             });
@@ -1216,6 +1219,7 @@
                 }
 
                 console.log("Survey:", currentSurveyID);
+                console.log("POV:", pov);
                 console.log("Responses:", responses);
 
             });
