@@ -1176,6 +1176,46 @@
                 surveyAnsweringDiv.appendChild(CreateSurveyQuestion(questionsList[i].thirdPersonText, questionsList[i].numberOfOptions).question);
               }
             }
+            const submitButton = document.createElement("button");
+            
+            submitButton.textContent = "Submit Survey";
+
+            submitButton.addEventListener("click", async () => {
+
+                console.log("Submit clicked");
+
+                const responses = {};
+
+                document
+                  .querySelectorAll("#surveyAnsweringDiv .question")
+                  .forEach((question, index) => {
+
+                    const selected =
+                      question.querySelector(
+                        'input[type="radio"]:checked'
+                      );
+
+                    responses[`question_${index + 1}`] =
+                      selected ? selected.value : null;
+                  });
+
+                const unanswered =
+                  Object.values(responses).some(
+                    answer => answer === null
+                  );
+
+                if (unanswered) {
+                  document.getElementById("output").textContent =
+                    "Please answer all questions.";
+                  return;
+                }
+
+                console.log("Survey:", currentSurveyID);
+                console.log("Responses:", responses);
+
+            });
+
+            surveyAnsweringDiv.appendChild(submitButton);
           });
 
         }
