@@ -1126,11 +1126,17 @@
               alert("Please enter an email address.");
               return;
             }
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            if (error || !session) {
+              alert("Please sign in to proceed.");
+              return;
+            }
             try {
-              const response = await fetch("invite", {
+              const response = await fetch("/invite", {
                 method: "POST",
                 headers: {
-                  "Content-Type": "application/json"
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${session.access_token}`
                 },
                 body: JSON.stringify({ 
                   surveyID: ID,
@@ -1153,7 +1159,6 @@
           });
           
           this.viewButton.addEventListener("click", async () => {
-
             currentSurveyID = ID;
             potentialMainPageDivs.forEach((div) => {
               div.classList.remove("active");
@@ -1177,7 +1182,6 @@
               }
             }
           });
-
         }
       }
       

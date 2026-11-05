@@ -335,6 +335,58 @@ app.get("/admin/surveys", async (req, res) => {
   }
 });
 
+app.post("/invite", async (req, res) => {
+  const authorization = req.get("authorization");
+
+  const accessToken = authorization?.startsWith("Bearer ")
+  ? authorization.slice("Bearer ".length)
+  : null;
+
+  if (!accessToken) {
+    return res.status(401).json({error: "Authentication required."});
+  }
+  const { data, error } = await supabaseAuthClient.auth.getUser(accessToken);
+
+  if (error || !data.user) {
+     return res.status(401).json({error: "Invalid session."});
+  }
+
+  const user = data.user;
+
+  const { surveyID, email } = req.body;
+  if (!surveyID || !email) {
+    return res.status(400).json({ error: "Missing surveyID or email" });
+  }
+
+  const { data:userList, error:userListError } = await supabaseServiceClient.auth.admin.listUsers();
+  if (userListError) {
+    console.error("Supabase error:", userListError.message);
+    return res.status(500).json({ error: "Failed to retrieve user list" });
+  }
+  const recipient = userList.users.find(
+  user => user.email?.toLowerCase() === email.toLowerCase()
+  );
+  if (!recipient) {
+    return res.status(404).json({ error: "Recipient not found" });
+  }
+  const recipientID = recipient.id;
+  const {error: surveyError } = await supabaseServiceClient
+    .from("user_surveys")
+    .insert({
+      user_id: recipientID,
+      survey_id: surveyID,
+    });
+  if (surveyError) {
+    console.error("Supabase error:", surveyError.message);
+    return res.status(500).json({ error: "Failed to create survey" });
+  }
+  
+  return res.json({
+    success: true,
+    message: "Invitation sent successfully."
+  });
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
