@@ -807,6 +807,7 @@
           document.getElementById("welcomeMessage").querySelector("h2").textContent =
             `Welcome Back, ${payload.user.email}`;
           document.getElementById("output").textContent = "Successfully signed in.";
+          await loadSurveys();
         } catch (err) {
           document.getElementById("userStatus").textContent = "Not Signed In";
           document.getElementById("output").textContent = err.message;
@@ -1257,7 +1258,7 @@
           surveyAccessDisplay.textContent = "Unable to load surveys.";
         }
       }
-      document.addEventListener("DOMContentLoaded", loadSurveys);
+      //document.addEventListener("DOMContentLoaded", loadSurveys);
 
       document.addEventListener("click", (event) => {
         const popups = document.querySelectorAll(".surveyPopup:popover-open");
