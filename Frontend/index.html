@@ -474,15 +474,14 @@
       const surveysDiv = document.getElementById("surveysDiv");
       const invitesDiv = document.getElementById("invitesDiv");
       const resultsDiv = document.getElementById("resultsDiv");
-      const surveysDisplayDiv = document.createElement("div");
       const createSurveyButton = document.getElementById("CreateSurvey");
       const CreateSurveyDiv = document.getElementById("createSurveyDiv");
       const surveyBuilder = document.getElementById("surveyBuilder");
       const addQuestionButton = document.getElementById("addQuestion");
+      const surveysDisplayDiv = document.querySelector(".surveysDisplayDiv");
       surveysDisplayDiv.classList.add("surveysDisplayDiv");
       document.getElementById("surveysDiv").appendChild(surveysDisplayDiv);
       loadSurveys();
-      
       let currentSurveyID = null;
 
       let currentPOV = null;
@@ -785,8 +784,8 @@
           document
               .querySelectorAll(".surveyQuestionDisplay")
               .forEach(el => el.remove());
-
-          questions.forEach(question => {
+              console.log(questions);
+              questions.forEach((question, index) => {
 
               const questionDiv =
                   document.createElement("div");
@@ -796,14 +795,59 @@
                   "surveyQuestionDisplay"
               );
 
-              questionDiv.innerHTML =
-                  `<label>${question.questionText}</label>`;
+              questionDiv.innerHTML = `
+                  <label>${question.questionText}</label>
+
+                  <div class="surveyField">
+                      <label>
+                          <input type="radio"
+                                name="question_${index}"
+                                value="1">
+                          1
+                      </label>
+
+                      <label>
+                          <input type="radio"
+                                name="question_${index}"
+                                value="2">
+                          2
+                      </label>
+
+                      <label>
+                          <input type="radio"
+                                name="question_${index}"
+                                value="3">
+                          3
+                      </label>
+
+                      <label>
+                          <input type="radio"
+                                name="question_${index}"
+                                value="4">
+                          4
+                      </label>
+
+                      <label>
+                          <input type="radio"
+                                name="question_${index}"
+                                value="5">
+                          5
+                      </label>
+                  </div>
+              `;
 
               surveysDiv.appendChild(questionDiv);
-          });
-      });
+              });
+              if (!document.getElementById("submitSurveyButton")) {
 
-      surveysDisplayDiv.appendChild(button);
+              submitButton.id = "submitSurveyButton";
+
+              surveysDiv.appendChild(submitButton);
+}
+
+    });
+              surveysDisplayDiv.appendChild(button);
+      
       }
           async function loadSurveys() {
           try {
@@ -950,8 +994,6 @@ function CreateBlankSurveyQuestion() {
 
       submitButton.textContent = "Submit Survey";
 
-      surveysDisplayDiv.appendChild(submitButton);
-
       submitButton.addEventListener("click", async () => {
 
         console.log("Submit button clicked");
@@ -961,7 +1003,7 @@ function CreateBlankSurveyQuestion() {
         const responses = {};
 
         document
-          .querySelectorAll(".question")
+          .querySelectorAll(".surveyQuestionDisplay")
           .forEach((question, index) => {
 
             const selected =
