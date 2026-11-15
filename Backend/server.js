@@ -3,6 +3,7 @@ const cors = require("cors");
 const path = require("path");
 const { createClient } = require("@supabase/supabase-js");
 const fs = require("fs");
+const crypto = require("crypto");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 const app = express();
@@ -171,23 +172,12 @@ app.post("/submitSurvey", async (req, res) => {
     const { surveyID, responses, pov } = req.body;
 
     console.log("POV received:", pov);
-
     console.log("Survey ID:", surveyID);
-    console.log("POV:", pov);
     console.log("Responses:", responses);
 
     let insertError;
 
     if (Number(pov) === 0) {
-      const { error } = await supabaseServiceClient
-        .from("survey_responses")
-        .insert({
-          survey_id: surveyID,
-          user_id: user.id,
-          response_data: responses,
-          pov: Number(pov),
-        });
-
       const { data: survey, error: fetchError } = await supabaseServiceClient
         .from("surveys")
         .select("Already_Answered, Global_Class_Answers_JSON")
@@ -198,6 +188,7 @@ app.post("/submitSurvey", async (req, res) => {
         throw fetchError;
       }
 
+      //Avoids duplicate submissions by the same user for the same survey
       survey.Already_Answered = survey.Already_Answered || [];
       if (survey.Already_Answered.includes(user.id)) {
         return res.status(409).json({
@@ -206,6 +197,7 @@ app.post("/submitSurvey", async (req, res) => {
         });
       }
 
+      //Update answers in global survey
       const globalAnswers = survey.Global_Class_Answers_JSON || {};
 
       for (const [question, answer] of Object.entries(responses)) {
@@ -233,7 +225,21 @@ app.post("/submitSurvey", async (req, res) => {
           throw updateError;
         }
 
-      insertError = error;
+        const inviteCode = crypto.randomBytes(16).toString("hex");
+
+        const {error: insertError} = await supabaseServiceClient
+          .from("survey_responses")
+          .insert({
+            SurveyID: surveyID,
+            OriginalUserID: user.id,
+            InviteCode: inviteCode,
+            OriginalUserAnswers: responses
+          });
+
+        if (insertError) {
+          throw insertError;
+        }
+
     } else if (Number(pov) === 1) {
       const { error } = await supabaseServiceClient
         .from("user_surveys")
