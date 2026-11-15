@@ -98,8 +98,7 @@ class surveyAccessButton {
             this.answeredLabel.textContent = "This survey has not been completed.";
           }
 
-          this.inviterEmailLabel = document.createElement("label");
-          this.inviterEmailLabel.textContent = `Invited By: ${inviterEmail}`;
+          
 
           this.inviteButton = document.createElement("button");
           this.inviteButton.textContent = "Invite Participants";
@@ -124,7 +123,6 @@ class surveyAccessButton {
           this.verticalDiv1.appendChild(this.nameLabel);
           this.verticalDiv1.appendChild(this.IDLabel);
           this.verticalDiv1.appendChild(this.answeredLabel);
-          this.verticalDiv1.appendChild(this.inviterEmailLabel);
           this.verticalDiv1.style.alignItems = "flex-start";
           this.verticalDiv1.style.justifyContent = "center";
           this.verticalDiv1.style.paddingLeft = "10px";
@@ -269,6 +267,9 @@ class peerSurveyAccessButton {
           this.div.dataset.questions = questionsList;
           this.div.dataset.inviterEmail = inviterEmail;
 
+          this.inviterEmailLabel = document.createElement("label");
+          this.inviterEmailLabel.textContent = `Invited By: ${inviterEmail}`;
+
           this.nameLabel = document.createElement("label");
           this.nameLabel.textContent = title;
 
@@ -305,6 +306,7 @@ class peerSurveyAccessButton {
           this.verticalDiv1.appendChild(this.nameLabel);
           this.verticalDiv1.appendChild(this.IDLabel);
           this.verticalDiv1.appendChild(this.answeredLabel);
+          this.verticalDiv1.appendChild(this.inviterEmailLabel);
           this.verticalDiv1.style.alignItems = "flex-start";
           this.verticalDiv1.style.justifyContent = "center";
           this.verticalDiv1.style.paddingLeft = "10px";
