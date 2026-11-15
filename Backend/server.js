@@ -190,7 +190,7 @@ app.post("/submitSurvey", async (req, res) => {
 
       const { data: survey, error: fetchError } = await supabaseServiceClient
         .from("surveys")
-        .select("Already_Answered, global_class_answers_JSON")
+        .select("Already_Answered, Global_Class_Answers_JSON")
         .eq("survey_id", surveyID)
         .single();
 
@@ -206,7 +206,7 @@ app.post("/submitSurvey", async (req, res) => {
         });
       }
 
-      const globalAnswers = survey.global_class_answers_JSON || {};
+      const globalAnswers = survey.Global_Class_Answers_JSON || {};
 
       for (const [question, answer] of Object.entries(responses)) {
         if (!globalAnswers[question]) {
@@ -225,7 +225,7 @@ app.post("/submitSurvey", async (req, res) => {
         .from("surveys")
         .update({
           Already_Answered: survey.Already_Answered,
-          global_class_answers_JSON: globalAnswers,
+          Global_Class_Answers_JSON: globalAnswers,
         })
         .eq("survey_id", surveyID);
 
