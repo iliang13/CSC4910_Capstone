@@ -188,6 +188,51 @@ app.post("/submitSurvey", async (req, res) => {
           pov: Number(pov),
         });
 
+      const { data: survey, error: fetchError } = await supabaseServiceClient
+        .from("surveys")
+        .select("already_answered, global_class_answers_JSON")
+        .eq("survey_id", surveyID)
+        .single();
+
+      if (fetchError) {
+        throw fetchError;
+      }
+
+      survey.already_answered = survey.already_answered || [];
+      if (survey.already_answered.includes(user.id)) {
+        return res.status(409).json({
+          success: false,
+          error: "User has already answered this survey.",
+        });
+      }
+
+      const globalAnswers = survey.global_class_answers_JSON || {};
+
+      for (const [question, answer] of Object.entries(responses)) {
+        if (!globalAnswers[question]) {
+          globalAnswers[question] = {};
+        }
+
+        if (!globalAnswers[question][answer]) {
+          globalAnswers[question][answer] = 0;
+        }
+
+        globalAnswers[question][answer]++;
+      }
+      survey.already_answered.push(user.id);
+
+      const {error: updateError} = await supabaseServiceClient
+        .from("surveys")
+        .update({
+          already_answered: survey.already_answered,
+          global_class_answers_JSON: globalAnswers,
+        })
+        .eq("survey_id", surveyID);
+
+        if (updateError) {
+          throw updateError;
+        }
+
       insertError = error;
     } else if (Number(pov) === 1) {
       const { error } = await supabaseServiceClient
