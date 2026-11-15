@@ -213,6 +213,7 @@ class surveyAccessButton {
                 surveyAnsweringDiv.appendChild(CreateSurveyQuestion(questionsList[i].thirdPersonText, questionsList[i].numberOfOptions).question);
               }
             }
+
             const submitButton = document.createElement("button");
             
             submitButton.textContent = "Submit Survey";
@@ -250,9 +251,37 @@ class surveyAccessButton {
                 console.log("Survey:", currentSurveyID);
                 console.log("Responses:", responses);
 
-            });
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
 
-            surveyAnsweringDiv.appendChild(submitButton);
+                if (error || !session) {
+                  document.getElementById("output").textContent = "Please sign in to submit the survey.";
+                  return;
+                }
+
+                try {
+                  const res = await fetch("/submitSurvey", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      "Authorization": `Bearer ${session.access_token}`
+                    },
+                    body: JSON.stringify({
+                    surveyID: currentSurveyID,
+                    pov: pov,
+                    responses: responses
+                    })  
+                  });
+
+                  const data = await res.json();
+
+                  document.getElementById("output").textContent =
+                    res.ok ? data.message : data.error;
+
+                } catch (err) {
+                  document.getElementById("output").textContent = err.message;
+                }
+              });
+              surveyAnsweringDiv.appendChild(submitButton);
           });
         }
       }
@@ -393,6 +422,7 @@ class peerSurveyAccessButton {
                 surveyAnsweringDiv.appendChild(CreateSurveyQuestion(questionsList[i].thirdPersonText, questionsList[i].numberOfOptions).question);
               }
             }
+
             const submitButton = document.createElement("button");
             
             submitButton.textContent = "Submit Survey";
@@ -430,9 +460,37 @@ class peerSurveyAccessButton {
                 console.log("Survey:", currentSurveyID);
                 console.log("Responses:", responses);
 
-            });
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
 
-            surveyAnsweringDiv.appendChild(submitButton);
+                if (error || !session) {
+                  document.getElementById("output").textContent = "Please sign in to submit the survey.";
+                  return;
+                }
+
+                try {
+                  const res = await fetch("/submitSurvey", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      "Authorization": `Bearer ${session.access_token}`
+                    },
+                    body: JSON.stringify({
+                    surveyID: currentSurveyID,
+                    pov: pov,
+                    responses: responses
+                    })  
+                  });
+
+                  const data = await res.json();
+
+                  document.getElementById("output").textContent =
+                    res.ok ? data.message : data.error;
+
+                } catch (err) {
+                  document.getElementById("output").textContent = err.message;
+                }
+              });
+              surveyAnsweringDiv.appendChild(submitButton);
           });
         }
       }
