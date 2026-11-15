@@ -434,7 +434,7 @@ app.get("/user/surveys", async (req, res) => {
         .from("user_surveys")
         .select("survey_id")
         .eq("user_id", user.id)
-        .eq("pov", 1);
+        .eq("POV", 1);
 
     if (surveyListError) {
       console.error("Supabase error:", {
