@@ -1266,7 +1266,9 @@
             throw new Error("Failed to load surveys");
           }
           const surveys = await response.json();
-          surveyAccessDisplay.replaceChildren();
+
+          firstPersonSurveys.replaceChildren();
+          thirdPersonSurveys.replaceChildren();
 
           surveys.forEach((survey) => { //title, ID, pov, answered, questionsList
             createSurveyAccessButton(survey.title, survey.survey_id, "0", false, survey.questions);
