@@ -31,6 +31,7 @@ const supabaseServiceClient = createClient(supabaseUrl, supabaseServiceRoleKey);
 
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || false }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "..", "Frontend")));
 
 app.get("/testSurvey/:id", async (req, res) => {
   try {
