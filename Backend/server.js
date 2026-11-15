@@ -539,6 +539,7 @@ app.get("/user/loadSurveys2", async (req, res) => {
 
     res.json(data);
   } catch (error) {
+    console.error("Unexpected error loading surveys:", error);
     res.status(500).json({
       message: "Internal server error",
     });
