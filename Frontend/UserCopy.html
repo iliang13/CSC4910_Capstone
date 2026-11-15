@@ -493,7 +493,17 @@
 
           </div>
 
-          <div id="displaySurveyAccessButtons" class="surveysDisplayDiv"></div>
+          <div id="displaySurveyAccessButtons" class="surveysDisplayDiv">
+
+            <div id="firstPersonSurveys" class="surveysDisplayDiv">
+            
+            </div>
+
+            <div id="thirdPersonSurveys" class="surveysDisplayDiv">
+            
+            </div>
+
+          </div>
           
         </div>
 
@@ -551,6 +561,8 @@
       const saveSurveyButton = document.getElementById("saveSurvey");
       const submitSurveyCodeButton = document.getElementById("submitSurveyCode");
       const surveyAccessDisplay = document.getElementById("displaySurveyAccessButtons");
+      const firstPersonSurveys = document.getElementById("firstPersonSurveys");
+      const thirdPersonSurveys = document.getElementById("thirdPersonSurveys");
       const surveyAnsweringDiv = document.getElementById("surveyAnsweringDiv");
       const popup = document.getElementById("codePopup");
 
@@ -1227,8 +1239,14 @@
       }
       
       function createSurveyAccessButton(title, ID, pov, answered, questionsList) {
-        const tempSurveyAccessButton = new surveyAccessButton(title, ID, pov, answered, questionsList);
-        surveyAccessDisplay.appendChild(tempSurveyAccessButton.div);
+        if (pov === "0") {
+          const tempSurveyAccessButton = new surveyAccessButton(title, ID, pov, answered, questionsList);
+          firstPersonSurveys.appendChild(tempSurveyAccessButton.div);
+        }
+        if (pov === "1") {
+          const tempSurveyAccessButton = new surveyAccessButton(title, ID, pov, answered, questionsList);
+          thirdPersonSurveys.appendChild(tempSurveyAccessButton.div);
+        }
       }
       
       async function loadSurveys() {
@@ -1238,7 +1256,7 @@
           return;
           }
         try {
-          const response = await fetch("/user/surveys", {
+          const response = await fetch("/user/loadSurveys1", {
             headers: {
               "Authorization": `Bearer ${session.access_token}`
             }
@@ -1250,10 +1268,30 @@
           const surveys = await response.json();
           surveyAccessDisplay.replaceChildren();
 
-          surveys.forEach((survey) => { //createSurveyAccessButton(title, ID, pov, answered, questionsList)
+          surveys.forEach((survey) => { //title, ID, pov, answered, questionsList
             createSurveyAccessButton(survey.title, survey.survey_id, "0", false, survey.questions);
           });
         } catch (error) {
+          console.error("Error loading surveys:", error);
+          surveyAccessDisplay.textContent = "Unable to load surveys.";
+        }
+        try {
+          response = await fetch("/user/loadSurveys2", {
+            headers: {
+              "Authorization": `Bearer ${session.access_token}`
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to load surveys");
+          }
+          surveys = await response.json();
+
+          surveys.forEach((survey) => { //title, ID, pov, answered, questionsList
+            createSurveyAccessButton(survey.title, survey.survey_id, "1", false, survey.questions);
+          });
+        }
+         catch (error) {
           console.error("Error loading surveys:", error);
           surveyAccessDisplay.textContent = "Unable to load surveys.";
         }

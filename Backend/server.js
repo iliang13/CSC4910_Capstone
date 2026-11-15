@@ -383,7 +383,7 @@ app.post("/validateSurveyCode", async (req, res) => {
   });
 });
 
-app.get("/admin/surveys", async (req, res) => {
+app.get("/admin/loadSurveys", async (req, res) => {
   try {
     const { data, error } = await supabaseServiceClient
       .from("surveys")
@@ -409,7 +409,7 @@ app.get("/admin/surveys", async (req, res) => {
   }
 });
 
-app.get("/user/surveys", async (req, res) => {
+app.get("/user/loadSurveys1", async (req, res) => {
   try {
     const authorization = req.get("authorization");
 
@@ -432,9 +432,8 @@ app.get("/user/surveys", async (req, res) => {
     const { data: SurveyList, error: surveyListError } =
       await supabaseServiceClient
         .from("user_surveys")
-        .select("survey_id")
-        .eq("user_id", user.id)
-        .eq("POV", 1);
+        .select("survey_id, POV")
+        .eq("user_id", user.id);
 
     if (surveyListError) {
       console.error("Supabase error:", {
@@ -452,6 +451,75 @@ app.get("/user/surveys", async (req, res) => {
     if (surveyIDs.length === 0) {
       return res.json([]);
     }
+    const { data, error: surveyError } = await supabaseServiceClient
+      .from("surveys")
+      .select("survey_id, title, questions")
+      .in("survey_id", surveyIDs);
+
+    if (surveyError) {
+      console.error("Supabase error:", {
+        message: surveyError.message,
+        details: surveyError.details,
+        hint: surveyError.hint,
+        code: surveyError.code,
+      });
+      return res.status(500).json({
+        message: "Failed to load surveys",
+      });
+    }
+
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+});
+
+app.get("/user/loadSurveys2", async (req, res) => {
+  try {
+    const authorization = req.get("authorization");
+
+    const accessToken = authorization?.startsWith("Bearer ")
+      ? authorization.slice("Bearer ".length)
+      : null;
+
+    if (!accessToken) {
+      return res.status(401).json({ error: "Authentication required." });
+    }
+    const { data: authData, error: authError } =
+      await supabaseAuthClient.auth.getUser(accessToken);
+
+    if (authError || !authData.user) {
+      return res.status(401).json({ error: "Invalid session." });
+    }
+
+    const user = authData.user;
+
+    const { data: InvitedSurveys, error: invitedError } =
+      await supabaseServiceClient
+        .from("survey_responses")
+        .select("SurveyID")
+        .contains("Invitees", [user.id]);
+
+    if (invitedError) {
+      console.error("Supabase error:", {
+        message: invitedError.message,
+        details: invitedError.details,
+        hint: invitedError.hint,
+        code: invitedError.code,
+      });
+      return res.status(500).json({
+        message: "Failed to load surveys",
+      });
+    }
+
+    const surveyIDs = InvitedSurveys.map((survey) => survey.SurveyID);
+  
+    if (surveyIDs.length === 0) {
+      return res.json([]);
+    }
+
     const { data, error: surveyError } = await supabaseServiceClient
       .from("surveys")
       .select("survey_id, title, questions")
