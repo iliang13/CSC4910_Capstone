@@ -961,14 +961,14 @@
               throw new Error("Failed to load surveys");
             }
             const surveys = await response.json();
-            surveyAccessDisplay.replaceChildren();
+            firstPersonSurveys.replaceChildren();
 
             surveys.forEach((survey) => { //createSurveyAccessButton(title, ID, pov, answered, questionsList)
               createSurveyAccessButton(survey.title, survey.survey_id, "0", false, survey.questions);
             });
           } catch (error) {
             console.error("Error loading surveys:", error);
-            surveyAccessDisplay.textContent = "Unable to load surveys.";
+            firstPersonSurveys.textContent = "Unable to load surveys.";
           }
         }
         document.addEventListener("DOMContentLoaded", loadSurveys);
