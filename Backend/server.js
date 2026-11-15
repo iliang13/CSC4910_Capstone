@@ -579,7 +579,7 @@ app.post("/user/invite", async (req, res) => {
     await supabaseServiceClient
     .from("survey_responses")
     .select("Invitees")
-    .eq("survey_id", surveyID)
+    .eq("SurveyID", surveyID)
     .eq("OriginalUserID", user.id)
     .single();
 
@@ -597,7 +597,7 @@ app.post("/user/invite", async (req, res) => {
     const { error: updateError } = await supabaseServiceClient
       .from("survey_responses")
       .update({ Invitees: invitees })
-      .eq("survey_id", surveyID)
+      .eq("SurveyID", surveyID)
       .eq("OriginalUserID", user.id);
 
     if (updateError) {
