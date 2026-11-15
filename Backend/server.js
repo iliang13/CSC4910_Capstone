@@ -500,7 +500,7 @@ app.get("/user/loadSurveys2", async (req, res) => {
       await supabaseServiceClient
         .from("survey_responses")
         .select("SurveyID")
-        .contains("Invitees", [user.id]);
+        .contains("Invitees", JSON.stringify([user.id]));
 
     if (invitedError) {
       console.error("Supabase error:", {
