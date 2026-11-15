@@ -184,11 +184,21 @@
         display: block;
       }
       .surveysDisplayDiv {
+        padding: 20px;
+        border: 1px solid var(--color-accent);
+        border-radius: 4px;
         display: flex;
         flex-wrap: wrap;
         gap: 20px;
         justify-content: center;
-        background-color: none;
+        background-color: var(--color-button-bg);
+        width:100%;
+      }
+      .surveysDisplayDivDiv {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
         width:100%;
       }
       .surveyField {
@@ -391,7 +401,7 @@
       .surveyPopup:not(:popover-open) {
         display: none;
       }
-
+      
     </style>
   </head>
 
@@ -493,14 +503,13 @@
 
           </div>
 
-          <div id="displaySurveyAccessButtons" class="surveysDisplayDiv">
-
+          <div id="displaySurveyAccessButtons" class="surveysDisplayDivDiv">
+            <h2>Personal Survey Assessments</h2>
             <div id="firstPersonSurveys" class="surveysDisplayDiv">
-            
             </div>
 
+            <h2>Peer Survey Assessments</h2>
             <div id="thirdPersonSurveys" class="surveysDisplayDiv">
-            
             </div>
 
           </div>
@@ -1060,7 +1069,6 @@
       
       class surveyAccessButton {
         constructor(title, ID, pov, answered, questionsList) {
-          
           this.div = document.createElement("div");
           this.div.classList.add("SurveyAccessDiv");
           this.div.dataset.surveyID = ID;
@@ -1182,7 +1190,7 @@
             console.log("Questions:", questionsList);
             surveyAnsweringDiv.replaceChildren();
             for (let i = 0; i < questionsList.length; i++) {
-              if (pov === "1") {
+              if (pov === "0") {
                 surveyAnsweringDiv.appendChild(
                   CreateSurveyQuestion(
                     questionsList[i].questionText,
@@ -1190,7 +1198,7 @@
                   ).question
                 );
               }
-              else if (pov === "0") {
+              else if (pov === "1") {
                 surveyAnsweringDiv.appendChild(CreateSurveyQuestion(questionsList[i].thirdPersonText, questionsList[i].numberOfOptions).question);
               }
             }
