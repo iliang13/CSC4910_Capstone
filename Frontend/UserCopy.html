@@ -1022,7 +1022,7 @@
           surveys = await response.json();
 
           surveys.forEach((survey) => { //title, ID, pov, answered, questionsList
-            createSurveyAccessButton(survey.title, survey.survey_id, "1", false, survey.questions);
+            createSurveyAccessButton(survey.title, survey.survey_id, "1", false, survey.questions, survey.inviterEmail);
           });
         }
          catch (error) {
