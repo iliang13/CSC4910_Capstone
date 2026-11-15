@@ -979,16 +979,7 @@
       
       
       
-      function createSurveyAccessButton(title, ID, pov, answered, questionsList) {
-        if (pov === "0") {
-          const tempSurveyAccessButton = new surveyAccessButton(title, ID, pov, answered, questionsList);
-          firstPersonSurveys.appendChild(tempSurveyAccessButton.div);
-        }
-        if (pov === "1") {
-          const tempSurveyAccessButton = new surveyAccessButton(title, ID, pov, answered, questionsList);
-          thirdPersonSurveys.appendChild(tempSurveyAccessButton.div);
-        }
-      }
+      
       
       async function loadSurveys() {
         const { data: { session }, error } = await supabaseClient.auth.getSession();

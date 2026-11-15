@@ -955,7 +955,7 @@
         
         async function loadSurveys() {
           try {
-            const response = await fetch("/admin/surveys");
+            const response = await fetch("/admin/loadSurveys");
 
             if (!response.ok) {
               throw new Error("Failed to load surveys");

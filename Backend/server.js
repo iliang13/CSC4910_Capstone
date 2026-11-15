@@ -500,7 +500,7 @@ app.get("/user/loadSurveys2", async (req, res) => {
     const { data: InvitedSurveys, error: invitedError } =
       await supabaseServiceClient
         .from("survey_responses")
-        .select("SurveyID")
+        .select("SurveyID, OriginalUserID")
         .contains("Invitees", JSON.stringify([user.id]));
 
     if (invitedError) {
@@ -515,16 +515,32 @@ app.get("/user/loadSurveys2", async (req, res) => {
       });
     }
 
-    const surveyIDs = InvitedSurveys.map((survey) => survey.SurveyID);
-  
-    if (surveyIDs.length === 0) {
+    if (InvitedSurveys.length === 0) {
       return res.json([]);
     }
+
+    const surveyInviters = await Promise.all(
+      InvitedSurveys.map(async (survey) => {
+        const { data: inviter, error: inviterError } = 
+        await supabaseServiceClient.auth.admin.getUserById(
+          survey.OriginalUserID
+        );
+
+        if (inviterError) {
+          throw inviterError;
+        }
+
+        return {
+          surveyID: survey.SurveyID,
+          inviterEmail: inviter.user.email
+        };
+      })
+    );
 
     const { data, error: surveyError } = await supabaseServiceClient
       .from("surveys")
       .select("survey_id, title, questions")
-      .in("survey_id", surveyIDs);
+      .in("survey_id", surveyInviters.map(s => s.surveyID));
 
     if (surveyError) {
       console.error("Supabase error:", {
@@ -538,7 +554,16 @@ app.get("/user/loadSurveys2", async (req, res) => {
       });
     }
 
-    res.json(data);
+    const surveysWithInviters = data.map((survey) => {
+    const inviter = surveyInviters.find(
+      (s) => s.surveyID === survey.survey_id
+    );
+
+    return {...survey, inviterEmail: inviter?.inviterEmail };
+  });
+
+  res.json(surveysWithInviters);
+
   } catch (error) {
     console.error("Unexpected error loading surveys:", error);
     res.status(500).json({
