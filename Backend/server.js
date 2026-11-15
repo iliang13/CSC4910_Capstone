@@ -190,7 +190,7 @@ app.post("/submitSurvey", async (req, res) => {
 
       const { data: survey, error: fetchError } = await supabaseServiceClient
         .from("surveys")
-        .select("already_answered, global_class_answers_JSON")
+        .select("Already_Answered, global_class_answers_JSON")
         .eq("survey_id", surveyID)
         .single();
 
@@ -198,8 +198,8 @@ app.post("/submitSurvey", async (req, res) => {
         throw fetchError;
       }
 
-      survey.already_answered = survey.already_answered || [];
-      if (survey.already_answered.includes(user.id)) {
+      survey.Already_Answered = survey.Already_Answered || [];
+      if (survey.Already_Answered.includes(user.id)) {
         return res.status(409).json({
           success: false,
           error: "User has already answered this survey.",
@@ -219,12 +219,12 @@ app.post("/submitSurvey", async (req, res) => {
 
         globalAnswers[question][answer]++;
       }
-      survey.already_answered.push(user.id);
+      survey.Already_Answered.push(user.id);
 
       const {error: updateError} = await supabaseServiceClient
         .from("surveys")
         .update({
-          already_answered: survey.already_answered,
+          Already_Answered: survey.Already_Answered,
           global_class_answers_JSON: globalAnswers,
         })
         .eq("survey_id", surveyID);
