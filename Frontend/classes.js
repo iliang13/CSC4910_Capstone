@@ -153,17 +153,23 @@ class surveyAccessButton {
           });
 
           this.submitButton.addEventListener("click", async () => {
+            console.log("1. Invite button clicked");
             const email = this.emailInput.value.trim();
             if (!email) {
               alert("Please enter an email address.");
               return;
             }
+            console.log("2. Retrieving Supabase session");
             const { data: { session }, error } = await supabaseClient.auth.getSession();
+            console.log("3. Session:", session);
+            console.log("4. Session error:", error);
+            
             if (error || !session) {
               alert("Please sign in to proceed.");
               return;
             }
             try {
+              console.log("5. Sending request to /user/invite");
               const response = await fetch("/user/invite", {
                 method: "POST",
                 headers: {
@@ -309,10 +315,6 @@ class peerSurveyAccessButton {
             this.answeredLabel.textContent = "This survey has not been completed.";
           }
 
-          this.inviteButton = document.createElement("button");
-          this.inviteButton.textContent = "Invite Participants";
-          this.inviteButton.classList.add("inviteButton");
-
           this.viewButton = document.createElement("button");
           this.viewButton.textContent = "View Survey";
 
@@ -338,66 +340,10 @@ class peerSurveyAccessButton {
 
 
           this.verticalDiv2.appendChild(this.viewButton);
-          this.verticalDiv2.appendChild(this.inviteButton);
           this.verticalDiv2.style.alignItems = "flex-end";
           this.verticalDiv2.style.justifyContent = "center";
           this.verticalDiv2.style.paddingRight = "10px";
-
-          this.emailInput = document.createElement("input");
-          this.popup = document.createElement("div");
-          this.popup.classList.add("surveyPopup");
-          this.popup.setAttribute("popover", "manual");
-          
-          this.submitButton = document.createElement("button");
-          this.submitButton.textContent = "Invite";
-          
-          this.inviteButton.addEventListener("click", () => {
-            const surveyCode = `S${ID}`;
-
-            this.popup.textContent = "Invitees Email Address: ";
-            this.popup.appendChild(this.emailInput);
-            this.popup.appendChild(this.submitButton);
-            document.body.appendChild(this.popup);
-            this.popup.showPopover();
-          });
-
-          this.submitButton.addEventListener("click", async () => {
-            const email = this.emailInput.value.trim();
-            if (!email) {
-              alert("Please enter an email address.");
-              return;
-            }
-            const { data: { session }, error } = await supabaseClient.auth.getSession();
-            if (error || !session) {
-              alert("Please sign in to proceed.");
-              return;
-            }
-            try {
-              const response = await fetch("/user/invite", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": `Bearer ${session.access_token}`
-                },
-                body: JSON.stringify({ 
-                  surveyID: ID,
-                  email: email
-                })
-              });
               
-              const result = await response.json();
-              
-              if (!response.ok) {
-                alert(result.message);
-                return;
-              }
-              alert("Invitation sent successfully.");
-            } catch (error) {
-              console.error("Error sending invitation:", error);
-              alert("Could not contact the server");
-            }
-            this.popup.hidePopover();
-          });
           
           this.viewButton.addEventListener("click", async () => {
             currentSurveyID = ID;
