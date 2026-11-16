@@ -269,7 +269,7 @@ app.post("/api/admin-session", async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "lax",
-      path: "/admin",
+      path: "/",
       maxAge: 60 * 60 * 1000,
     });
 
@@ -286,7 +286,7 @@ app.post("/api/admin-session/logout", (req, res) => {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
-    path: "/admin",
+    path: "/",
   });
 
   res.json({ success: true });
