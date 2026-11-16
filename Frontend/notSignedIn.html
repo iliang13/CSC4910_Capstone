@@ -509,7 +509,7 @@
         document.getElementById("closeAuthDialog").addEventListener("click", () => authDialog.close());
 
         async function signOutCurrentSession() {
-            const { error } = await supabaseClient.auth.signOut({ scope: "local" });
+            const { error } = await supabaseClient.auth.signOut({ scope: "global" });
             if (error) throw error;
 
             await fetch("/api/admin-session/logout", {
