@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DataPulse360 - Invites</title>
     <link rel="stylesheet" href="../Styling.css">
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -32,6 +32,23 @@
     <main>
         <p id="output"></p>
     </main>
+
+    <dialog id="authDialog">
+        <form id="authForm">
+            <h2 id="authTitle">Sign In</h2>
+            <button id="googleAuthButton" type="button">Continue with Google</button>
+            <p>Google sign-in creates your account the first time you use it.</p>
+            <label for="authEmail">Email</label>
+            <input id="authEmail" type="email" autocomplete="email" required />
+            <label for="authPassword">Password</label>
+            <input id="authPassword" type="password" autocomplete="current-password" minlength="6" required />
+            <p id="authMessage" role="status"></p>
+            <div id="authActions">
+                <button id="closeAuthDialog" type="button">Cancel</button>
+                <button id="authSubmit" type="submit">Sign In</button>
+            </div>
+        </form>
+    </dialog>
 
     <script src="../classes.js"></script>
     <script src="adminNavigation.js"></script>
