@@ -474,7 +474,7 @@
         placeholder="Search for surveys..."
           />
 
-          
+          <button ID="CreateSurvey">Create New Survey</button>
 
           <button popovertarget="codePopup">
             Use Survey Code
@@ -565,6 +565,7 @@
       const surveysDiv = document.getElementById("surveysDiv");
       const invitesDiv = document.getElementById("invitesDiv");
       const resultsDiv = document.getElementById("resultsDiv");
+      const createSurveyButton = document.getElementById("CreateSurvey");
       const surveyBuilder = document.getElementById("surveyBuilder");
       const addQuestionButton = document.getElementById("addQuestion");
       const saveSurveyButton = document.getElementById("saveSurvey");
@@ -646,7 +647,17 @@
         clearSurvey()
       });
 
-      
+      createSurveyButton.addEventListener("click", () => {
+        const questionsContainer = document.getElementById("questionsContainer");
+        if (questionsContainer.children.length === 0) {
+          surveyBuilder.classList.add("active");
+          CreateBlankSurveyQuestion();
+        }   
+      });
+
+      addQuestionButton.addEventListener("click", () => {
+        CreateBlankSurveyQuestion();
+      })
 
       saveSurveyButton.addEventListener("click", async () => { 
         const questionElements = document.querySelectorAll("#questionsContainer .question");
