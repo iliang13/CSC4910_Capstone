@@ -266,7 +266,7 @@ class surveyAccessButton {
                 }
 
                 try {
-                  const res = await fetch("/submitSurvey", {
+                  const res = await fetch("/submitSurvey/personal", {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
@@ -415,7 +415,7 @@ class peerSurveyAccessButton {
                 }
 
                 try {
-                  const res = await fetch("/submitSurvey", {
+                  const res = await fetch("/submitSurvey/peer", {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",

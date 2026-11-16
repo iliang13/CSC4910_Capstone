@@ -144,7 +144,7 @@ app.get("/api/me", async (req, res) => {
   res.json({ user: data.user });
 });
 
-app.post("/submitSurvey", async (req, res) => {
+app.post("/submitSurvey/personal", async (req, res) => {
   try {
     const authorization = req.get("authorization");
 
@@ -170,27 +170,22 @@ app.post("/submitSurvey", async (req, res) => {
 
     const user = data.user;
 
-    const { surveyID, responses, pov } = req.body;
+    const { surveyID, responses } = req.body;
 
-    console.log("POV received:", pov);
-    console.log("Survey ID:", surveyID);
-    console.log("Responses:", responses);
+    const { data: survey, error: fetchError } = await supabaseServiceClient
+    .from("surveys")
+    .select("*")
+    .eq("survey_id", surveyID)
+    .single();
 
-    let insertError;
+    if (fetchError || !survey) {
+      return res.status(404).json({
+        success: false,
+        error: "Survey not found.",
+      });
+    }
 
-    if (Number(pov) === 0) {
-      const { data: survey, error: fetchError } = await supabaseServiceClient
-        .from("surveys")
-        .select("Already_Answered, Global_Class_Answers_JSON")
-        .eq("survey_id", surveyID)
-        .single();
-
-      if (fetchError) {
-        throw fetchError;
-      }
-
-      //Avoids duplicate submissions by the same user for the same survey
-      survey.Already_Answered = survey.Already_Answered || [];
+    survey.Already_Answered = survey.Already_Answered || [];
       if (survey.Already_Answered.includes(user.id)) {
         return res.status(409).json({
           success: false,
@@ -198,7 +193,6 @@ app.post("/submitSurvey", async (req, res) => {
         });
       }
 
-      //Update answers in global survey
       const globalAnswers = survey.Global_Class_Answers_JSON || {};
 
       for (const [question, answer] of Object.entries(responses)) {
@@ -212,6 +206,7 @@ app.post("/submitSurvey", async (req, res) => {
 
         globalAnswers[question][answer]++;
       }
+
       survey.Already_Answered.push(user.id);
 
       const {error: updateError} = await supabaseServiceClient
@@ -238,46 +233,128 @@ app.post("/submitSurvey", async (req, res) => {
           });
 
         if (insertError) {
-          throw insertError;
+          console.error(insertError);
+          return res.status(500).json({
+            success: false,
+            error: insertError.message,
+          });
         }
 
-    } else if (Number(pov) === 1) {
-      const { error } = await supabaseServiceClient
-        .from("user_surveys")
-        .insert({
-          survey_id: surveyID,
-          user_id: user.id,
-          response_data: responses,
-          pov: Number(pov),
+        res.json({
+          success: true,
+          message: "Survey submitted successfully.",
         });
 
-      insertError = error;
-    } else {
+  } catch (error) {
+    console.error("Error submitting survey:", error);
+    return res.status(500).json({
+      success: false,
+      error: "Failed to submit survey.",
+    });
+  }
+});
+
+app.post("/submitSurvey/peer", async (req, res) => {
+  try {
+    const authorization = req.get("authorization");
+
+    const accessToken = authorization?.startsWith("Bearer ")
+      ? authorization.slice("Bearer ".length)
+      : null;
+
+    if (!accessToken) {
+      return res.status(401).json({
+        success: false,
+        error: "Authentication required.",
+      });
+    }
+
+    const { data, error } = await supabaseAuthClient.auth.getUser(accessToken);
+
+    if (error || !data.user) {
+      return res.status(401).json({
+        success: false,
+        error: "Invalid session.",
+      });
+    }
+
+    const user = data.user;
+
+    const { surveyID, responses } = req.body;
+
+    //Validation for surveyID and responses
+    if (!surveyID || !responses || typeof responses !== "object" || Array.isArray(responses)) {
       return res.status(400).json({
         success: false,
-        error: "Invalid POV value.",
+        error: "Invalid survey submission.",
       });
     }
 
-    if (insertError) {
-      console.error(insertError);
+    const { data: surveyResponse, error: fetchError } = await supabaseServiceClient
+      .from("survey_responses")
+      .select("*")
+      .eq("surveyID", surveyID)
+      .contains("Invitees", [user.id])
+      .single();
 
-      return res.status(500).json({
+    if (fetchError || !surveyResponse) {
+      return res.status(404).json({
         success: false,
-        error: insertError.message,
+        error: "You have not been invited to this survey or it does not exist.",
       });
     }
 
-    res.json({
-      success: true,
-      message: "Survey submitted successfully.",
-    });
-  } catch (err) {
-    console.error(err);
+    const inviteesWhoAnswered = surveyResponse.InviteesWhoHaveAnswered || [];
 
-    res.status(500).json({
+    if (inviteesWhoAnswered.includes(user.id)) {
+      return res.status(409).json({
+        success: false,
+        error: "You have already submitted your peer responses.",
+      });
+    }
+
+    const aggregateAnswers = surveyResponse.AggregateInviteeAnswers || {};
+
+    for (const [question, answer] of Object.entries(responses)) {
+      if (!aggregateAnswers[question]) {
+        aggregateAnswers[question] = {};
+      }
+
+      if (!aggregateAnswers[question][answer]) {
+        aggregateAnswers[question][answer] = 0;
+      }
+      aggregateAnswers[question][answer]++;
+    }
+
+    inviteesWhoAnswered.push(user.id);
+    const remainingInvitees = (surveyResponse.Invitees || [])
+      .filter(inviteeID => inviteeID !== user.id);
+
+
+    const {error: updateError} = await supabaseServiceClient
+      .from("survey_responses")
+      .update({
+        AggregateInviteeAnswers: aggregateAnswers,
+        InviteesWhoHaveAnswered: inviteesWhoAnswered,
+        Invitees: remainingInvitees
+      })
+      .eq("surveyID", surveyID)
+      .eq("OriginalUserID", surveyResponse.OriginalUserID);
+      
+      if (updateError) {
+        throw updateError;
+      }
+
+      return res.json({
+        success: true,
+        message: "Peer survey submitted successfully.",
+      });
+
+  } catch (error) {
+    console.error("Error submitting survey:", error);
+    return res.status(500).json({
       success: false,
-      error: "Could not save survey response.",
+      error: "Failed to submit survey.",
     });
   }
 });
@@ -681,6 +758,11 @@ app.post("/user/invite", async (req, res) => {
     .single();
 
     if (fetchError) {
+      if (fetchError.code === "PGRST116") {
+        return res.status(400).json({
+          error: "Please submit your own survey before inviting participants."
+        });
+      }
       throw fetchError;
     }
 
