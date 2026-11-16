@@ -76,8 +76,8 @@ async function requireAdmin(req, res, next) {
 
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || false }));
 app.use(express.json());
-app.use("/admin", requireAdmin);
 app.use(cookieParser());
+app.use("/admin", requireAdmin);
 
 app.use((req, res, next) => {
   const adminPages = [
