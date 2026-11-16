@@ -193,7 +193,7 @@ app.get("/admin/invites", (req, res) => {
 
 
 app.get("/user", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "Frontend", "UserCopy.html"));
+  res.sendFile(path.join(__dirname, "..", "Frontend", "NormalUserWebsite", "UserWebsite.html"));
 });
 
 app.get("/healthz", (req, res) => {
