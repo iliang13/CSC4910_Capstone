@@ -479,7 +479,6 @@ class adminSurveyAccessButton {
           
           this.verticalDiv1.appendChild(this.nameLabel);
           this.verticalDiv1.appendChild(this.IDLabel);
-          this.verticalDiv1.appendChild(this.answeredLabel);
           this.verticalDiv1.style.alignItems = "flex-start";
           this.verticalDiv1.style.justifyContent = "center";
           this.verticalDiv1.style.paddingLeft = "10px";
