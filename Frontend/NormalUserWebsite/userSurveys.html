@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataPulse360 - Surveys</title>
+    <link rel="stylesheet" href="../Styling.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <header>
+        <img src="../images/logo.png" alt="DataPulse360 Logo">
+        <h1>DataPulse360 Merrimack</h1>
+    </header>
+
+    <div id="buttonSection">
+        <button id="home">Home</button>
+        <button id="SurveysBtn">View Surveys</button>
+        <button id="InvitesBtn">My Invites</button>
+        <button id="PersonalResults">Personal Results</button>
+        <button id="signUp">Sign Up</button>
+        <button id="signIn">Sign In</button>
+    </div>
+
+    <main>
+        <div id="surveysDiv" class="my-div">
+          <input
+        type="text"
+        id="surveySearch"
+        placeholder="Search for surveys..."
+          />
+
+          <button ID="CreateSurvey">Create New Survey</button>
+
+          <button popovertarget="codePopup">
+            Use Survey Code
+          </button>
+
+          <div id="codePopup" class="surveyPopup" popover>
+            <input type="text" id="surveyCode" placeholder="Enter your invite code">
+
+            <button id="submitSurveyCode" type="button">Submit</button>
+          </div>
+
+          <div id="surveyBuilder" class="surveyBuilder">
+            <input 
+              type="text"
+              id="surveyNameInput"
+              placeholder="Enter survey name"
+              class = "questionInput"
+            />
+
+            <div id="questionsContainer">
+
+            </div>
+
+            <button id="addQuestion">Add Question</button>
+            <button id="saveSurvey">Save Survey</button>
+
+          </div>
+
+          <div id="displaySurveyAccessButtons" class="surveysDisplayDivDiv">
+            <h2>Personal Survey Assessments</h2>
+            <div id="firstPersonSurveys" class="surveysDisplayDiv">
+            </div>
+
+            <h2>Peer Survey Assessments</h2>
+            <div id="thirdPersonSurveys" class="surveysDisplayDiv">
+            </div>
+
+          </div>
+          
+        </div>
+
+        </div>
+    </main>
+
+    <main>
+        <p id="output"></p>
+    </main>
+
+    <dialog id="authDialog">
+        <form id="authForm">
+            <h2 id="authTitle">Sign In</h2>
+            <button id="googleAuthButton" type="button">Continue with Google</button>
+            <p>Google sign-in creates your account the first time you use it.</p>
+            <label for="authEmail">Email</label>
+            <input id="authEmail" type="email" autocomplete="email" required />
+            <label for="authPassword">Password</label>
+            <input id="authPassword" type="password" autocomplete="current-password" minlength="6" required />
+            <p id="authMessage" role="status"></p>
+            <div id="authActions">
+                <button id="closeAuthDialog" type="button">Cancel</button>
+                <button id="authSubmit" type="submit">Sign In</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="../classes.js"></script>
+    <script src="/NormalUserWebsite/userSurveys.js"></script>
+    <script src="/NormalUserWebsite/userNavigation.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", loadSurveys);
+    </script>
+
+</body>
+</html>

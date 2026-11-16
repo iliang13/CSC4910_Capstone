@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataPulse360 - Home</title>
+    <link rel="stylesheet" href="../Styling.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <header>
+        <img src="../images/logo.png" alt="DataPulse360 Logo">
+        <h1>DataPulse360 Merrimack</h1>
+    </header>
+
+    <div id="buttonSection">
+        <button id="home">Home</button>
+        <button id="SurveysBtn">View Surveys</button>
+        <button id="InvitesBtn">My Invites</button>
+        <button id="PersonalResults">Personal Results</button>
+        <button id="signUp">Sign Up</button>
+        <button id="signIn">Sign In</button>
+    </div>
+
+    <main>
+        <div id="homeDiv" class="my-div active">
+            
+            <div id="welcomeMessage">
+                <h2>Welcome to DataPulse360</h2>
+                <p>
+                    DataPulse360 is designed to streamline survey participation, student
+                    feedback collection, and engagement analytics across Merrimack
+                    College.
+                </p>
+            </div>
+    
+            <div id="dashboard">
+                <div class="card">
+                    <h3>Active Surveys</h3>
+                    <p class="stat">3</p>
+                </div>
+
+                <div class="card">
+                    <h3>Invitations</h3>
+                    <p class="stat">5</p>
+                </div>
+
+                <div class="card">
+                    <h3>Completed Surveys</h3>
+                    <p class="stat">2</p>
+                </div>
+
+                <div id="userPanel">
+                    <h2>User Status</h2>
+                    <p id="userStatus">Not Signed In</p>
+                </div>
+
+                <div id="activityFeed">
+                    <h2>Recent Activity</h2>
+
+                    <ul>
+                        <li>Completed Student Satisfaction Survey</li>
+                        <li>Received invitation to Campus Dining Survey</li>
+                        <li>Survey results updated</li>
+                        <li>Microsoft account integration configured</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <main>
+        <p id="output"></p>
+    </main>
+
+    <dialog id="authDialog">
+        <form id="authForm">
+            <h2 id="authTitle">Sign In</h2>
+            <button id="googleAuthButton" type="button">Continue with Google</button>
+            <p>Google sign-in creates your account the first time you use it.</p>
+            <label for="authEmail">Email</label>
+            <input id="authEmail" type="email" autocomplete="email" required />
+            <label for="authPassword">Password</label>
+            <input id="authPassword" type="password" autocomplete="current-password" minlength="6" required />
+            <p id="authMessage" role="status"></p>
+            <div id="authActions">
+                <button id="closeAuthDialog" type="button">Cancel</button>
+                <button id="authSubmit" type="submit">Sign In</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="../classes.js"></script>
+    <script src="/NormalUserWebsite/userNavigation.js"></script>
+    
+</body>
+</html>
