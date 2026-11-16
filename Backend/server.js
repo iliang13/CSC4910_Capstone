@@ -164,7 +164,7 @@ if (!fs.existsSync(surveysDirectory)) {
 loadSurveyIDs();
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "Frontend", "index.html"));
+  res.sendFile(path.join(__dirname, "..", "Frontend", "notSignedIn.html"));
 });
 
 app.get("/admin/home", (req, res) => {
