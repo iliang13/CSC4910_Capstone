@@ -617,7 +617,10 @@ app.post("/admin/invite", async (req, res) => {
     });
   if (surveyError) {
     console.error("Supabase error:", surveyError.message);
-    return res.status(500).json({ error: "Failed to create survey" });
+    return res.status(500).json({ 
+      error: "Failed to create survey", 
+      details: surveyError.message,
+      code: surveyError.code });
   }
 
   return res.json({
