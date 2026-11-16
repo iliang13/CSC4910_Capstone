@@ -199,9 +199,6 @@ class surveyAccessButton {
           
           this.viewButton.addEventListener("click", async () => {
             currentSurveyID = ID;
-            potentialMainPageDivs.forEach((div) => {
-              div.classList.remove("active");
-            });
             surveyAnsweringDiv.classList.add("active");
             clearSurvey()
             console.log("POV:", pov, typeof pov);
@@ -348,9 +345,6 @@ class peerSurveyAccessButton {
           
           this.viewButton.addEventListener("click", async () => {
             currentSurveyID = ID;
-            potentialMainPageDivs.forEach((div) => {
-              div.classList.remove("active");
-            });
             surveyAnsweringDiv.classList.add("active");
             clearSurvey()
             console.log("POV:", pov, typeof pov);
@@ -555,9 +549,6 @@ class adminSurveyAccessButton {
           
           this.viewButton.addEventListener("click", async () => {
             currentSurveyID = ID;
-            potentialMainPageDivs.forEach((div) => {
-              div.classList.remove("active");
-            });
             surveyAnsweringDiv.classList.add("active");
             clearSurvey()
             console.log("POV:", pov, typeof pov);

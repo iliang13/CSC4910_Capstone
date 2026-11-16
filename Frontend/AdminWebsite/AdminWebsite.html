@@ -599,34 +599,19 @@
         });
 
         surveysButton.addEventListener("click", () => {
-          potentialMainPageDivs.forEach((div) => {
-            div.classList.remove("active");
-          });
-          surveysDiv.classList.add("active");
+          window.location.href = "/admin/surveys";
         });
 
         invitesButton.addEventListener("click", () => {
-          potentialMainPageDivs.forEach((div) => {
-            div.classList.remove("active");
-          });
-          invitesDiv.classList.add("active");
-          clearSurvey()
+          window.location.href = "/admin/invites";
         });
 
         personalResultsButton.addEventListener("click", () => {
-          potentialMainPageDivs.forEach((div) => {
-            div.classList.remove("active");
-          });
-          resultsDiv.classList.add("active");
-          clearSurvey()
+          window.location.href = "/admin/results";
         });
 
         homeButton.addEventListener("click", () => {
-          potentialMainPageDivs.forEach((div) => {
-            div.classList.remove("active");
-          });
-          homeDiv.classList.add("active");
-          clearSurvey()
+          window.location.href = "/admin/home";
         });
 
         createSurveyButton.addEventListener("click", () => {

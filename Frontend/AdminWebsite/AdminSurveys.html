@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataPulse360 - Surveys</title>
+    <link rel="stylesheet" href="../Styling.css">
+
+</head>
+
+<body>
+
+    <header>
+        <img src="../images/logo.png" alt="DataPulse360 Logo">
+        <h1>DataPulse360 Merrimack</h1>
+    </header>
+
+    <div id="buttonSection">
+        <button id="home">Home</button>
+        <button id="SurveysBtn">View Surveys</button>
+        <button id="InvitesBtn">My Invites</button>
+        <button id="PersonalResults">Personal Results</button>
+        <button id="signUp">Sign Up</button>
+        <button id="signIn">Sign In</button>
+    </div>
+
+    <main>
+        <div id="surveysDiv">
+            <input type="text" id="surveySearch" placeholder="Search for surveys..."/>
+            <button id="CreateSurvey">Create New Survey</button>
+
+            <button popovertarget="codePopup">
+                Use Survey Code
+            </button>
+
+            <div id="codePopup" class="surveyPopup" popover>
+                <input type="text" id="surveyCode" placeholder="Enter your invite code">
+                <button id="submitSurveyCode" type="button">Submit</button>
+            </div>
+
+            <div id="surveyBuilder" class="surveyBuilder">
+                <input type="text" id="surveyNameInput"
+                    placeholder="Enter survey name"
+                    class="questionInput"
+                />
+
+                <div id="questionsContainer"></div>
+
+                <button id="addQuestion">Add Question</button>
+                <button id="saveSurvey">Save Survey</button>
+            </div>
+
+            <div id="displaySurveyAccessButtons" class="surveysDisplayDiv"></div>
+
+            <div id="surveyAnsweringDiv"></div>
+        </div>
+    </main>
+
+    <main>
+        <p id="output"></p>
+    </main>
+
+    <script src="../classes.js"></script>
+    <script src="adminSurveys.js"></script>
+    <script src="adminNavigation.js"></script>
+
+</body>
+</html>

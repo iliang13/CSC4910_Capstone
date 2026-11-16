@@ -104,9 +104,30 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "Frontend", "index.html"));
 });
 
-app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "Frontend", "AdminWebsite.html"));
+app.get("/admin/home", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "..", "Frontend", "AdminWebsite", "adminHome.html")
+  );
 });
+
+app.get("/admin/surveys", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "..", "Frontend", "AdminWebsite", "adminSurveys.html")
+  );
+});
+
+app.get("/admin/results", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "..", "Frontend", "AdminWebsite", "adminResults.html")
+  );
+});
+
+app.get("/admin/invites", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "..", "Frontend", "AdminWebsite", "adminInvites.html")
+  );
+});
+
 
 app.get("/user", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "Frontend", "UserCopy.html"));
