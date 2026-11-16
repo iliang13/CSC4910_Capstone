@@ -294,7 +294,7 @@ app.post("/submitSurvey/peer", async (req, res) => {
       .from("survey_responses")
       .select("*")
       .eq("SurveyID", surveyID)
-      .contains("Invitees", [user.id])
+      .contains("Invitees", JSON.stringify([user.id]))
       .single();
 
     console.log("Peer survey lookup:", {
