@@ -105,7 +105,7 @@ homeButton.addEventListener("click", () => {
           }
         });
 
-        async function showAuthenticatedUser(session) {
+        async function showAuthenticatedUser(session, redirectAdmin = false) {
           const userStatus = document.getElementById("userStatus");
           const welcomeMessage = document.getElementById("welcomeMessage");
           const output = document.getElementById("output");
@@ -136,6 +136,11 @@ homeButton.addEventListener("click", () => {
 
             if (!adminResponse.ok && adminResponse.status !== 403) {
               throw new Error("Could not establish administrator session. Please sign in as an administrator.");
+            }
+
+            if (adminResponse.ok && redirectAdmin) {
+              window.location.href = "/admin/home";
+              return;
             }
 
             if (userStatus) {
@@ -212,7 +217,7 @@ homeButton.addEventListener("click", () => {
             return;
           }
 
-          await showAuthenticatedUser(session);
+          await showAuthenticatedUser(session, attempt.mode === "signin");
         }
 
         authForm.addEventListener("submit", async (event) => {
@@ -251,7 +256,7 @@ homeButton.addEventListener("click", () => {
               return;
             }
 
-            await showAuthenticatedUser(result.data.session);
+            await showAuthenticatedUser(result.data.session, authMode === "signin");
             authDialog.close();
           } catch (err) {
             authMessage.textContent = err.message || "Authentication failed.";
