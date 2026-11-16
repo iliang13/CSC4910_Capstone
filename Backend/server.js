@@ -297,6 +297,13 @@ app.post("/submitSurvey/peer", async (req, res) => {
       .contains("Invitees", [user.id])
       .single();
 
+    console.log("Peer survey lookup:", {
+      surveyID,
+      userID: user.id,
+      fetchError,
+      surveyResponse
+    });
+
     if (fetchError || !surveyResponse) {
       return res.status(404).json({
         success: false,
