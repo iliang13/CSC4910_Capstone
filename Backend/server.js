@@ -345,7 +345,7 @@ app.post("/submitSurvey/peer", async (req, res) => {
         InviteesWhoHaveAnswered: inviteesWhoAnswered,
         Invitees: remainingInvitees
       })
-      .eq("surveyID", surveyID)
+      .eq("SurveyID", surveyID)
       .eq("OriginalUserID", surveyResponse.OriginalUserID);
       
       if (updateError) {
