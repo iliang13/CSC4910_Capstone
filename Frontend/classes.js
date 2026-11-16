@@ -153,23 +153,22 @@ class surveyAccessButton {
           });
 
           this.submitButton.addEventListener("click", async () => {
-            console.log("1. Invite button clicked");
+            
             const email = this.emailInput.value.trim();
             if (!email) {
               alert("Please enter an email address.");
               return;
             }
-            console.log("2. Retrieving Supabase session");
+            
             const { data: { session }, error } = await supabaseClient.auth.getSession();
-            console.log("3. Session:", session);
-            console.log("4. Session error:", error);
+            
             
             if (error || !session) {
               alert("Please sign in to proceed.");
               return;
             }
             try {
-              console.log("5. Sending request to /user/invite");
+
               const response = await fetch("/user/invite", {
                 method: "POST",
                 headers: {
@@ -443,7 +442,144 @@ class peerSurveyAccessButton {
         }
       }
 
+class adminSurveyAccessButton {
+        constructor(title, ID, pov, answered, questionsList) {
+          this.div = document.createElement("div");
+          this.div.classList.add("SurveyAccessDiv");
+          this.div.dataset.surveyID = ID;
+          this.div.dataset.pov = pov;
+          this.div.dataset.answered = answered;
+          this.div.dataset.questions = questionsList;
 
+          this.nameLabel = document.createElement("label");
+          this.nameLabel.textContent = title;
+
+          this.IDLabel = document.createElement("label");
+          this.IDLabel.textContent = `Survey ID: ${ID}`;   
+
+          this.inviteButton = document.createElement("button");
+          this.inviteButton.textContent = "Invite Participants";
+          this.inviteButton.classList.add("inviteButton");
+
+          this.viewButton = document.createElement("button");
+          this.viewButton.textContent = "View Survey";
+
+          this.horizontalDiv = document.createElement("div");
+          this.horizontalDiv.classList.add("horizontalDiv");
+
+          this.verticalDiv1 = document.createElement("div");
+          this.verticalDiv1.classList.add("verticalDiv");
+          
+          this.verticalDiv2 = document.createElement("div");
+          this.verticalDiv2.classList.add("verticalDiv");
+          
+          this.div.appendChild(this.horizontalDiv);
+          this.horizontalDiv.appendChild(this.verticalDiv1);
+          this.horizontalDiv.appendChild(this.verticalDiv2);
+          
+          this.verticalDiv1.appendChild(this.nameLabel);
+          this.verticalDiv1.appendChild(this.IDLabel);
+          this.verticalDiv1.appendChild(this.answeredLabel);
+          this.verticalDiv1.style.alignItems = "flex-start";
+          this.verticalDiv1.style.justifyContent = "center";
+          this.verticalDiv1.style.paddingLeft = "10px";
+
+
+          this.verticalDiv2.appendChild(this.viewButton);
+          this.verticalDiv2.appendChild(this.inviteButton);
+          this.verticalDiv2.style.alignItems = "flex-end";
+          this.verticalDiv2.style.justifyContent = "center";
+          this.verticalDiv2.style.paddingRight = "10px";
+
+          this.emailInput = document.createElement("input");
+          this.popup = document.createElement("div");
+          this.popup.classList.add("surveyPopup");
+          this.popup.setAttribute("popover", "manual");
+          
+          this.submitButton = document.createElement("button");
+          this.submitButton.textContent = "Invite";
+          
+          this.inviteButton.addEventListener("click", () => {
+            const surveyCode = `S${ID}`;
+
+            this.popup.textContent = "Invitees Email Address: ";
+            this.popup.appendChild(this.emailInput);
+            this.popup.appendChild(this.submitButton);
+            document.body.appendChild(this.popup);
+            this.popup.showPopover();
+          });
+
+          this.submitButton.addEventListener("click", async () => {
+            
+            const email = this.emailInput.value.trim();
+            if (!email) {
+              alert("Please enter an email address.");
+              return;
+            }
+            
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            
+            
+            if (error || !session) {
+              alert("Please sign in to proceed.");
+              return;
+            }
+            try {
+
+              const response = await fetch("/admin/invite", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({ 
+                  surveyID: ID,
+                  email: email
+                })
+              });
+              
+              const result = await response.json();
+              console.log("Invite response status:", response.status);
+              console.log("Invite response body:", result);
+              
+              if (!response.ok) {
+                alert(result.message || result.error || JSON.stringify(result));
+                return;
+              }
+              alert("Invitation sent successfully.");
+            } catch (error) {
+              console.error("Error sending invitation:", error);
+              alert("Could not contact the server");
+            }
+            this.popup.hidePopover();
+          });
+          
+          this.viewButton.addEventListener("click", async () => {
+            currentSurveyID = ID;
+            potentialMainPageDivs.forEach((div) => {
+              div.classList.remove("active");
+            });
+            surveyAnsweringDiv.classList.add("active");
+            clearSurvey()
+            console.log("POV:", pov, typeof pov);
+            console.log("Questions:", questionsList);
+            surveyAnsweringDiv.replaceChildren();
+            for (let i = 0; i < questionsList.length; i++) {
+              if (pov === "0") {
+                surveyAnsweringDiv.appendChild(
+                  CreateSurveyQuestion(
+                    questionsList[i].questionText,
+                    questionsList[i].numberOfOptions
+                  ).question
+                );
+              }
+              else if (pov === "1") {
+                surveyAnsweringDiv.appendChild(CreateSurveyQuestion(questionsList[i].thirdPersonText, questionsList[i].numberOfOptions).question);
+              }
+            }
+          });
+        }
+      }
 
 function CreateSurveyQuestion(questionText, numAnswers) { 
         const answers = [];
@@ -472,4 +608,10 @@ function createSurveyAccessButton(title, ID, pov, answered, questionsList, invit
           const tempSurveyAccessButton = new peerSurveyAccessButton(title, ID, pov, answered, questionsList, inviterEmail);
           thirdPersonSurveys.appendChild(tempSurveyAccessButton.div);
         }
+      }
+
+function createAdminSurveyAccessButton(title, ID, pov, answered, questionsList, inviterEmail) {
+          const tempSurveyAccessButton = new adminSurveyAccessButton(title, ID, pov, answered, questionsList);
+          firstPersonSurveys.appendChild(tempSurveyAccessButton.div);
+
       }
