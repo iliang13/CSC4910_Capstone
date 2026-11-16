@@ -589,7 +589,7 @@
               alert(result.message);
               return;
             }
-            createSurveyAccessButton(result.surveyName, result.surveyId, result.pov, false, result.questions); //title, ID, pov, answered, questionsList
+            createAdminSurveyAccessButton(result.surveyName, result.surveyId, result.pov, false, result.questions); //title, ID, pov, answered, questionsList
             alert("Survey Added Successfully");
           } catch (error) {
             console.error("Error validating survey code:", error);
@@ -963,8 +963,8 @@
             const surveys = await response.json();
             firstPersonSurveys.replaceChildren();
 
-            surveys.forEach((survey) => { //createSurveyAccessButton(title, ID, pov, answered, questionsList)
-              createSurveyAccessButton(survey.title, survey.survey_id, "0", false, survey.questions);
+            surveys.forEach((survey) => { //title, ID, pov, answered, questionsList
+              createAdminSurveyAccessButton(survey.title, survey.survey_id, "0", false, survey.questions);
             });
           } catch (error) {
             console.error("Error loading surveys:", error);
@@ -972,7 +972,7 @@
           }
         }
         document.addEventListener("DOMContentLoaded", loadSurveys);
-        //createSurveyAccessButton("A", 12345, "0", false, []);
+
 
         document.addEventListener("click", (event) => {
           const popups = document.querySelectorAll(".surveyPopup:popover-open");
