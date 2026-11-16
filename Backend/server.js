@@ -5,6 +5,7 @@ const { createClient } = require("@supabase/supabase-js");
 const fs = require("fs");
 const crypto = require("crypto");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
+const cookieParser = require("cookie-parser");
 
 const app = express();
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -29,8 +30,70 @@ const supabaseAuthClient = createClient(supabaseUrl, supabaseAnonKey, {
 });
 const supabaseServiceClient = createClient(supabaseUrl, supabaseServiceRoleKey);
 
+
+async function requireAdmin(req, res, next) {
+  try {
+    
+    const accessToken = req.cookies?.["datapulse360-admin"];
+
+    if (!accessToken) {
+      return res.status(401).send("Authentication required.");
+    }
+
+    
+    const { data, error } =
+      await supabaseAuthClient.auth.getUser(accessToken);
+
+    if (error || !data.user) {
+      return res.status(401).send("Invalid or expired session.");
+    }
+
+    // Check whether this user is an administrator.
+    const { data: admin, error: adminError } =
+      await supabaseServiceClient
+        .from("admin_users")
+        .select("user_id")
+        .eq("user_id", data.user.id)
+        .maybeSingle();
+
+    if (adminError) {
+      console.error("Admin verification error:", adminError.message);
+      return res.status(500).send("Unable to verify administrator access.");
+    }
+
+    if (!admin) {
+      return res.status(403).send("Administrator access required.");
+    }
+
+    req.user = data.user;
+    next();
+  } catch (error) {
+    console.error("Admin authentication error:", error);
+    res.status(500).send("Authentication error.");
+  }
+}
+
+
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || false }));
 app.use(express.json());
+app.use("/admin", requireAdmin);
+app.use(cookieParser());
+
+app.use((req, res, next) => {
+  const adminPages = [
+    "/AdminWebsite/adminHome.html",
+    "/AdminWebsite/adminSurveys.html",
+    "/AdminWebsite/adminResults.html",
+    "/AdminWebsite/adminInvites.html"
+  ];
+
+  if (adminPages.includes(req.path)) {
+    return requireAdmin(req, res, next);
+  }
+
+  next();
+});
+
 app.use(express.static(path.join(__dirname, "..", "Frontend")));
 
 app.get("/testSurvey/:id", async (req, res) => {
@@ -163,6 +226,70 @@ app.get("/api/me", async (req, res) => {
   }
 
   res.json({ user: data.user });
+});
+
+app.post("/api/admin-session", async (req, res) => {
+  try {
+    const authorization = req.get("authorization");
+    const accessToken = authorization?.startsWith("Bearer ")
+      ? authorization.slice("Bearer ".length)
+      : null;
+
+    if (!accessToken) {
+      return res.status(401).json({ error: "Authentication required." });
+    }
+
+    // Verify the Supabase user.
+    const { data, error } =
+      await supabaseAuthClient.auth.getUser(accessToken);
+
+    if (error || !data.user) {
+      return res.status(401).json({ error: "Invalid session." });
+    }
+
+    // Verify administrator privileges.
+    const { data: admin, error: adminError } =
+      await supabaseServiceClient
+        .from("admin_users")
+        .select("user_id")
+        .eq("user_id", data.user.id)
+        .maybeSingle();
+
+    if (adminError) {
+      console.error(adminError);
+      return res.status(500).json({ error: "Admin verification failed." });
+    }
+
+    if (!admin) {
+      return res.status(403).json({ error: "Administrator access required." });
+    }
+
+    // Establish the administrator cookie.
+    res.cookie("datapulse360-admin", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/admin",
+      maxAge: 60 * 60 * 1000,
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Admin session error:", error);
+    res.status(500).json({ error: "Unable to establish admin session." });
+  }
+});
+
+//Clears cookies
+app.post("/api/admin-session/logout", (req, res) => {
+  res.clearCookie("datapulse360-admin", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/admin",
+  });
+
+  res.json({ success: true });
 });
 
 app.post("/submitSurvey/personal", async (req, res) => {

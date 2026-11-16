@@ -63,6 +63,11 @@ homeButton.addEventListener("click", () => {
         async function signOutCurrentSession() {
             const { error } = await supabaseClient.auth.signOut({ scope: "local" });
             if (error) throw error;
+
+            await fetch("/api/admin-session/logout", {
+              method: "POST",
+            });
+
             const userStatus = document.getElementById("userStatus");
             if (userStatus) {
                 userStatus.textContent = "Not Signed In";
@@ -120,6 +125,17 @@ homeButton.addEventListener("click", () => {
             const payload = await response.json();
             if (!response.ok) {
               throw new Error(payload.error || "Could not verify account.");
+            }
+
+            const adminResponse = await fetch("/api/admin-session", {
+              method: "POST",
+              headers: {
+                 Authorization: `Bearer ${session.access_token}`,
+              },
+            });
+
+            if (!adminResponse.ok && adminResponse.status !== 403) {
+              throw new Error("Could not establish administrator session. Please sign in as an administrator.");
             }
 
             if (userStatus) {
@@ -260,6 +276,23 @@ homeButton.addEventListener("click", () => {
                 storageKey: authStorageKey,
               },
             });
+
+            supabaseClient.auth.onAuthStateChange((event, session) => {
+              if (event === "TOKEN_REFRESHED" && session) {
+                fetch("/api/admin-session", {
+                  method: "POST",
+                  headers: {
+                    Authorization: `Bearer ${session.access_token}`,
+                  },
+                }).then(async (response) => {
+                  if (!response.ok && response.status !== 403) {
+                    console.error("Failed to refresh admin session.");
+                  }
+                }).catch((error) => {
+                  console.error("Admin session refresh failed:", error);
+                });
+              }
+});
             authSetupState = "ready";
             authSubmit.disabled = false;
             googleAuthButton.disabled = false;
