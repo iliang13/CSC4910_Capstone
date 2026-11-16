@@ -40,11 +40,6 @@ homeButton.addEventListener("click", () => {
         authSubmit.disabled = true;
         googleAuthButton.disabled = true;
 
-        window.addEventListener("pagehide", () => {
-          if (sessionStorage.getItem(googleAuthAttemptKey)) return;
-          sessionStorage.removeItem(authStorageKey);
-        });
-
         function openAuthDialog(mode) {
           authMode = mode;
           const isSignUp = mode === "signup";
