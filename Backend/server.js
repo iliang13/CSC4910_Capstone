@@ -613,7 +613,6 @@ app.post("/admin/invite", async (req, res) => {
     .insert({
       user_id: recipientID,
       survey_id: surveyID,
-      pov: 0,
     });
   if (surveyError) {
     console.error("Supabase error:", surveyError.message);
