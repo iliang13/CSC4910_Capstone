@@ -293,7 +293,7 @@ app.post("/submitSurvey/peer", async (req, res) => {
     const { data: surveyResponse, error: fetchError } = await supabaseServiceClient
       .from("survey_responses")
       .select("*")
-      .eq("surveyID", surveyID)
+      .eq("SurveyID", surveyID)
       .contains("Invitees", [user.id])
       .single();
 
