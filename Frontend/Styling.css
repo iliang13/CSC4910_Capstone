@@ -174,13 +174,23 @@
           display: block;
         }
         .surveysDisplayDiv {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 20px;
-          justify-content: center;
-          background-color: none;
-          width:100%;
-        }
+        padding: 20px;
+        border: 1px solid var(--color-accent);
+        border-radius: 4px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        background-color: var(--color-button-bg);
+        width:100%;
+      }
+      .surveysDisplayDivDiv {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        width:100%;
+      }
         .surveyField {
           width:100%;
           box-sizing: border-box;
