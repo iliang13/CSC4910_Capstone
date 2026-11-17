@@ -3,7 +3,7 @@ const main = document.getElementById("main");
 class surveyInviteeDiv {
   constructor(title, unansweredList, answeredList) {
     this.mainDiv = document.createElement("div");
-    this.mainDiv.classList.add("verticalDiv");
+    this.mainDiv.classList.add("surveyInviteeMainDiv");
     this.mainDiv.dataset.title = title;
 
     this.nameLabel = document.createElement("label");
@@ -13,13 +13,13 @@ class surveyInviteeDiv {
     this.compeletedLabel.textContent = "Users Who Have Completed This Survey";
 
     this.completedDiv = document.createElement("div")
-    this.completedDiv.classList.add("verticalDiv");
+    this.completedDiv.classList.add("surveyInviteeSubDiv");
 
     this.uncompeletedLabel = document.createElement("label");
     this.uncompeletedLabel.textContent = "Users Who Have Not Completed This Survey";
 
     this.uncompletedDiv = document.createElement("div")
-    this.uncompletedDiv.classList.add("verticalDiv");
+    this.uncompletedDiv.classList.add("surveyInviteeSubDiv");
 
     for (let i = 0; i < answeredList.length; i++) {
         let userLabel = document.createElement("label");

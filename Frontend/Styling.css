@@ -11,7 +11,9 @@
           --color-delete-hover: #bd0d07;
           --color-survey-field: #c8c5c0;
           --color-question-bg: #dfdcd4;
-  }
+          --color-inviteeMainDiv-bg: #18191d;
+          --color-inviteeSubDiv: rgb(49, 55, 71);
+        }
         body {
           margin: 0;
           padding: 0;
@@ -386,4 +388,30 @@
         }
         .surveyPopup:not(:popover-open) {
           display: none;
+        }
+        .surveyInviteeMainDiv {
+          padding: 20px;
+          border: 1px solid var(--color-accent);
+          border-radius: 4px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 20px;
+          justify-content: center;
+          background-color: var(--color-inviteeMainDiv-bg);
+          width:100%;
+          color: white;
+          font-size: 18px;
+        }
+        .surveyInviteeSubDiv {
+          padding: 20px;
+          border: 1px solid var(--color-accent);
+          border-radius: 4px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 20px;
+          justify-content: flex-start;
+          background-color: var(--color-inviteeSubDiv-bg);
+          width:100%;
+          color: white;
+          font-size: 18px;
         }
