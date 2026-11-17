@@ -1004,6 +1004,25 @@ app.post("/user/loadInviteesTab", async (req, res) => {
       throw detailsError;
     }
 
+    const allInviteeIds = [...new Set(
+      surveys.flatMap((survey) => [
+        ...(survey.Invitees || []),
+        ...(survey.InviteesWhoHaveAnswered || [])
+      ])
+    )];
+
+    const inviteeEmails = {};
+
+    for (const inviteeId of allInviteeIds) {
+      const { data, error } = await supabaseServiceClient.auth.admin.getUserById(inviteeId);
+
+      if (error) {
+        throw error;
+      }
+      
+      inviteeEmails[inviteeId] = data.user.email;
+    }
+
     const processedSurveys = surveys.map((survey) => {
       const matchingSurvey = surveyDetails.find(
         (details) => details.survey_id === survey.SurveyID
@@ -1011,8 +1030,11 @@ app.post("/user/loadInviteesTab", async (req, res) => {
 
       return {
         title: matchingSurvey ? matchingSurvey.title : "Unknown Survey",
-        answeredList: survey.InviteesWhoHaveAnswered || [],
-        unansweredList: survey.Invitees || []
+        answeredList: (survey.InviteesWhoHaveAnswered || [])
+        .map((id) => inviteeEmails[id]),
+
+        unansweredList: (survey.Invitees || [])
+        .map((id) => inviteeEmails[id])
       };
     });
     return res.status(200).json(processedSurveys);

@@ -1,4 +1,5 @@
 const main = document.getElementById("main");
+main.style.gap = "20px";
 
 class surveyInviteeDiv {
   constructor(title, unansweredList, answeredList) {
