@@ -126,11 +126,6 @@ homeButton.addEventListener("click", () => {
           if (adminResponse.ok) {
             window.location.href = "/admin/home";
             return;
-          } else if (adminResponse.status === 403) {
-            if (window.location.pathname !== "/user/home") {
-              window.location.href = "/user/home";
-            }
-            return;
           }
 
           if (userStatus) {
@@ -156,7 +151,8 @@ homeButton.addEventListener("click", () => {
         }
       }
 
-      fetch("/api/config")
+      let supabaseReady;
+      supabaseReady = fetch("/api/config")
         .then(async (response) => {
           const config = await response.json();
           if (!response.ok) throw new Error(config.error || "Authentication setup is unavailable.");

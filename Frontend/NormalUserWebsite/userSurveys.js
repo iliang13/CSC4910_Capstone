@@ -62,6 +62,10 @@ document.addEventListener("click", (event) => {
 });
 
 async function loadSurveys() {
+        await supabaseReady;
+
+        if (authSetupState !== "ready") return;
+
         const { data: { session }, error } = await supabaseClient.auth.getSession();
         if (error || !session) {
           alert("Please sign in to proceed.");
