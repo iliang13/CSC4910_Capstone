@@ -191,9 +191,29 @@ app.get("/admin/invites", (req, res) => {
   );
 });
 
+//User File Paths
+app.get("/user/home", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "..", "Frontend", "NormalUserWebsite", "userHome.html")
+  );
+});
 
-app.get("/user", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "Frontend", "NormalUserWebsite", "UserWebsite.html"));
+app.get("/user/surveys", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "..", "Frontend", "NormalUserWebsite", "userSurveys.html")
+  );
+});
+
+app.get("/user/results", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "..", "Frontend", "NormalUserWebsite", "userResults.html")
+  );
+});
+
+app.get("/user/invites", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "..", "Frontend", "NormalUserWebsite", "userInvites.html")
+  );
 });
 
 app.get("/healthz", (req, res) => {

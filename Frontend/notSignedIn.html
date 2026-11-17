@@ -512,8 +512,14 @@
               throw new Error("Could not establish administrator session. Please sign in as an administrator.");
             }
 
+
+
             if (adminResponse.ok && redirectAdmin) {
               window.location.href = "/admin/home";
+              return;
+            }
+            else if (adminResponse.status === 403) {
+              window.location.href = "/user/home";
               return;
             }
 
