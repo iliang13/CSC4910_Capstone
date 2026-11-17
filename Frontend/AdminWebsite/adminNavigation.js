@@ -151,10 +151,14 @@ homeButton.addEventListener("click", () => {
           }
 
           if (adminResponse.ok) {
-            window.location.href = "/admin/home";
+            if (!window.location.pathname.startsWith("/admin")) {
+              window.location.href = "/admin/home";
+            }
             return;
           } else if (adminResponse.status === 403) {
-            window.location.href = "/user/home";
+            if (window.location.pathname !== "/user/home") {
+              window.location.href = "/user/home";
+            }
             return;
           }
 
