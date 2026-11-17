@@ -2,7 +2,8 @@ const surveysButton = document.getElementById("SurveysBtn");
 const invitesButton = document.getElementById("InvitesBtn");
 const personalResultsButton = document.getElementById("PersonalResults");
 const homeButton = document.getElementById("home");
-
+const signInButton = document.getElementById("signIn");
+const signOutButton = document.getElementById("signOut");
 
 
 surveysButton.addEventListener("click", () => {
@@ -22,11 +23,7 @@ homeButton.addEventListener("click", () => {
 });
 
 
-        //Universal Authentication Setup
-      const signInButton = document.getElementById("signIn");
-      const signOutButton = document.getElementById("signOut");
-
-      // Universal Authentication Setup
+      // Universal Authentication2 Setup
       const authDialog = document.getElementById("authDialog");
       const authForm = document.getElementById("authForm");
 
@@ -189,10 +186,12 @@ homeButton.addEventListener("click", () => {
               });
             }
           });
+          const { data } = await supabaseClient.auth.getSession();
+          
           authSetupState = "ready";
           googleAuthButton.disabled = false;
 
-          await handleGoogleAuthSession(data.session);
+          await showAuthenticatedUser(data.session);
         })
         .catch((err) => {
           authSetupState = "error";
