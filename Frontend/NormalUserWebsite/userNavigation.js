@@ -137,8 +137,8 @@ homeButton.addEventListener("click", () => {
 
           if (userStatus) {
             userStatus.textContent = `Signed in as ${payload.user.email}`;
-            updateAuthenticationButtons(true); //false shows sign in button
           }
+          updateAuthenticationButtons(true); //false shows sign in button
 
           if (welcomeMessage) {
             welcomeMessage.querySelector("h2").textContent =
