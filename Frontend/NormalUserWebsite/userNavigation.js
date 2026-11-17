@@ -5,6 +5,11 @@ const homeButton = document.getElementById("home");
 const signInButton = document.getElementById("signIn");
 const signOutButton = document.getElementById("signOut");
 
+function updateAuthenticationButtons(isSignedIn) {
+    signInButton.hidden = isSignedIn;
+    signOutButton.hidden = !isSignedIn;
+}
+
 surveysButton.addEventListener("click", () => {
     window.location.href = "/user/surveys";
 });
@@ -99,6 +104,7 @@ homeButton.addEventListener("click", () => {
           if (userStatus) {
             userStatus.textContent = "Not Signed In";
           }
+          updateAuthenticationButtons(false); //false shows sign in button
           return;
         }
 
@@ -130,6 +136,7 @@ homeButton.addEventListener("click", () => {
 
           if (userStatus) {
             userStatus.textContent = `Signed in as ${payload.user.email}`;
+            updateAuthenticationButtons(true); //false shows sign in button
           }
 
           if (welcomeMessage) {
@@ -142,6 +149,7 @@ homeButton.addEventListener("click", () => {
           }
         } catch (err) {
           if (userStatus) {
+            updateAuthenticationButtons(false); //False shows sign in
             userStatus.textContent = "Not Signed In";
           }
 
