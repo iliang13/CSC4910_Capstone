@@ -5,9 +5,11 @@ const homeButton = document.getElementById("home");
 const signInButton = document.getElementById("signIn");
 const signOutButton = document.getElementById("signOut");
 
+//Handles SignIn-SignOut swapping
 function updateAuthenticationButtons(isSignedIn) {
-    signInButton.hidden = isSignedIn;
-    signOutButton.hidden = !isSignedIn;
+  console.log("Update button clicked");
+  signInButton.hidden = isSignedIn;
+  signOutButton.hidden = !isSignedIn;
 }
 
 

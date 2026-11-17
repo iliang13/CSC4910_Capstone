@@ -6,8 +6,9 @@ const signInButton = document.getElementById("signIn");
 const signOutButton = document.getElementById("signOut");
 
 function updateAuthenticationButtons(isSignedIn) {
-    signInButton.hidden = isSignedIn;
-    signOutButton.hidden = !isSignedIn;
+  console.log("Update button clicked");
+  signInButton.hidden = isSignedIn;
+  signOutButton.hidden = !isSignedIn;
 }
 
 surveysButton.addEventListener("click", () => {
