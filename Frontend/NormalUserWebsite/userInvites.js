@@ -1,4 +1,7 @@
 const main = document.getElementById("main");
+
+main.style.display = "flex";
+main.style.flexDirection = "column";
 main.style.gap = "20px";
 
 class surveyInviteeDiv {
