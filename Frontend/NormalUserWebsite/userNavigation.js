@@ -73,6 +73,26 @@ homeButton.addEventListener("click", () => {
         }
       }
 
+      signOutButton.addEventListener("click", async () =>  {
+        try {
+          await signOutCurrentSession();
+
+          updateAuthenticationButtons(false);
+
+          const output = document.getElementById("output");
+          if (output) {
+            output.textContent = "Successfully signed out.";
+          }
+        } catch {
+          console.error("Could not sign out:", err);
+
+          const output = document.getElementById("output");
+          if (output) {
+            output.textContent = err.message;
+          }
+        }
+      });
+
       googleAuthButton.addEventListener("click", async () => {
         if (!supabaseClient) {
           authMessage.textContent = "Sign-in setup could not load. Refresh the page and try again.";
