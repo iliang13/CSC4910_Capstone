@@ -12,7 +12,7 @@
           --color-survey-field: #c8c5c0;
           --color-question-bg: #dfdcd4;
           --color-inviteeMainDiv-bg: #18191d;
-          --color-inviteeSubDiv-bg: rgb(49, 55, 71);
+          --color-inviteeSubDiv-bg: rgb(35, 39, 51);
         }
         body {
           margin: 0;
@@ -404,6 +404,7 @@
           font-size: 18px;
         }
         .surveyInviteeSubDiv {
+          box-sizing: border-box;
           padding: 20px;
           border: 1px solid var(--color-accent);
           border-radius: 4px;
@@ -412,7 +413,7 @@
           gap: 20px;
           justify-content: flex-start;
           background-color: var(--color-inviteeSubDiv-bg);
-          width:100%;
+          width: 100%;
           color: white;
           font-size: 18px;
         }
