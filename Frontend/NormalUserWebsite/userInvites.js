@@ -64,7 +64,8 @@ async function loadInvitesPage() {
 
   try {
     const response = await fetch("/user/loadInviteesTab", {
-      headers: {
+        method: "POST",
+        headers: {
         "Authorization": `Bearer ${session.access_token}`
       }
     });
