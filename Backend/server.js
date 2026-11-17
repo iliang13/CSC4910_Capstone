@@ -987,7 +987,7 @@ app.post("/user/loadInviteesTab", async (req, res) => {
     const user = data.user;
     const userId = user.id;
     
-    const { data: surveys, error: surveyError } = await supabase
+    const { data: surveys, error: surveyError } = await supabaseServiceClient
       .from("survey_responses")
       .select("SurveyID, Invitees, InviteesWhoHaveAnswered")
       .eq("OriginalUserID", userId);
@@ -996,7 +996,7 @@ app.post("/user/loadInviteesTab", async (req, res) => {
       throw surveyError;
     }
     
-    const { data: surveyDetails, error: detailsError } = await supabase
+    const { data: surveyDetails, error: detailsError } = await supabaseServiceClient
       .from("surveys")
       .select("survey_id, title");
 
