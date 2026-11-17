@@ -41,6 +41,9 @@ class surveyInviteeDiv {
 
     this.mainDiv.appendChild(this.nameLabel);
 
+    this.divider1 = document.createElement("hr");
+    this.mainDiv.appendChild(this.divider1);
+
     this.mainDiv.appendChild(this.compeletedLabel);
     this.mainDiv.appendChild(this.completedDiv);
 
