@@ -41,7 +41,7 @@ class surveyInviteeDiv {
     if (unansweredList.length === 0) {
       let userLabel = document.createElement("label");
       userLabel.textContent = "None";
-      this.completedDiv.appendChild(userLabel);
+      this.uncompletedDiv.appendChild(userLabel);
     } else {
       for (let i = 0; i < unansweredList.length; i++) {
         let userLabel = document.createElement("label");
