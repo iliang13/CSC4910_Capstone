@@ -151,7 +151,9 @@ homeButton.addEventListener("click", () => {
           }
 
           if (adminResponse.ok) {
-            window.location.href = "/admin/home";
+            if (window.location.pathname !== "/user/home") {
+              window.location.href = "/admin/home";
+            }
             return;
           } else if (adminResponse.status === 403) {
             if (window.location.pathname !== "/user/home") {

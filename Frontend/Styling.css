@@ -11,8 +11,8 @@
           --color-delete-hover: #bd0d07;
           --color-survey-field: #c8c5c0;
           --color-question-bg: #dfdcd4;
-          --color-inviteeMainDiv-bg: #18191d;
-          --color-inviteeSubDiv-bg: #27282b;
+          --color-inviteeMainDiv-bg: #27282b; /*#18191d*/
+          --color-inviteeSubDiv-bg: #18191d;
         }
         body {
           margin: 0;
