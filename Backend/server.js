@@ -968,6 +968,62 @@ app.post("/user/invite", async (req, res) => {
   }
 });
 
+app.post("/user/loadInviteesTab", async (req, res) => {
+  try {
+    const authorization = req.get("authorization");
+    const accessToken = authorization?.startsWith("Bearer ")
+      ? authorization.slice("Bearer ".length)
+      : null;
+
+    if (!accessToken) {
+      return res.status(401).json({ error: "Authentication required." });
+    }
+    const { data, error } = await supabaseAuthClient.auth.getUser(accessToken);
+
+    if (error || !data.user) {
+      return res.status(401).json({ error: "Invalid session." });
+    }
+
+    const user = data.user;
+    const userId = user.id;
+    
+    const { data: surveys, error: surveyError } = await supabase
+      .from("survey_responses")
+      .select("SurveyID, Invitees, InviteesWhoHaveAnswered")
+      .eq("OriginalUserID", userId);
+
+    if (surveyError) {
+      throw surveyError;
+    }
+    
+    const { data: surveyDetails, error: detailsError } = await supabase
+      .from("surveys")
+      .select("survey_id, title");
+
+    if (detailsError) {
+      throw detailsError;
+    }
+
+    const processedSurveys = surveys.map((survey) => {
+      const matchingSurvey = surveyDetails.find(
+        (details) => details.survey_id === survey.SurveyID
+      );
+
+      return {
+        title: matchingSurvey ? matchingSurvey.title : "Unknown Survey",
+        answeredList: survey.InviteesWhoHaveAnswered || [],
+        unansweredList: survey.Invitees || []
+      };
+    });
+    return res.status(200).json(processedSurveys);
+
+  } catch (error) {
+    console.error("Error loading invitees tab:", error);
+    return res.status(500).json({ error: "Unable to load invitees." });
+  }
+
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
