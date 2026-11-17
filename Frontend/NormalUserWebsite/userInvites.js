@@ -25,19 +25,32 @@ class surveyInviteeDiv {
     this.uncompletedDiv = document.createElement("div")
     this.uncompletedDiv.classList.add("surveyInviteeSubDiv");
 
-    for (let i = 0; i < answeredList.length; i++) {
+    if (answeredList.length === 0) {
+      let userLabel = document.createElement("label");
+      userLabel.textContent = "None";
+      this.completedDiv.appendChild(userLabel);
+    } else {
+      for (let i = 0; i < answeredList.length; i++) {
         let userLabel = document.createElement("label");
         userLabel.textContent = answeredList[i];
 
         this.completedDiv.appendChild(userLabel);
+      }
     }
-
-    for (let i = 0; i < unansweredList.length; i++) {
+    
+    if (unansweredList.length === 0) {
+      let userLabel = document.createElement("label");
+      userLabel.textContent = "None";
+      this.completedDiv.appendChild(userLabel);
+    } else {
+      for (let i = 0; i < unansweredList.length; i++) {
         let userLabel = document.createElement("label");
         userLabel.textContent = unansweredList[i];
 
         this.uncompletedDiv.appendChild(userLabel);
+      }
     }
+    
 
     this.mainDiv.appendChild(this.nameLabel);
 
