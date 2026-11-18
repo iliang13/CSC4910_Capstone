@@ -76,7 +76,7 @@ homeButton.addEventListener("click", () => {
       signOutButton.addEventListener("click", async () =>  {
         try {
           await signOutCurrentSession();
-
+          window.location.href = "/";
           updateAuthenticationButtons(false);
 
           const output = document.getElementById("output");
@@ -159,13 +159,12 @@ homeButton.addEventListener("click", () => {
             if (window.location.pathname !== "/user/home") {
               window.location.href = "/user/home";
             }
+            updateAuthenticationButtons(true);
+            if (userStatus) {
+              userStatus.textContent = `Signed in as ${payload.user.email}`;
+            }
             return;
           }
-
-          if (userStatus) {
-            userStatus.textContent = `Signed in as ${payload.user.email}`;
-          }
-          updateAuthenticationButtons(true); //false shows sign in button
           
           if (welcomeMessage) {
             welcomeMessage.querySelector("h2").textContent =

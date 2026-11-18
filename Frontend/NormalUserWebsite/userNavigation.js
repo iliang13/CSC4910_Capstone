@@ -76,6 +76,7 @@ homeButton.addEventListener("click", () => {
       signOutButton.addEventListener("click", async () =>  {
         try {
           await signOutCurrentSession();
+          window.location.href = "/";
 
           updateAuthenticationButtons(false);
 
