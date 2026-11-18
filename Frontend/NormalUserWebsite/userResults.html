@@ -1,53 +1,55 @@
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DataPulse360 - Results</title>
-    <link rel="stylesheet" href="../Styling.css">
+    <link rel="stylesheet" href="../Styling.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <header>
-        <img src="../images/logo.png" alt="DataPulse360 Logo">
-        <h1>DataPulse360 Merrimack</h1>
+      <img src="../images/logo.png" alt="DataPulse360 Logo" />
+      <h1>DataPulse360 Merrimack</h1>
     </header>
 
     <div id="buttonSection">
-        <button id="home">Home</button>
-        <button id="SurveysBtn">View Surveys</button>
-        <button id="InvitesBtn">Invitee Status</button>
-        <button id="PersonalResults">Personal Results</button>
-        <button id="signIn">Sign In</button>
-        <button id="signOut" type="button" hidden>Sign Out</button>
+      <button id="home">Home</button>
+      <button id="SurveysBtn">View Surveys</button>
+      <button id="InvitesBtn">Invitee Status</button>
+      <button id="PersonalResults">Personal Results</button>
+      <button id="signIn">Sign In</button>
+      <button id="signOut" type="button" hidden>Sign Out</button>
     </div>
 
     <main>
-        
+      <div id="resultsList"></div>
     </main>
 
     <main>
-        <p id="output"></p>
+      <p id="output"></p>
     </main>
 
     <dialog id="authDialog">
       <form id="authForm">
         <h2 id="authTitle">Sign In</h2>
-        
-        <button id="googleAuthButton" type="button">Continue with Google</button>
-        <p>Sign in with Google.<br>First time users will automatically have an account created.</p>
-        
+
+        <button id="googleAuthButton" type="button">
+          Continue with Google
+        </button>
+        <p>
+          Sign in with Google.<br />First time users will automatically have an
+          account created.
+        </p>
+
         <p id="authMessage" role="status"></p>
-          <button id="closeAuthDialog" type="button">Cancel</button>
+        <button id="closeAuthDialog" type="button">Cancel</button>
       </form>
     </dialog>
 
     <script src="../classes.js"></script>
-    <script src="/NormalUserWebsite/userSurveys.js"></script>
     <script src="/NormalUserWebsite/userNavigation.js"></script>
-
-</body>
+    <script src="/NormalUserWebsite/userResults.js"></script>
+  </body>
 </html>
