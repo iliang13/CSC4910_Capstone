@@ -30,31 +30,26 @@ const supabaseAuthClient = createClient(supabaseUrl, supabaseAnonKey, {
 });
 const supabaseServiceClient = createClient(supabaseUrl, supabaseServiceRoleKey);
 
-
 async function requireAdmin(req, res, next) {
   try {
-    
     const accessToken = req.cookies?.["datapulse360-admin"];
 
     if (!accessToken) {
       return res.status(401).send("Authentication required.");
     }
 
-    
-    const { data, error } =
-      await supabaseAuthClient.auth.getUser(accessToken);
+    const { data, error } = await supabaseAuthClient.auth.getUser(accessToken);
 
     if (error || !data.user) {
       return res.status(401).send("Invalid or expired session.");
     }
 
     // Check whether this user is an administrator.
-    const { data: admin, error: adminError } =
-      await supabaseServiceClient
-        .from("admin_users")
-        .select("user_id")
-        .eq("user_id", data.user.id)
-        .maybeSingle();
+    const { data: admin, error: adminError } = await supabaseServiceClient
+      .from("admin_users")
+      .select("user_id")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
 
     if (adminError) {
       console.error("Admin verification error:", adminError.message);
@@ -73,7 +68,6 @@ async function requireAdmin(req, res, next) {
   }
 }
 
-
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || false }));
 app.use(express.json());
 app.use(cookieParser());
@@ -84,7 +78,7 @@ app.use((req, res, next) => {
     "/AdminWebsite/adminHome.html",
     "/AdminWebsite/adminSurveys.html",
     "/AdminWebsite/adminResults.html",
-    "/AdminWebsite/adminInvites.html"
+    "/AdminWebsite/adminInvites.html",
   ];
 
   if (adminPages.includes(req.path)) {
@@ -200,19 +194,37 @@ app.get("/user/home", (req, res) => {
 
 app.get("/user/surveys", (req, res) => {
   res.sendFile(
-    path.join(__dirname, "..", "Frontend", "NormalUserWebsite", "userSurveys.html")
+    path.join(
+      __dirname,
+      "..",
+      "Frontend",
+      "NormalUserWebsite",
+      "userSurveys.html"
+    )
   );
 });
 
 app.get("/user/results", (req, res) => {
   res.sendFile(
-    path.join(__dirname, "..", "Frontend", "NormalUserWebsite", "userResults.html")
+    path.join(
+      __dirname,
+      "..",
+      "Frontend",
+      "NormalUserWebsite",
+      "userResults.html"
+    )
   );
 });
 
 app.get("/user/invites", (req, res) => {
   res.sendFile(
-    path.join(__dirname, "..", "Frontend", "NormalUserWebsite", "userInvites.html")
+    path.join(
+      __dirname,
+      "..",
+      "Frontend",
+      "NormalUserWebsite",
+      "userInvites.html"
+    )
   );
 });
 
@@ -248,6 +260,55 @@ app.get("/api/me", async (req, res) => {
   res.json({ user: data.user });
 });
 
+app.get("/user/myResponses", async (req, res) => {
+  try {
+    const authorization = req.get("authorization");
+    const accessToken = authorization?.startsWith("Bearer ")
+      ? authorization.slice("Bearer ".length)
+      : null;
+    if (!accessToken)
+      return res.status(401).json({ error: "Authentication required." });
+
+    const { data: authData, error: authError } =
+      await supabaseAuthClient.auth.getUser(accessToken);
+    if (authError || !authData.user)
+      return res.status(401).json({ error: "Invalid session." });
+
+    const { data: responses, error } = await supabaseServiceClient
+      .from("survey_responses")
+      .select("SurveyID, OriginalUserAnswers")
+      .eq("OriginalUserID", authData.user.id);
+    if (error)
+      return res.status(500).json({ message: "Failed to load responses." });
+    if (responses.length === 0) return res.json([]);
+
+    const { data: surveys, error: surveyError } = await supabaseServiceClient
+      .from("surveys")
+      .select("survey_id, title, questions")
+      .in(
+        "survey_id",
+        responses.map((r) => r.SurveyID)
+      );
+    if (surveyError)
+      return res.status(500).json({ message: "Failed to load surveys." });
+
+    res.json(
+      responses.map((r) => {
+        const s = surveys.find((s) => s.survey_id === r.SurveyID);
+        return {
+          surveyID: r.SurveyID,
+          title: s?.title,
+          questions: s?.questions || [],
+          answers: r.OriginalUserAnswers,
+        };
+      })
+    );
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 app.post("/api/admin-session", async (req, res) => {
   try {
     const authorization = req.get("authorization");
@@ -260,20 +321,18 @@ app.post("/api/admin-session", async (req, res) => {
     }
 
     // Verify the Supabase user.
-    const { data, error } =
-      await supabaseAuthClient.auth.getUser(accessToken);
+    const { data, error } = await supabaseAuthClient.auth.getUser(accessToken);
 
     if (error || !data.user) {
       return res.status(401).json({ error: "Invalid session." });
     }
 
     // Verify administrator privileges.
-    const { data: admin, error: adminError } =
-      await supabaseServiceClient
-        .from("admin_users")
-        .select("user_id")
-        .eq("user_id", data.user.id)
-        .maybeSingle();
+    const { data: admin, error: adminError } = await supabaseServiceClient
+      .from("admin_users")
+      .select("user_id")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
 
     if (adminError) {
       console.error(adminError);
@@ -341,10 +400,10 @@ app.post("/submitSurvey/personal", async (req, res) => {
     const { surveyID, responses } = req.body;
 
     const { data: survey, error: fetchError } = await supabaseServiceClient
-    .from("surveys")
-    .select("*")
-    .eq("survey_id", surveyID)
-    .single();
+      .from("surveys")
+      .select("*")
+      .eq("survey_id", surveyID)
+      .single();
 
     if (fetchError || !survey) {
       return res.status(404).json({
@@ -354,65 +413,64 @@ app.post("/submitSurvey/personal", async (req, res) => {
     }
 
     survey.Already_Answered = survey.Already_Answered || [];
-      if (survey.Already_Answered.includes(user.id)) {
-        return res.status(409).json({
-          success: false,
-          error: "User has already answered this survey.",
-        });
+    if (survey.Already_Answered.includes(user.id)) {
+      return res.status(409).json({
+        success: false,
+        error: "User has already answered this survey.",
+      });
+    }
+
+    const globalAnswers = survey.Global_Class_Answers_JSON || {};
+
+    for (const [question, answer] of Object.entries(responses)) {
+      if (!globalAnswers[question]) {
+        globalAnswers[question] = {};
       }
 
-      const globalAnswers = survey.Global_Class_Answers_JSON || {};
-
-      for (const [question, answer] of Object.entries(responses)) {
-        if (!globalAnswers[question]) {
-          globalAnswers[question] = {};
-        }
-
-        if (!globalAnswers[question][answer]) {
-          globalAnswers[question][answer] = 0;
-        }
-
-        globalAnswers[question][answer]++;
+      if (!globalAnswers[question][answer]) {
+        globalAnswers[question][answer] = 0;
       }
 
-      survey.Already_Answered.push(user.id);
+      globalAnswers[question][answer]++;
+    }
 
-      const {error: updateError} = await supabaseServiceClient
-        .from("surveys")
-        .update({
-          Already_Answered: survey.Already_Answered,
-          Global_Class_Answers_JSON: globalAnswers,
-        })
-        .eq("survey_id", surveyID);
+    survey.Already_Answered.push(user.id);
 
-        if (updateError) {
-          throw updateError;
-        }
+    const { error: updateError } = await supabaseServiceClient
+      .from("surveys")
+      .update({
+        Already_Answered: survey.Already_Answered,
+        Global_Class_Answers_JSON: globalAnswers,
+      })
+      .eq("survey_id", surveyID);
 
-        const inviteCode = crypto.randomBytes(16).toString("hex");
+    if (updateError) {
+      throw updateError;
+    }
 
-        const {error: insertError} = await supabaseServiceClient
-          .from("survey_responses")
-          .insert({
-            SurveyID: surveyID,
-            OriginalUserID: user.id,
-            InviteCode: inviteCode,
-            OriginalUserAnswers: responses
-          });
+    const inviteCode = crypto.randomBytes(16).toString("hex");
 
-        if (insertError) {
-          console.error(insertError);
-          return res.status(500).json({
-            success: false,
-            error: insertError.message,
-          });
-        }
+    const { error: insertError } = await supabaseServiceClient
+      .from("survey_responses")
+      .insert({
+        SurveyID: surveyID,
+        OriginalUserID: user.id,
+        InviteCode: inviteCode,
+        OriginalUserAnswers: responses,
+      });
 
-        res.json({
-          success: true,
-          message: "Survey submitted successfully.",
-        });
+    if (insertError) {
+      console.error(insertError);
+      return res.status(500).json({
+        success: false,
+        error: insertError.message,
+      });
+    }
 
+    res.json({
+      success: true,
+      message: "Survey submitted successfully.",
+    });
   } catch (error) {
     console.error("Error submitting survey:", error);
     return res.status(500).json({
@@ -451,25 +509,31 @@ app.post("/submitSurvey/peer", async (req, res) => {
     const { surveyID, responses } = req.body;
 
     //Validation for surveyID and responses
-    if (!surveyID || !responses || typeof responses !== "object" || Array.isArray(responses)) {
+    if (
+      !surveyID ||
+      !responses ||
+      typeof responses !== "object" ||
+      Array.isArray(responses)
+    ) {
       return res.status(400).json({
         success: false,
         error: "Invalid survey submission.",
       });
     }
 
-    const { data: surveyResponse, error: fetchError } = await supabaseServiceClient
-      .from("survey_responses")
-      .select("*")
-      .eq("SurveyID", surveyID)
-      .contains("Invitees", JSON.stringify([user.id]))
-      .single();
+    const { data: surveyResponse, error: fetchError } =
+      await supabaseServiceClient
+        .from("survey_responses")
+        .select("*")
+        .eq("SurveyID", surveyID)
+        .contains("Invitees", JSON.stringify([user.id]))
+        .single();
 
     console.log("Peer survey lookup:", {
       surveyID,
       userID: user.id,
       fetchError,
-      surveyResponse
+      surveyResponse,
     });
 
     if (fetchError || !surveyResponse) {
@@ -502,29 +566,28 @@ app.post("/submitSurvey/peer", async (req, res) => {
     }
 
     inviteesWhoAnswered.push(user.id);
-    const remainingInvitees = (surveyResponse.Invitees || [])
-      .filter(inviteeID => inviteeID !== user.id);
+    const remainingInvitees = (surveyResponse.Invitees || []).filter(
+      (inviteeID) => inviteeID !== user.id
+    );
 
-
-    const {error: updateError} = await supabaseServiceClient
+    const { error: updateError } = await supabaseServiceClient
       .from("survey_responses")
       .update({
         AggregateInviteeAnswers: aggregateAnswers,
         InviteesWhoHaveAnswered: inviteesWhoAnswered,
-        Invitees: remainingInvitees
+        Invitees: remainingInvitees,
       })
       .eq("SurveyID", surveyID)
       .eq("OriginalUserID", surveyResponse.OriginalUserID);
-      
-      if (updateError) {
-        throw updateError;
-      }
 
-      return res.json({
-        success: true,
-        message: "Peer survey submitted successfully.",
-      });
+    if (updateError) {
+      throw updateError;
+    }
 
+    return res.json({
+      success: true,
+      message: "Peer survey submitted successfully.",
+    });
   } catch (error) {
     console.error("Error submitting survey:", error);
     return res.status(500).json({
@@ -773,10 +836,10 @@ app.get("/user/loadSurveys2", async (req, res) => {
 
     const surveyInviters = await Promise.all(
       InvitedSurveys.map(async (survey) => {
-        const { data: inviter, error: inviterError } = 
-        await supabaseServiceClient.auth.admin.getUserById(
-          survey.OriginalUserID
-        );
+        const { data: inviter, error: inviterError } =
+          await supabaseServiceClient.auth.admin.getUserById(
+            survey.OriginalUserID
+          );
 
         if (inviterError) {
           throw inviterError;
@@ -784,7 +847,7 @@ app.get("/user/loadSurveys2", async (req, res) => {
 
         return {
           surveyID: survey.SurveyID,
-          inviterEmail: inviter.user.email
+          inviterEmail: inviter.user.email,
         };
       })
     );
@@ -792,7 +855,10 @@ app.get("/user/loadSurveys2", async (req, res) => {
     const { data, error: surveyError } = await supabaseServiceClient
       .from("surveys")
       .select("survey_id, title, questions")
-      .in("survey_id", surveyInviters.map(s => s.surveyID));
+      .in(
+        "survey_id",
+        surveyInviters.map((s) => s.surveyID)
+      );
 
     if (surveyError) {
       console.error("Supabase error:", {
@@ -807,15 +873,14 @@ app.get("/user/loadSurveys2", async (req, res) => {
     }
 
     const surveysWithInviters = data.map((survey) => {
-    const inviter = surveyInviters.find(
-      (s) => s.surveyID === survey.survey_id
-    );
+      const inviter = surveyInviters.find(
+        (s) => s.surveyID === survey.survey_id
+      );
 
-    return {...survey, inviterEmail: inviter?.inviterEmail };
-  });
+      return { ...survey, inviterEmail: inviter?.inviterEmail };
+    });
 
-  res.json(surveysWithInviters);
-
+    res.json(surveysWithInviters);
   } catch (error) {
     console.error("Unexpected error loading surveys:", error);
     res.status(500).json({
@@ -868,10 +933,11 @@ app.post("/admin/invite", async (req, res) => {
     });
   if (surveyError) {
     console.error("Supabase error:", surveyError.message);
-    return res.status(500).json({ 
-      error: "Failed to create survey", 
+    return res.status(500).json({
+      error: "Failed to create survey",
       details: surveyError.message,
-      code: surveyError.code });
+      code: surveyError.code,
+    });
   }
 
   return res.json({
@@ -901,18 +967,18 @@ app.post("/user/invite", async (req, res) => {
     const { surveyID, email } = req.body;
     if (!surveyID || !email) {
       return res.status(400).json({
-        error: "Missing surveyID or email."
+        error: "Missing surveyID or email.",
       });
     }
 
     const { data: userList, error: userListError } =
-    await supabaseServiceClient.auth.admin.listUsers();
+      await supabaseServiceClient.auth.admin.listUsers();
     if (userListError) {
       throw userListError;
     }
 
     const recipient = userList.users.find(
-    (u) => u.email?.toLowerCase() === email.toLowerCase()
+      (u) => u.email?.toLowerCase() === email.toLowerCase()
     );
     if (!recipient) {
       return res.status(404).json({ error: "Recipient not found" });
@@ -924,18 +990,18 @@ app.post("/user/invite", async (req, res) => {
       return res.status(400).json({ error: "Cannot invite yourself" });
     }
 
-    const {data: surveyResponse, error: fetchError} = 
-    await supabaseServiceClient
-    .from("survey_responses")
-    .select("Invitees")
-    .eq("SurveyID", surveyID)
-    .eq("OriginalUserID", user.id)
-    .single();
+    const { data: surveyResponse, error: fetchError } =
+      await supabaseServiceClient
+        .from("survey_responses")
+        .select("Invitees")
+        .eq("SurveyID", surveyID)
+        .eq("OriginalUserID", user.id)
+        .single();
 
     if (fetchError) {
       if (fetchError.code === "PGRST116") {
         return res.status(400).json({
-          error: "Please submit your own survey before inviting participants."
+          error: "Please submit your own survey before inviting participants.",
         });
       }
       throw fetchError;
@@ -986,7 +1052,7 @@ app.post("/user/loadInviteesTab", async (req, res) => {
 
     const user = data.user;
     const userId = user.id;
-    
+
     const { data: surveys, error: surveyError } = await supabaseServiceClient
       .from("survey_responses")
       .select("SurveyID, Invitees, InviteesWhoHaveAnswered")
@@ -995,31 +1061,33 @@ app.post("/user/loadInviteesTab", async (req, res) => {
     if (surveyError) {
       throw surveyError;
     }
-    
-    const { data: surveyDetails, error: detailsError } = await supabaseServiceClient
-      .from("surveys")
-      .select("survey_id, title");
+
+    const { data: surveyDetails, error: detailsError } =
+      await supabaseServiceClient.from("surveys").select("survey_id, title");
 
     if (detailsError) {
       throw detailsError;
     }
 
-    const allInviteeIds = [...new Set(
-      surveys.flatMap((survey) => [
-        ...(survey.Invitees || []),
-        ...(survey.InviteesWhoHaveAnswered || [])
-      ])
-    )];
+    const allInviteeIds = [
+      ...new Set(
+        surveys.flatMap((survey) => [
+          ...(survey.Invitees || []),
+          ...(survey.InviteesWhoHaveAnswered || []),
+        ])
+      ),
+    ];
 
     const inviteeEmails = {};
 
     for (const inviteeId of allInviteeIds) {
-      const { data, error } = await supabaseServiceClient.auth.admin.getUserById(inviteeId);
+      const { data, error } =
+        await supabaseServiceClient.auth.admin.getUserById(inviteeId);
 
       if (error) {
         throw error;
       }
-      
+
       inviteeEmails[inviteeId] = data.user.email;
     }
 
@@ -1030,20 +1098,18 @@ app.post("/user/loadInviteesTab", async (req, res) => {
 
       return {
         title: matchingSurvey ? matchingSurvey.title : "Unknown Survey",
-        answeredList: (survey.InviteesWhoHaveAnswered || [])
-        .map((id) => inviteeEmails[id]),
+        answeredList: (survey.InviteesWhoHaveAnswered || []).map(
+          (id) => inviteeEmails[id]
+        ),
 
-        unansweredList: (survey.Invitees || [])
-        .map((id) => inviteeEmails[id])
+        unansweredList: (survey.Invitees || []).map((id) => inviteeEmails[id]),
       };
     });
     return res.status(200).json(processedSurveys);
-
   } catch (error) {
     console.error("Error loading invitees tab:", error);
     return res.status(500).json({ error: "Unable to load invitees." });
   }
-
 });
 
 const port = process.env.PORT || 3000;
