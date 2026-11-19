@@ -1,5 +1,40 @@
+let loadedItems = [];
+
+function csvCell(value) {
+  let text = String(value ?? "");
+  // Stop spreadsheet apps from treating text as a formula
+  if (/^[=+\-@]/.test(text)) text = "'" + text;
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+function downloadResultsCsv() {
+  const rows = [["Survey", "Question #", "Question", "My Answer"]];
+  loadedItems.forEach((item) => {
+    item.questions.forEach((q, i) => {
+      rows.push([
+        item.title || "Untitled survey",
+        i + 1,
+        q.questionText,
+        item.answers[`question_${i + 1}`] ?? "",
+      ]);
+    });
+  });
+
+  const csv = "\uFEFF" + rows.map((r) => r.map(csvCell).join(",")).join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "my-survey-results.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 async function loadMyResponses() {
   const list = document.getElementById("resultsList");
+  const downloadButton = document.getElementById("downloadResults");
+  downloadButton.addEventListener("click", downloadResultsCsv);
+
   await supabaseReady;
   if (authSetupState !== "ready") return;
 
@@ -22,6 +57,9 @@ async function loadMyResponses() {
       list.textContent = "You haven't submitted any surveys yet.";
       return;
     }
+
+    loadedItems = items;
+    downloadButton.hidden = false;
 
     list.replaceChildren();
     items.forEach((item) => {
