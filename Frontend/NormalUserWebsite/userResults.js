@@ -26,17 +26,27 @@ async function loadMyResponses() {
     list.replaceChildren();
     items.forEach((item) => {
       const card = document.createElement("div");
+      card.className = "resultCard";
+
       const h = document.createElement("h3");
       h.textContent = item.title || "Untitled survey";
       card.appendChild(h);
 
       item.questions.forEach((q, i) => {
-        const p = document.createElement("p");
-        p.textContent = `${q.questionText}: ${
-          item.answers[`question_${i + 1}`] ?? "No answer"
-        }`;
-        card.appendChild(p);
+        const row = document.createElement("div");
+        row.className = "resultRow";
+
+        const question = document.createElement("span");
+        question.textContent = q.questionText;
+
+        const answer = document.createElement("span");
+        answer.className = "resultAnswer";
+        answer.textContent = item.answers[`question_${i + 1}`] ?? "—";
+
+        row.append(question, answer);
+        card.appendChild(row);
       });
+
       list.appendChild(card);
     });
   } catch (err) {
