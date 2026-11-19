@@ -187,7 +187,8 @@ homeButton.addEventListener("click", () => {
         }
       }
 
-      fetch("/api/config")
+      let supabaseReady;
+      supabaseReady = fetch("/api/config")
         .then(async (response) => {
           const config = await response.json();
           if (!response.ok) throw new Error(config.error || "Authentication setup is unavailable.");

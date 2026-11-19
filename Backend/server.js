@@ -1112,6 +1112,66 @@ app.post("/user/loadInviteesTab", async (req, res) => {
   }
 });
 
+app.post("/admin/loadInviteesTab", async (req, res) => {
+  const authorization = req.get("authorization");
+
+  const accessToken = authorization?.startsWith("Bearer ")
+    ? authorization.slice("Bearer ".length)
+    : null;
+
+  if (!accessToken) {
+    return res.status(401).json({ error: "Authentication required." });
+  }
+  const { data, error } = await supabaseAuthClient.auth.getUser(accessToken);
+
+  if (error || !data.user) {
+    return res.status(401).json({ error: "Invalid session." });
+  }
+
+  const user = data.user;
+
+  const { data: surveys, error: surveyError } = await supabaseServiceClient
+    .from("surveys")
+    .select("survey_id, title, Already_Answered");
+  if ( surveyError ) return res.status(500).json({ error: "Failed to load surveys" });
+
+  const { data: responses, error: responseError } = await supabaseServiceClient
+    .from("survey_responses")
+    .select("SurveyID, OriginalUserID")
+    .in("SurveyID", surveys.map(s => s.survey_id));
+  if (responseError) return res.status(500).json({ error: "Failed to load invites" });
+
+  const invitedBySurvey = {};
+  for (const r of responses) {
+    (invitedBySurvey[r.SurveyID] ??= []).push(r.OriginalUserID);
+  }
+
+  for (const r of responses) {
+    (invitedBySurvey[r.SurveyID] ??= []).push(r.OriginalUserID);
+  }
+
+  const emails = {};
+  for (const id of new Set(responses.map(r => r.OriginalUserID))) {
+    const { data, error } = await supabaseServiceClient.auth.admin.getUserById(id);
+    emails[id] = error ? id : data.user.email;
+  }
+
+  const result = surveys.map(s => {
+    const answered = new Set(s.Already_Answered ?? []);
+    const invited = invitedBySurvey[s.survey_id] ?? [];
+    return {
+      surveyId: s.survey_id,
+      title: s.title,
+      answeredList: invited.filter(id => answered.has(id)).map(id => emails[id]),
+      unansweredList: invited.filter(id => !answered.has(id)).map(id => emails[id]),
+    };
+
+});
+
+res.json(result);
+
+  });
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
