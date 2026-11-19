@@ -1146,10 +1146,6 @@ app.post("/admin/loadInviteesTab", async (req, res) => {
     (invitedBySurvey[r.SurveyID] ??= []).push(r.OriginalUserID);
   }
 
-  for (const r of responses) {
-    (invitedBySurvey[r.SurveyID] ??= []).push(r.OriginalUserID);
-  }
-
   const emails = {};
   for (const id of new Set(responses.map(r => r.OriginalUserID))) {
     const { data, error } = await supabaseServiceClient.auth.admin.getUserById(id);
