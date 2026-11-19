@@ -936,11 +936,9 @@ app.post("/admin/invite", async (req, res) => {
     return res.status(500).json({ error: "Failed to retrieve user ID list" });
   }
 
-  const allUserIDs = [...new Set(
-    surveys.flatMap(survey => survey.invited ?? [])
-  )];
+  const invitedUsers = surveys.invited ?? [];
 
-  if (allUserIDs.includes(recipientID)) {
+  if (invitedUsers.includes(recipientID)) {
     return res.status(409).json({ error: "Cannot invite a user twice" });
   }
 
