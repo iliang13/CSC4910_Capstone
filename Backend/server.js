@@ -583,7 +583,38 @@ app.post("/submitSurvey/peer", async (req, res) => {
         error: "You have already submitted your peer responses.",
       });
     }
+    const { data: peerSurvey, error: peerSurveyError } =
+      await supabaseServiceClient
+        .from("surveys")
+        .select("questions")
+        .eq("survey_id", surveyID)
+        .single();
 
+    if (peerSurveyError || !peerSurvey) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Survey not found." });
+    }
+
+    const questions = peerSurvey.questions || [];
+
+    if (Object.keys(responses).length !== questions.length) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Please answer every question." });
+    }
+
+    for (let i = 0; i < questions.length; i++) {
+      const answer = Number(responses[`question_${i + 1}`]);
+      const maxOption = Number(questions[i].numberOfOptions);
+
+      if (!Number.isInteger(answer) || answer < 1 || answer > maxOption) {
+        return res.status(400).json({
+          success: false,
+          error: `Invalid answer for question ${i + 1}.`,
+        });
+      }
+    }
     const aggregateAnswers = surveyResponse.AggregateInviteeAnswers || {};
 
     for (const [question, answer] of Object.entries(responses)) {

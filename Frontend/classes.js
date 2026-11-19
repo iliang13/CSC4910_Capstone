@@ -402,13 +402,24 @@ class peerSurveyAccessButton {
               : null;
           });
 
-        const unanswered = Object.values(responses).some(
-          (answer) => answer === null
-        );
+        const missing = Object.entries(responses)
+          .filter(([, answer]) => answer === null)
+          .map(([key]) => key.replace("question_", ""));
 
-        if (unanswered) {
-          document.getElementById("output").textContent =
-            "Please answer all questions.";
+        document
+          .querySelectorAll("#surveyAnsweringDiv .question")
+          .forEach((q, i) => {
+            q.style.outline = missing.includes(String(i + 1))
+              ? "3px solid #f7120a"
+              : "";
+          });
+
+        if (missing.length > 0) {
+          document.getElementById(
+            "output"
+          ).textContent = `Please answer question${
+            missing.length > 1 ? "s" : ""
+          }: ${missing.join(", ")}`;
           return;
         }
 
@@ -427,6 +438,7 @@ class peerSurveyAccessButton {
         }
 
         try {
+          submitButton.disabled = true;
           const res = await fetch("/submitSurvey/peer", {
             method: "POST",
             headers: {
@@ -441,11 +453,13 @@ class peerSurveyAccessButton {
           });
 
           const data = await res.json();
+          if (!res.ok) submitButton.disabled = false;
 
           document.getElementById("output").textContent = res.ok
             ? data.message
             : data.error;
         } catch (err) {
+          submitButton.disabled = false;
           document.getElementById("output").textContent = err.message;
         }
       });
