@@ -398,6 +398,17 @@ app.post("/submitSurvey/personal", async (req, res) => {
     const user = data.user;
 
     const { surveyID, responses } = req.body;
+    if (
+      !surveyID ||
+      !responses ||
+      typeof responses !== "object" ||
+      Array.isArray(responses)
+    ) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid survey submission.",
+      });
+    }
 
     const { data: survey, error: fetchError } = await supabaseServiceClient
       .from("surveys")
@@ -410,6 +421,27 @@ app.post("/submitSurvey/personal", async (req, res) => {
         success: false,
         error: "Survey not found.",
       });
+    }
+
+    const questions = survey.questions || [];
+
+    if (Object.keys(responses).length !== questions.length) {
+      return res.status(400).json({
+        success: false,
+        error: "Please answer every question.",
+      });
+    }
+
+    for (let i = 0; i < questions.length; i++) {
+      const answer = Number(responses[`question_${i + 1}`]);
+      const maxOption = Number(questions[i].numberOfOptions);
+
+      if (!Number.isInteger(answer) || answer < 1 || answer > maxOption) {
+        return res.status(400).json({
+          success: false,
+          error: `Invalid answer for question ${i + 1}.`,
+        });
+      }
     }
 
     survey.Already_Answered = survey.Already_Answered || [];
@@ -931,7 +963,7 @@ app.post("/admin/invite", async (req, res) => {
     .select("invited")
     .eq("survey_id", surveyID)
     .single();
-    
+
   if (userIDError) {
     return res.status(500).json({ error: "Failed to retrieve user ID list" });
   }
@@ -962,7 +994,7 @@ app.post("/admin/invite", async (req, res) => {
   const { error: updateError } = await supabaseServiceClient
     .from("surveys")
     .update({
-      invited: updatedInvited
+      invited: updatedInvited,
     })
     .eq("survey_id", surveyID);
   if (updateError) {
@@ -1165,7 +1197,8 @@ app.post("/admin/loadInviteesTab", async (req, res) => {
   const { data: surveys, error: surveyError } = await supabaseServiceClient
     .from("surveys")
     .select("survey_id, title, Already_Answered, invited");
-  if ( surveyError ) return res.status(500).json({ error: "Failed to load surveys" });
+  if (surveyError)
+    return res.status(500).json({ error: "Failed to load surveys" });
 
   const invitedBySurvey = {};
   const answeredBySurvey = {};
@@ -1177,30 +1210,33 @@ app.post("/admin/loadInviteesTab", async (req, res) => {
 
   const allUserIDs = new Set([
     ...Object.values(invitedBySurvey).flat(),
-    ...Object.values(answeredBySurvey).flat()
+    ...Object.values(answeredBySurvey).flat(),
   ]);
 
   const emails = {};
 
   for (const id of allUserIDs) {
-    const { data, error } = await supabaseServiceClient.auth.admin.getUserById(id);
+    const { data, error } = await supabaseServiceClient.auth.admin.getUserById(
+      id
+    );
     emails[id] = error ? id : data.user.email;
   }
 
-  const result = surveys.map(s => {
+  const result = surveys.map((s) => {
     return {
       surveyId: s.survey_id,
       title: s.title,
-      answeredList: (answeredBySurvey[s.survey_id] ?? []).map(id => emails[id]),
+      answeredList: (answeredBySurvey[s.survey_id] ?? []).map(
+        (id) => emails[id]
+      ),
       unansweredList: (invitedBySurvey[s.survey_id] ?? [])
-      .filter(id => !(answeredBySurvey[s.survey_id] ?? []).includes(id))
-      .map(id => emails[id])
+        .filter((id) => !(answeredBySurvey[s.survey_id] ?? []).includes(id))
+        .map((id) => emails[id]),
     };
-});
-
-res.json(result);
-
   });
+
+  res.json(result);
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
