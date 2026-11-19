@@ -232,13 +232,7 @@ homeButton.addEventListener("click", () => {
 
 const loadingOverlay = document.getElementById("loadingOverlay");
 
-// Display the loading symbol whenever a link is clicked
-document.querySelectorAll("a").forEach(link => {
-    link.addEventListener("click", () => {
-        loadingOverlay.style.display = "flex";
-    });
-});
 
-window.addEventListener("pageshow", () => {
-    loadingOverlay.style.display = "none";
-});
+
+
+

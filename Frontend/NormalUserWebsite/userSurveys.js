@@ -152,3 +152,15 @@ function clearSurvey() {
   if (surveyNameInput) surveyNameInput.value = "";
   surveyBuilder?.classList.remove("active");
 }
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const loadingOverlay = document.getElementById("loadingOverlay");
+
+    loadingOverlay.style.display = "flex";
+
+    try {
+        await loadSurveys();
+    } finally {
+        loadingOverlay.style.display = "none";
+    }
+});

@@ -147,7 +147,17 @@ async function loadSurveys() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", loadSurveys);
+document.addEventListener("DOMContentLoaded", async () => {
+    const loadingOverlay = document.getElementById("loadingOverlay");
+
+    loadingOverlay.style.display = "flex";
+
+    try {
+        await loadSurveys();
+    } finally {
+        loadingOverlay.style.display = "none";
+    }
+});
 
 document.addEventListener("click", (event) => {
     const popups = document.querySelectorAll(".surveyPopup:popover-open");

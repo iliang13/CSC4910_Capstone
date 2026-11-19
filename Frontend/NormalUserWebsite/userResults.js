@@ -92,4 +92,15 @@ async function loadMyResponses() {
     list.textContent = "Unable to load your results.";
   }
 }
-loadMyResponses();
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const loadingOverlay = document.getElementById("loadingOverlay");
+
+    loadingOverlay.style.display = "flex";
+
+    try {
+        await loadMyResponses();
+    } finally {
+        loadingOverlay.style.display = "none";
+    }
+});
