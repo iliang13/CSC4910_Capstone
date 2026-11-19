@@ -925,13 +925,49 @@ app.post("/admin/invite", async (req, res) => {
     return res.status(404).json({ error: "Recipient not found" });
   }
   const recipientID = recipient.id;
-  const { error: surveyError } = await supabaseServiceClient
+
+  const { data: surveys, error: userIDError } = await supabaseServiceClient
+    .from("surveys")
+    .select("invited")
+    .eq("survey_id", surveyID)
+    .single();
+    
+  if (userIDError) {
+    return res.status(500).json({ error: "Failed to retrieve user ID list" });
+  }
+
+  const allUserIDs = [...new Set(
+    surveys.flatMap(survey => survey.invited ?? [])
+  )];
+
+  if (allUserIDs.includes(recipientID)) {
+    return res.status(409).json({ error: "Cannot invite a user twice" });
+  }
+
+  const { error: surveyResponseError } = await supabaseServiceClient
     .from("user_surveys")
     .insert({
       user_id: recipientID,
       survey_id: surveyID,
     });
-  if (surveyError) {
+  if (surveyResponseError) {
+    console.error("Supabase error:", surveyError.message);
+    return res.status(500).json({
+      error: "Failed to create survey",
+      details: surveyError.message,
+      code: surveyError.code,
+    });
+  }
+
+  const updatedInvited = [...invitedUsers, recipientID];
+
+  const { error: updateError } = await supabaseServiceClient
+    .from("surveys")
+    .update({
+      invited: updatedInvited
+    })
+    .eq("survey_id", surveyID);
+  if (updateError) {
     console.error("Supabase error:", surveyError.message);
     return res.status(500).json({
       error: "Failed to create survey",
@@ -1134,12 +1170,6 @@ app.post("/admin/loadInviteesTab", async (req, res) => {
     .from("surveys")
     .select("survey_id, title, Already_Answered");
   if ( surveyError ) return res.status(500).json({ error: "Failed to load surveys" });
-
-  const { data: responses, error: responseError } = await supabaseServiceClient
-    .from("survey_responses")
-    .select("SurveyID, OriginalUserID")
-    .in("SurveyID", surveys.map(s => s.survey_id));
-  if (responseError) return res.status(500).json({ error: "Failed to load invites" });
 
   const invitedBySurvey = {};
   for (const r of responses) {
