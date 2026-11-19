@@ -1164,7 +1164,7 @@ app.post("/admin/loadInviteesTab", async (req, res) => {
 
   const { data: surveys, error: surveyError } = await supabaseServiceClient
     .from("surveys")
-    .select("survey_id, title, Already_Answered", "invited");
+    .select("survey_id, title, Already_Answered, invited");
   if ( surveyError ) return res.status(500).json({ error: "Failed to load surveys" });
 
   const invitedBySurvey = {};
@@ -1196,7 +1196,6 @@ app.post("/admin/loadInviteesTab", async (req, res) => {
       .filter(id => !(answeredBySurvey[s.survey_id] ?? []).includes(id))
       .map(id => emails[id])
     };
-
 });
 
 res.json(result);
