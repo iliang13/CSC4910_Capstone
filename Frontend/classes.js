@@ -295,11 +295,8 @@ class surveyAccessButton {
           document.getElementById("output").textContent = res.ok
             ? data.message
             : data.error;
-
-          document.getElementById("output").textContent = res.ok
-            ? data.message
-            : data.error;
         } catch (err) {
+          submitButton.disabled = false;
           document.getElementById("output").textContent = err.message;
         }
       });
