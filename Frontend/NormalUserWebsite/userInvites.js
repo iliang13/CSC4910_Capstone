@@ -107,4 +107,15 @@ async function loadInvitesPage() {
   }
 }
 
-loadInvitesPage();
+document.addEventListener("DOMContentLoaded", async () => {
+    const loadingOverlay = document.getElementById("loadingOverlay");
+
+    loadingOverlay.style.display = "flex";
+
+    try {
+        await loadInvitesPage();
+    } finally {
+        loadingOverlay.style.display = "none";
+    }
+});
+
