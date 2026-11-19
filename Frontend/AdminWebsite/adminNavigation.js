@@ -154,15 +154,16 @@ homeButton.addEventListener("click", () => {
             if (!window.location.pathname.startsWith("/admin")) {
               window.location.href = "/admin/home";
             }
+            updateAuthenticationButtons(true);
+            if (userStatus) {
+              userStatus.textContent = `Signed in as ${payload.user.email}`;
+            }
             return;
           } else if (adminResponse.status === 403) {
             if (window.location.pathname !== "/user/home") {
               window.location.href = "/user/home";
             }
-            updateAuthenticationButtons(true);
-            if (userStatus) {
-              userStatus.textContent = `Signed in as ${payload.user.email}`;
-            }
+            
             return;
           }
           
