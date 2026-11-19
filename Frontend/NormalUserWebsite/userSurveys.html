@@ -29,9 +29,7 @@
 
     <main>
 
-      <div id="loadingOverlay">
-        <div class="loader"></div>
-      </div>
+      
         <div id="surveysDiv" class="my-div">
           <input
         type="text"
@@ -39,11 +37,13 @@
         placeholder="Search for surveys..."
           />
 
-          
-
           <button popovertarget="codePopup">
             Use Survey Code
           </button>
+
+          <div id="loadingOverlay">
+           <div class="loader"></div>
+          </div>
 
           <div id="codePopup" class="surveyPopup" popover>
             <input type="text" id="surveyCode" placeholder="Enter your invite code">
