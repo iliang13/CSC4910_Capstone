@@ -1191,9 +1191,9 @@ app.post("/admin/loadInviteesTab", async (req, res) => {
     return {
       surveyId: s.survey_id,
       title: s.title,
-      answeredList: answeredBySurvey[surveyID].map(id => emails[id]),
-      unansweredList: invitedBySurvey[surveyID]
-      .filter(id => !answeredBySurvey[surveyID].includes(id))
+      answeredList: answeredBySurvey[s.survey_id].map(id => emails[id]),
+      unansweredList: invitedBySurvey[s.survey_id]
+      .filter(id => !answeredBySurvey[s.survey_id].includes(id))
       .map(id => emails[id])
     };
 
