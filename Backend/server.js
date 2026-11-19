@@ -1162,32 +1162,39 @@ app.post("/admin/loadInviteesTab", async (req, res) => {
     return res.status(401).json({ error: "Invalid session." });
   }
 
-  const user = data.user;
-
   const { data: surveys, error: surveyError } = await supabaseServiceClient
     .from("surveys")
-    .select("survey_id, title, Already_Answered");
+    .select("survey_id, title, Already_Answered", "invited");
   if ( surveyError ) return res.status(500).json({ error: "Failed to load surveys" });
 
   const invitedBySurvey = {};
-  for (const r of responses) {
-    (invitedBySurvey[r.SurveyID] ??= []).push(r.OriginalUserID);
+  const answeredBySurvey = {};
+
+  for (const survey of surveys) {
+    invitedBySurvey[survey.survey_id] = survey.invited ?? [];
+    answeredBySurvey[survey.survey_id] = survey.Already_Answered ?? [];
   }
 
+  const allUserIDs = new Set([
+    ...Object.values(invitedBySurvey).flat(),
+    ...Object.values(answeredBySurvey).flat()
+  ]);
+
   const emails = {};
-  for (const id of new Set(responses.map(r => r.OriginalUserID))) {
+
+  for (const id of allUserIDs) {
     const { data, error } = await supabaseServiceClient.auth.admin.getUserById(id);
     emails[id] = error ? id : data.user.email;
   }
 
   const result = surveys.map(s => {
-    const answered = new Set(s.Already_Answered ?? []);
-    const invited = invitedBySurvey[s.survey_id] ?? [];
     return {
       surveyId: s.survey_id,
       title: s.title,
-      answeredList: invited.filter(id => answered.has(id)).map(id => emails[id]),
-      unansweredList: invited.filter(id => !answered.has(id)).map(id => emails[id]),
+      answeredList: answeredBySurvey[surveyID].map(id => emails[id]),
+      unansweredList: invitedBySurvey[surveyID]
+      .filter(id => !answeredBySurvey[surveyID].includes(id))
+      .map(id => emails[id])
     };
 
 });
