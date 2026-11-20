@@ -71,6 +71,7 @@ button:hover {
 button:active {
   transform: translateY(1px);
 }
+
 .deleteSurveyButton {
   padding: 0;
   width: 20px;
@@ -104,35 +105,7 @@ main {
   text-align: center;
 }
 
-#dashboard {
-  display: flex;
-  justify-content: center;
-  gap: 25px;
-  flex-wrap: wrap;
-  margin-bottom: 25px;
-}
-
-.card {
-  width: 230px;
-  background-color: var(--color-button-bg);
-  border: 2px solid var(--color-accent);
-  border-radius: 10px;
-  padding: 20px;
-  text-align: center;
-}
-
-.card h3 {
-  margin-top: 0;
-}
-
-.stat {
-  font-size: 42px;
-  color: var(--color-highlight);
-  margin: 15px 0;
-}
-
-#userPanel,
-#activityFeed {
+#userPanel {
   width: 85%;
   margin: 20px auto;
   background-color: var(--color-button-bg);
@@ -140,11 +113,6 @@ main {
   border-radius: 10px;
   padding: 20px;
   text-align: center;
-}
-
-#activityFeed ul {
-  text-align: left;
-  line-height: 2;
 }
 
 #surveySearch {
@@ -185,7 +153,6 @@ main {
   flex-wrap: wrap;
   gap: 20px;
   justify-content: center;
-  background-color: var(--color-button-bg);
   width: 100%;
 }
 
@@ -200,8 +167,6 @@ main {
   padding: 20px;
   border: 1px solid var(--color-accent);
   border-radius: 10px;
-  color: var(--color-background);
-  background-color: rgb(213, 224, 163);
 }
 .question {
   width: 100%;
@@ -210,11 +175,9 @@ main {
   flex-direction: column;
   gap: 20px;
   justify-content: center;
-  color: var(--color-background);
   border: 1px solid var(--color-accent);
   border-radius: 10px;
   padding: 20px;
-  background-color: rgb(214, 190, 125);
 }
 .horizontalDiv {
   display: flex;
@@ -237,7 +200,6 @@ main {
   box-sizing: border-box;
   display: flex;
   gap: 20px;
-  color: var(--color-background);
   border: 1px solid var(--color-accent);
   border-radius: 10px;
   padding: 20px;
@@ -245,7 +207,6 @@ main {
   resize: none;
 }
 .questionInput::placeholder {
-  color: var(--color-background);
   opacity: 0.7;
 }
 .questionInput:focus {
@@ -274,7 +235,6 @@ main {
   background-color: var(--color-builder-bg);
   border: 2px solid var(--color-accent);
   border-radius: 10px;
-  color: var(--color-background);
   overflow-y: auto;
   max-height: 600px;
 }
@@ -326,14 +286,7 @@ main {
   flex-direction: column;
   gap: 12px;
 }
-#authActions {
-  display: flex;
-  gap: 10px;
-}
-#authActions button {
-  flex: 1;
-  width: auto;
-}
+
 #authMessage {
   min-height: 1.4em;
   color: var(--color-highlight);
