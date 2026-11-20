@@ -7,7 +7,7 @@ main.style.gap = "20px";
 class surveyInviteeDiv {
   constructor(title, unansweredList, answeredList) {
     this.mainDiv = document.createElement("div");
-    this.mainDiv.classList.add("surveyInviteeMainDiv");
+    this.mainDiv.classList.add("contentContainer");
     this.mainDiv.dataset.title = title;
 
     this.nameLabel = document.createElement("label");
