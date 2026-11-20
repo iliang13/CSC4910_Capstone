@@ -8,10 +8,6 @@ const surveyAccessDisplay = document.getElementById(
 const firstPersonSurveys = document.getElementById("firstPersonSurveys");
 const thirdPersonSurveys = document.getElementById("thirdPersonSurveys");
 
-console.log("userSurveys.js loaded");
-console.log("First person:", firstPersonSurveys);
-console.log("Third person:", thirdPersonSurveys);
-
 const popup = document.getElementById("codePopup");
 
 let currentSurveyID = null;
@@ -177,23 +173,8 @@ let firstPersonCollapsed = false;
 let thirdPersonCollapsed = false;
 
 function toggleSurveyVisibility(surveyDiv, isCollapsed) {
-  console.log("Registering collapse listeners");
   surveyDiv.querySelectorAll(".SurveyAccessDiv").forEach(survey => {
-    const innerDivs = survey.querySelectorAll(":scope > div > div");
-
-    innerDivs.forEach((div, index) => {
-      if (index !== 0 ) {
-        div.style.display = isCollapsed ? "none" : "";
-      }
-    });
-
-    const labels = survey.querySelectorAll(".verticalDiv:first-child label");
-
-    labels.forEach((label, index) => {
-      if (index !== 0) {
-        label.style.display = isCollapsed ? "none" : "";
-      }
-    });
+    survey.style.display = isCollapsed ? "none" : "";
   });
 }
 
