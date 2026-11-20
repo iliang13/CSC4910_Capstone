@@ -167,3 +167,37 @@ document.addEventListener("DOMContentLoaded", async () => {
         loadingOverlay.style.display = "none";
     }
 });
+
+//Collapsing Divs Function(s)
+let firstPersonCollapsed = false;
+let thirdPersonCollapsed = false;
+
+function toggleSurveyVisibility(surveyDiv, isCollapsed) {
+  surveyDiv.querySelectorAll(".SurveyAccessDiv").forEach(survey => {
+    const innerDivs = survey.querySelectorAll(":scope > div > div");
+
+    innerDivs.forEach((div, index) => {
+      if (index !== 0 ) {
+        div.style.display = isCollapsed ? "none" : "";
+      }
+    });
+
+    const labels = survey.querySelectorAll(".verticalDiv:first-child label");
+
+    labels.forEach((label, index) => {
+      if (index !== 0) {
+        label.style.display = isCollapsed ? "none" : "";
+      }
+    });
+  });
+}
+
+firstPersonSurveys.addEventListener("click", () => {
+    firstPersonCollapsed = !firstPersonCollapsed;
+    toggleSurveySection(firstPersonSurveys, firstPersonCollapsed);
+});
+
+thirdPersonSurveys.addEventListener("click", () => {
+    thirdPersonCollapsed = !thirdPersonCollapsed;
+    toggleSurveySection(thirdPersonSurveys, thirdPersonCollapsed);
+});
