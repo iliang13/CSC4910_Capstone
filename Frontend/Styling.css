@@ -164,6 +164,11 @@ main {
 .surveysDisplayDiv:hover {
   background-color: var(--color-button-hover);
 }
+.surveysDisplayDiv h2 {
+    width: 100%;
+    text-align: left;
+    margin: 0 0 10px 0;
+}
 
 .surveyField {
   width: 100%;
@@ -371,9 +376,9 @@ main {
   flex-direction: column;
   gap: 20px;
   justify-content: flex-start;
-  background-color: var(--color-inviteeSubDiv-bg);
+  background-color: var(--color-tertiary-background);
   width: 100%;
-  color: white;
+  color: var(--color-button-bg);
   font-size: 18px;
 }
 .surveyInviteeMainDiv hr {

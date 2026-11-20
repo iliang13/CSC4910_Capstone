@@ -99,8 +99,11 @@ async function loadSurveys() {
     }
     const surveys = await response.json();
 
-    firstPersonSurveys.replaceChildren();
-    thirdPersonSurveys.replaceChildren();
+    firstPersonSurveys.querySelectorAll(".SurveyAccessDiv")
+    .forEach(div => div.remove());
+    
+    thirdPersonSurveys.querySelectorAll(".SurveyAccessDiv")
+    .forEach(div => div.remove());
 
     surveys.forEach((survey) => {
       //title, ID, pov, answered, questionsList
