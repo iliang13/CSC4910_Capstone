@@ -178,14 +178,16 @@ function toggleSurveyVisibility(surveyDiv, isCollapsed) {
   });
 }
 
-firstPersonSurveys.addEventListener("click", () => {
-  console.log("Testing");
+firstPersonSurveys.addEventListener("click", (clickEvent) => {
+  if (clickEvent.target.closest(".SurveyAccessDiv")) return;
+  
   firstPersonCollapsed = !firstPersonCollapsed;
   toggleSurveyVisibility(firstPersonSurveys, firstPersonCollapsed);
 });
 
-thirdPersonSurveys.addEventListener("click", () => {
-  console.log("Testing");
+thirdPersonSurveys.addEventListener("click", (clickEvent) => {
+  if (clickEvent.target.closest(".SurveyAccessDiv")) return;
+
   thirdPersonCollapsed = !thirdPersonCollapsed;
   toggleSurveyVisibility(thirdPersonSurveys, thirdPersonCollapsed);
 });
