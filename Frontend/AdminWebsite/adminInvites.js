@@ -9,7 +9,7 @@ class surveyInviteeDiv {
     this.collapsed = false;
 
     this.mainDiv = document.createElement("div");
-    this.mainDiv.classList.add("surveyInviteeMainDiv");
+    this.mainDiv.classList.add("contentContainer");
     this.mainDiv.dataset.title = title;
 
     this.mainDiv.addEventListener("click", (clickEvent) => {
@@ -27,6 +27,7 @@ class surveyInviteeDiv {
     this.nameLabel = document.createElement("label");
     this.nameLabel.textContent = title;
 
+    
     this.compeletedLabel = document.createElement("label");
     this.compeletedLabel.textContent = "Users Who Have Completed This Survey";
 
