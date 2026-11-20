@@ -161,6 +161,9 @@ main {
   justify-content: center;
   width: 100%;
 }
+.surveysDisplayDiv:hover {
+  background-color: var(--color-button-hover);
+}
 
 .surveyField {
   width: 100%;
@@ -298,6 +301,7 @@ main {
   color: var(--color-highlight);
 }
 .SurveyAccessDiv {
+  color: var(--color-button-bg);
   background-color: var(--color-tertiary-background);
   display: flex;
   flex-direction: column;
