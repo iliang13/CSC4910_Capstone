@@ -19,9 +19,9 @@
   --color-accent: #976d03;
   --color-button-bg: #121d3a;
   --color-button-hover: #0e162c;
-  
 
 }
+
 body {
   margin: 0;
   padding: 0;
@@ -30,30 +30,30 @@ body {
 }
 
 header {
-  background-color: var(--color-background);
-  padding: 20px;
   position: relative;
+  padding: 20px;
   border-bottom: 2px solid var(--color-accent);
+  background-color: var(--color-background);
 }
 
 header img {
   position: absolute;
   left: 20px;
   top: 50%;
-  transform: translateY(-50%);
   height: 50px;
+  transform: translateY(-50%);
 }
 
 header h1 {
-  text-align: center;
   margin: 0;
   color: white;
+  text-align: center;
 }
 
 #buttonSection {
   display: flex;
-  justify-content: space-evenly;
   flex-wrap: wrap;
+  justify-content: space-evenly;
   gap: 10px;
   padding: 15px;
   border-bottom: 2px solid var(--color-accent);
@@ -68,22 +68,24 @@ button {
   color: white;
   font-size: 15px;
   cursor: pointer;
-  transition: 0.2s;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  transition: 0.2s;
 }
+
 button:hover {
   background-color: var(--color-button-hover);
   transform: translateY(-1px);
 }
+
 button:active {
   transform: translateY(1px);
 }
 
 .deleteSurveyButton {
-  padding: 0;
   width: 20px;
   height: 20px;
-  border: 1px solid var(--color-accent) 00;
+  padding: 0;
+  border: 1px solid var(--color-accent);
   border-radius: 50%;
   background-color: var(--color-delete-bg);
   color: white;
@@ -91,10 +93,12 @@ button:active {
   cursor: pointer;
   transition: 0.2s;
 }
+
 .deleteSurveyButton:hover {
   background-color: var(--color-delete-hover);
   transform: translateY(-1px);
 }
+
 .deleteSurveyButton:active {
   transform: translateY(1px);
 }
@@ -104,178 +108,199 @@ main {
 }
 
 #welcomeMessage {
-  background-color: var(--color-button-bg);
+  margin-bottom: 25px;
+  padding: 20px;
   border: 2px solid var(--color-accent);
   border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 25px;
+  background-color: var(--color-button-bg);
   text-align: center;
 }
 
 #userPanel {
   width: 85%;
   margin: 20px auto;
-  background-color: var(--color-button-bg);
+  padding: 20px;
   border: 2px solid var(--color-accent);
   border-radius: 10px;
-  padding: 20px;
+  background-color: var(--color-button-bg);
   text-align: center;
 }
 
 #surveySearch {
   width: 350px;
   max-width: 90%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid var(--color-accent);
   margin-bottom: 25px;
+  padding: 12px;
+  border: 1px solid var(--color-accent);
+  border-radius: 8px;
 }
 
 #output {
-  text-align: center;
+  margin-top: 20px;
   color: var(--color-highlight);
   font-size: 18px;
-  margin-top: 20px;
+  text-align: center;
 }
+
 #mainPageContainer {
-  flex: 1;
   display: flex;
+  flex: 1;
 }
+
 .my-div {
   display: block;
+  flex: 1;
   padding: 20px;
   background-color: var(--color-background);
-  flex: 1;
   color: white;
 }
+
 .my-div.active {
   display: block;
 }
+
 .surveysDisplayDiv {
-  background-color: var(--color-secondary-background);
-  box-sizing: border-box;
-  padding: 20px;
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
   justify-content: center;
+  gap: 20px;
   width: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+  background-color: var(--color-secondary-background);
 }
+
 .surveysDisplayDiv:hover {
   background-color: var(--color-button-hover);
 }
+
 .surveysDisplayDiv h2 {
-    width: 100%;
-    text-align: left;
-    margin: 0 0 10px 0;
+  width: 100%;
+  margin: 0 0 10px 0;
+  text-align: left;
 }
 
 .surveyField {
-  width: 100%;
-  box-sizing: border-box;
-
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-
-  padding: 20px;
-  border: 1px solid var(--color-accent);
-  border-radius: 10px;
-}
-.question {
   width: 100%;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  justify-content: center;
+  padding: 20px;
   border: 1px solid var(--color-accent);
   border-radius: 10px;
-  padding: 20px;
 }
+
+.question {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+  border: 1px solid var(--color-accent);
+  border-radius: 10px;
+}
+
 .horizontalDiv {
   display: flex;
   flex-direction: row;
-  gap: 20px;
-  align-items: stretch;
   flex: 1;
+  align-items: stretch;
+  gap: 20px;
   width: 100%;
 }
+
 .verticalDiv {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  align-items: center;
   flex: 1;
+  align-items: center;
+  gap: 20px;
   min-width: 0;
 }
+
 .questionInput {
-  width: 100%;
-  box-sizing: border-box;
   display: flex;
   gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px;
   border: 1px solid var(--color-accent);
   border-radius: 10px;
-  padding: 20px;
   background-color: rgb(214, 190, 125);
   resize: none;
 }
+
 .questionInput::placeholder {
   opacity: 0.7;
 }
+
 .questionInput:focus {
-  outline: 2px solid var(--color-focus);
   border: 1px solid transparent;
+  outline: 2px solid var(--color-focus);
 }
+
 .questionInput::-webkit-scrollbar {
   width: 8px;
 }
+
 .questionInput::-webkit-scrollbar-track {
+  border-radius: 10px;
   background: var(--color-builder-bg);
-  border-radius: 10px;
 }
+
 .questionInput::-webkit-scrollbar-thumb {
-  background: var(--color-accent);
-  border-radius: 10px;
   border: 2px solid var(--color-builder-bg);
+  border-radius: 10px;
+  background: var(--color-accent);
 }
+
 .questionInput::-webkit-scrollbar-thumb:hover {
   background: var(--color-scrollbar-hover);
 }
 
 #surveyBuilder {
   display: none;
+  max-height: 600px;
+  overflow-y: auto;
   padding: 20px;
-  background-color: var(--color-builder-bg);
   border: 2px solid var(--color-accent);
   border-radius: 10px;
-  overflow-y: auto;
-  max-height: 600px;
+  background-color: var(--color-builder-bg);
 }
+
 #surveyBuilder.active {
   display: block;
 }
+
 #surveyBuilder::-webkit-scrollbar {
   width: 8px;
 }
+
 #surveyBuilder::-webkit-scrollbar-track {
+  border-radius: 10px;
   background: var(--color-builder-bg);
-  border-radius: 10px;
 }
+
 #surveyBuilder::-webkit-scrollbar-thumb {
-  background: var(--color-accent);
-  border-radius: 10px;
   border: 2px solid var(--color-builder-bg);
+  border-radius: 10px;
+  background: var(--color-accent);
 }
+
 #surveyBuilder::-webkit-scrollbar-thumb:hover {
   background: var(--color-scrollbar-hover);
 }
+
 #questionsContainer {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-bottom: 20px;
 }
+
 #surveyNameInput {
   margin-bottom: 15px;
 }
@@ -283,112 +308,120 @@ main {
 #authDialog {
   box-sizing: border-box;
   width: min(420px, calc(100% - 48px));
+  padding: 24px;
   border: 1px solid var(--color-accent);
   border-radius: 8px;
   background: var(--color-button-bg);
   color: white;
-  padding: 24px;
 }
+
 #authDialog::backdrop {
   background: rgb(0 0 0 / 65%);
 }
+
 #authForm {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  text-align: center;
-  flex-direction: column;
   gap: 12px;
+  text-align: center;
 }
 
 #authMessage {
   min-height: 1.4em;
   color: var(--color-highlight);
 }
+
 .SurveyAccessDiv {
-  color: var(--color-button-bg);
-  background-color: var(--color-tertiary-background);
   display: flex;
   flex-direction: column;
   gap: 10px;
-  height: 150px;
   width: 100%;
-  padding: 10px;
-  box-sizing: border-box;
+  height: 150px;
   min-width: 0;
+  box-sizing: border-box;
+  padding: 10px;
   border: 2px solid var(--color-accent);
   border-radius: 10px;
+  background-color: var(--color-tertiary-background);
+  color: var(--color-button-bg);
 }
+
 .SurveyAccessDiv:hover {
   transform: translateY(-1px);
 }
+
 .SurveyAccessDiv:active {
   transform: translateY(1px);
 }
+
 #surveyAnsweringDiv {
   display: none;
   flex-direction: column;
   gap: 20px;
 }
+
 #surveyAnsweringDiv.active {
   display: flex;
 }
+
 .surveyPopup {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 5px;
-  padding: 10px;
   width: 15%;
+  height: fit-content;
+  padding: 10px;
   border: none;
   border-radius: 12px;
   background-color: white;
   color: var(--color-accent);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  height: fit-content;
 }
+
 .surveyPopup:not(:popover-open) {
   display: none;
 }
+
 .surveyInviteeMainDiv {
-  padding: 20px;
-  border: 1px solid var(--color-accent);
-  border-radius: 4px;
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
-  gap: 20px;
   justify-content: center;
-  background-color: var(--color-inviteeMainDiv-bg);
+  gap: 20px;
   width: 100%;
+  padding: 20px;
+  border: 1px solid var(--color-accent);
+  border-radius: 4px;
+  background-color: var(--color-inviteeMainDiv-bg);
   color: white;
   font-size: 18px;
 }
+
 .surveyInviteeMainDiv hr {
   width: 100%;
+  margin: 10px 0;
   border: 0;
   border-top: 1px solid var(--color-accent);
-  margin: 10px 0;
 }
 
 .surveyInviteeSubDiv {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 20px;
+  width: 100%;
   box-sizing: border-box;
   padding: 20px;
   border: 1px solid var(--color-accent);
   border-radius: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  justify-content: flex-start;
   background-color: var(--color-tertiary-background);
-  width: 100%;
   color: var(--color-button-bg);
   font-size: 18px;
 }
-
 
 #resultsList {
   display: flex;
@@ -401,11 +434,11 @@ main {
 }
 
 .resultCard {
+  padding: 20px;
   border: 2px solid var(--color-accent);
   border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
   color: #fff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
 }
 
 .resultCard h3 {
@@ -430,12 +463,12 @@ main {
 
 .resultAnswer {
   min-width: 36px;
-  text-align: center;
   padding: 4px 12px;
   border-radius: 999px;
   background: var(--color-highlight);
   color: #1f232d;
   font-weight: bold;
+  text-align: center;
 }
 
 #loadingOverlay {
@@ -455,7 +488,6 @@ main {
   border-top: 2px solid #3498db;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
-
 }
 
 @keyframes spin {
@@ -468,21 +500,21 @@ main {
 }
 
 .contentContainer {
-  box-sizing: border-box;
-  padding: 20px;
-  border: 1px solid var(--color-accent);
-  border-radius: 4px;
   display: flex;
   flex-direction: column;
   gap: 20px;
   width: 100%;
-  color: white;
+  box-sizing: border-box;
+  padding: 20px;
+  border: 1px solid var(--color-accent);
+  border-radius: 4px;
   background-color: var(--color-secondary-background);
+  color: white;
 }
 
 .contentContainer hr {
-    width: 100%;
-    border: 0;
-    border-top: 1px solid var(--color-accent);
-    margin: 10px 0;
+  width: 100%;
+  margin: 10px 0;
+  border: 0;
+  border-top: 1px solid var(--color-accent);
 }
