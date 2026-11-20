@@ -303,7 +303,6 @@ main {
 
   border: 2px solid var(--color-accent);
   border-radius: 10px;
-  background-color: var(--color-button-bg);
 }
 .SurveyAccessDiv:hover {
   background-color: var(--color-button-hover);
@@ -385,7 +384,6 @@ main {
 }
 
 .resultCard {
-  background: var(--color-button-bg);
   border: 2px solid var(--color-accent);
   border-radius: 10px;
   padding: 20px;
@@ -462,7 +460,6 @@ main {
   gap: 20px;
   width: 100%;
   color: white;
-  background-color: var(--color-button-bg);
 }
 
 .contentContainer hr {
