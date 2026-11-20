@@ -6,9 +6,23 @@ main.style.gap = "20px";
 
 class surveyInviteeDiv {
   constructor(title, unansweredList, answeredList) {
+    this.collapsed = false;
+
     this.mainDiv = document.createElement("div");
     this.mainDiv.classList.add("surveyInviteeMainDiv");
     this.mainDiv.dataset.title = title;
+
+    this.mainDiv.addEventListener("click", (clickEvent) => {
+      if (clickEvent.target !== this.mainDiv && clickEvent.target !== this.nameLabel && clickEvent.target !== this.divider1) {
+        return;
+      }
+      this.collapsed = !this.collapsed;
+
+      this.compeletedLabel.style.display = this.collapsed ? "none" : "";
+      this.completedDiv.style.display = this.collapsed ? "none" : "";
+      this.uncompeletedLabel.style.display = this.collapsed ? "none" : "";
+      this.uncompletedDiv.style.display = this.collapsed ? "none" : "";
+    });
 
     this.nameLabel = document.createElement("label");
     this.nameLabel.textContent = title;
