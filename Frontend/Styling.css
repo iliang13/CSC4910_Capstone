@@ -367,6 +367,13 @@ main {
   color: white;
   font-size: 18px;
 }
+.surveyInviteeMainDiv hr {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--color-accent);
+  margin: 10px 0;
+}
+
 .surveyInviteeSubDiv {
   box-sizing: border-box;
   padding: 20px;
@@ -381,12 +388,12 @@ main {
   color: var(--color-button-bg);
   font-size: 18px;
 }
-.surveyInviteeMainDiv hr {
-  width: 100%;
-  border: 0;
-  border-top: 1px solid var(--color-accent);
-  margin: 10px 0;
+.surveyInviteeSubDiv label {
+    font-weight: bold;
+    text-align: left;
+    font-size: 22px;
 }
+
 #resultsList {
   display: flex;
   flex-direction: column;

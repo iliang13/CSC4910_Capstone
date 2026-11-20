@@ -27,6 +27,19 @@ class surveyInviteeDiv {
     this.uncompeletedLabel = document.createElement("label");
     this.uncompeletedLabel.textContent = "Users Who Have Not Completed This Survey";
 
+
+    this.mainDiv.appendChild(this.nameLabel);
+
+    this.divider1 = document.createElement("hr");
+    this.mainDiv.appendChild(this.divider1);
+
+    this.completedDiv.appendChild(this.compeletedLabel);
+    this.mainDiv.appendChild(this.completedDiv);
+
+    this.uncompletedDiv.appendChild(this.uncompeletedLabel);
+    this.mainDiv.appendChild(this.uncompletedDiv);
+
+    
     if (answeredList.length === 0) {
       let userLabel = document.createElement("label");
       userLabel.textContent = "None";
@@ -54,16 +67,7 @@ class surveyInviteeDiv {
     }
     
 
-    this.mainDiv.appendChild(this.nameLabel);
-
-    this.divider1 = document.createElement("hr");
-    this.mainDiv.appendChild(this.divider1);
-
-    this.completedDiv.appendChild(this.compeletedLabel);
-    this.mainDiv.appendChild(this.completedDiv);
-
-    this.uncompletedDiv.appendChild(this.uncompeletedLabel);
-    this.mainDiv.appendChild(this.uncompletedDiv);
+    
 
   }
 }
