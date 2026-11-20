@@ -176,6 +176,7 @@ main {
   display: block;
 }
 .surveysDisplayDiv {
+  box-sizing: border-box;
   padding: 20px;
   border: 1px solid var(--color-accent);
   border-radius: 4px;
@@ -186,14 +187,7 @@ main {
   background-color: var(--color-button-bg);
   width: 100%;
 }
-.surveysDisplayDivDiv {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  width: 100%;
-  background-color: var(--color-inviteeMainDiv-bg); /* --color-inviteeSubDiv-bg */
-}
+
 .surveyField {
   width: 100%;
   box-sizing: border-box;
@@ -515,4 +509,11 @@ main {
   width: 100%;
   color: white;
   background-color: var(--color-button-bg);
+}
+
+.contentContainer hr {
+    width: 100%;
+    border: 0;
+    border-top: 1px solid var(--color-accent);
+    margin: 10px 0;
 }
