@@ -305,7 +305,6 @@ main {
   border-radius: 10px;
 }
 .SurveyAccessDiv:hover {
-  background-color: var(--color-button-hover);
   transform: translateY(-1px);
 }
 .SurveyAccessDiv:active {
