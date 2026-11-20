@@ -8,6 +8,10 @@ const surveyAccessDisplay = document.getElementById(
 const firstPersonSurveys = document.getElementById("firstPersonSurveys");
 const thirdPersonSurveys = document.getElementById("thirdPersonSurveys");
 
+console.log("userSurveys.js loaded");
+console.log("First person:", firstPersonSurveys);
+console.log("Third person:", thirdPersonSurveys);
+
 const popup = document.getElementById("codePopup");
 
 let currentSurveyID = null;
@@ -120,7 +124,7 @@ async function loadSurveys() {
     surveyAccessDisplay.textContent = "Unable to load surveys.";
   }
   try {
-    response = await fetch("/user/loadSurveys2", {
+    const response = await fetch("/user/loadSurveys2", {
       headers: {
         Authorization: `Bearer ${session.access_token}`,
       },
@@ -129,7 +133,7 @@ async function loadSurveys() {
     if (!response.ok) {
       throw new Error("Failed to load surveys");
     }
-    surveys = await response.json();
+    const surveys = await response.json();
 
     surveys.forEach((survey) => {
       //title, ID, pov, answered, questionsList
@@ -173,6 +177,7 @@ let firstPersonCollapsed = false;
 let thirdPersonCollapsed = false;
 
 function toggleSurveyVisibility(surveyDiv, isCollapsed) {
+  console.log("Registering collapse listeners");
   surveyDiv.querySelectorAll(".SurveyAccessDiv").forEach(survey => {
     const innerDivs = survey.querySelectorAll(":scope > div > div");
 
@@ -193,11 +198,13 @@ function toggleSurveyVisibility(surveyDiv, isCollapsed) {
 }
 
 firstPersonSurveys.addEventListener("click", () => {
-    firstPersonCollapsed = !firstPersonCollapsed;
-    toggleSurveySection(firstPersonSurveys, firstPersonCollapsed);
+  console.log("Testing");
+  firstPersonCollapsed = !firstPersonCollapsed;
+  toggleSurveyVisibility(firstPersonSurveys, firstPersonCollapsed);
 });
 
 thirdPersonSurveys.addEventListener("click", () => {
-    thirdPersonCollapsed = !thirdPersonCollapsed;
-    toggleSurveySection(thirdPersonSurveys, thirdPersonCollapsed);
+  console.log("Testing");
+  thirdPersonCollapsed = !thirdPersonCollapsed;
+  toggleSurveyVisibility(thirdPersonSurveys, thirdPersonCollapsed);
 });
