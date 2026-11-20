@@ -13,17 +13,19 @@ class surveyInviteeDiv {
     this.nameLabel = document.createElement("label");
     this.nameLabel.textContent = title;
 
-    this.compeletedLabel = document.createElement("label");
-    this.compeletedLabel.textContent = "Users Who Have Completed This Survey";
 
     this.completedDiv = document.createElement("div")
     this.completedDiv.classList.add("surveyInviteeSubDiv");
 
-    this.uncompeletedLabel = document.createElement("label");
-    this.uncompeletedLabel.textContent = "Users Who Have Not Completed This Survey";
+    this.compeletedLabel = document.createElement("label");
+    this.compeletedLabel.textContent = "Users Who Have Completed This Survey";
+
 
     this.uncompletedDiv = document.createElement("div")
     this.uncompletedDiv.classList.add("surveyInviteeSubDiv");
+
+    this.uncompeletedLabel = document.createElement("label");
+    this.uncompeletedLabel.textContent = "Users Who Have Not Completed This Survey";
 
     if (answeredList.length === 0) {
       let userLabel = document.createElement("label");
@@ -57,10 +59,10 @@ class surveyInviteeDiv {
     this.divider1 = document.createElement("hr");
     this.mainDiv.appendChild(this.divider1);
 
-    this.mainDiv.appendChild(this.compeletedLabel);
+    this.completedDiv.appendChild(this.compeletedLabel);
     this.mainDiv.appendChild(this.completedDiv);
 
-    this.mainDiv.appendChild(this.uncompeletedLabel);
+    this.uncompletedDiv.appendChild(this.uncompeletedLabel);
     this.mainDiv.appendChild(this.uncompletedDiv);
 
   }
