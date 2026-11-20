@@ -1,19 +1,26 @@
 :root {
-  --color-scrollbar-hover: #ffffff; /*#c79512*/
-  --color-delete-bg: #f7120a; /*#f7120a*/
-  --color-delete-hover: #bd0d07; /*#bd0d07*/
-  --color-accent: #976d03; /*#976d03*/
-  --color-button-bg: #121d3a; /*#121d3a*/
-  --color-button-hover: #0e162c; /*#0e162c*/
-
   --color-highlight: #ffffff; /*#ffd166*/
   --color-focus: #ffffff; /*#d39805*/
   --color-builder-bg: #ffffff; /*#e9d476*/
-  --color-background: #ffffff; /*1f232d*/
-  --color-survey-field: #c8c5c0; /*#c8c5c0;*/
-  --color-question-bg: #dfdcd4; /*#dfdcd4*/
+
+  --color-survey-field: #ffffff; /*#c8c5c0;*/
+  --color-question-bg: #ffffff; /*#dfdcd4*/
   --color-inviteeMainDiv-bg: #ffffff; /*#18191d*/
   --color-inviteeSubDiv-bg: #ffffff; /**/
+
+  /*New Colors For Final Sprint Ui Redesign*/
+  --color-background: #1F232D;
+  --color-secondary-background: #111C38;
+  --color-tertiary-background: #99D6EA;
+
+  --color-scrollbar-hover: #ffffff; /*#c79512*/
+  --color-delete-bg: #f7120a;
+  --color-delete-hover: #bd0d07;
+  --color-accent: #976d03;
+  --color-button-bg: #121d3a;
+  --color-button-hover: #0e162c;
+  
+
 }
 body {
   margin: 0;
@@ -145,10 +152,9 @@ main {
   display: block;
 }
 .surveysDisplayDiv {
+  background-color: var(--color-secondary-background);
   box-sizing: border-box;
   padding: 20px;
-  border: 1px solid var(--color-accent);
-  border-radius: 4px;
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
@@ -292,6 +298,7 @@ main {
   color: var(--color-highlight);
 }
 .SurveyAccessDiv {
+  background-color: var(--color-tertiary-background);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -300,7 +307,6 @@ main {
   padding: 10px;
   box-sizing: border-box;
   min-width: 0;
-
   border: 2px solid var(--color-accent);
   border-radius: 10px;
 }
@@ -459,6 +465,7 @@ main {
   gap: 20px;
   width: 100%;
   color: white;
+  background-color: var(--color-secondary-background);
 }
 
 .contentContainer hr {
