@@ -388,11 +388,7 @@ main {
   color: var(--color-button-bg);
   font-size: 18px;
 }
-.surveyInviteeSubDiv label {
-    font-weight: bold;
-    text-align: left;
-    font-size: 22px;
-}
+
 
 #resultsList {
   display: flex;

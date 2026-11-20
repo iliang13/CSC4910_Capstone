@@ -33,13 +33,13 @@ class surveyInviteeDiv {
     this.divider1 = document.createElement("hr");
     this.mainDiv.appendChild(this.divider1);
 
-    this.completedDiv.appendChild(this.compeletedLabel);
+    this.mainDiv.appendChild(this.compeletedLabel);
     this.mainDiv.appendChild(this.completedDiv);
 
-    this.uncompletedDiv.appendChild(this.uncompeletedLabel);
+    this.mainDiv.appendChild(this.uncompeletedLabel);
     this.mainDiv.appendChild(this.uncompletedDiv);
 
-    
+
     if (answeredList.length === 0) {
       let userLabel = document.createElement("label");
       userLabel.textContent = "None";
