@@ -1,4 +1,4 @@
-function openSurveyWindow(ID, pov, questionsList) {
+function openSurveyWindow(ID, pov, questionsList, title) {
   const width = 1000;
   const height = 800;
 
@@ -27,6 +27,7 @@ function openSurveyWindow(ID, pov, questionsList) {
         ID: ID,
         pov: pov,
         questionsList: questionsList,
+        surveyTitle: title,
         accessToken: error ? null : session?.access_token,
       },
       window.location.origin
@@ -34,7 +35,7 @@ function openSurveyWindow(ID, pov, questionsList) {
   }, { once: true });
 }
 
-function guestOpenSurveyWindow(ID, pov, questionsList) {
+function guestOpenSurveyWindow(ID, pov, questionsList, title) {
   const width = 1000;
   const height = 800;
 
@@ -59,6 +60,7 @@ function guestOpenSurveyWindow(ID, pov, questionsList) {
         ID: ID,
         pov: pov,
         questionsList: questionsList,
+        surveyTitle: title,
         accessToken: null,
       },
       window.location.origin
@@ -508,8 +510,9 @@ function createAdminSurveyAccessButton(
 
 
 
-function renderSurveyQuestions(ID, pov, questionsList, accessToken) {
+function renderSurveyQuestions(ID, pov, questionsList, accessToken, title) {
   const surveyAnsweringDiv = document.getElementById("surveyAnsweringDiv");
+  document.getElementById("surveyTitle").textContent = title;
 
   surveyAnsweringDiv.replaceChildren();
 
