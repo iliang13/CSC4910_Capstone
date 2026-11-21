@@ -265,7 +265,7 @@ class surveyAccessButton {
     });
 
     this.viewButton.addEventListener("click", async () => {
-      openSurveyWindow(ID, "0", questionsList);
+      openSurveyWindow(ID, "0", questionsList, title);
     });
 
     
@@ -324,7 +324,7 @@ class peerSurveyAccessButton {
     this.verticalDiv2.style.paddingRight = "10px";
 
     this.viewButton.addEventListener("click", async () => {
-      openSurveyWindow(ID, "1", questionsList);
+      openSurveyWindow(ID, "1", questionsList, title);
     });
   }
 }
@@ -440,7 +440,7 @@ class adminSurveyAccessButton {
     });
 
     this.viewButton.addEventListener("click", async () => {
-      openSurveyWindow(ID, "0", questionsList);
+      openSurveyWindow(ID, "0", questionsList, title);
     });
   }
 }
