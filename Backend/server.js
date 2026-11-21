@@ -955,7 +955,7 @@ app.get("/user/loadSurveys1", async (req, res) => {
     }
     const { data, error: surveyError } = await supabaseServiceClient
       .from("surveys")
-      .select("survey_id, title, questions")
+      .select("survey_id, title, questions, Already_Answered")
       .in("survey_id", surveyIDs);
 
     if (surveyError) {
@@ -970,7 +970,16 @@ app.get("/user/loadSurveys1", async (req, res) => {
       });
     }
 
-    res.json(data);
+    const surveysData = data.map((survey) => ({
+      survey_id: survey.survey_id,
+      title: survey.title,
+      questions: survey.questions,
+      alreadyAnswered: Array.isArray(survey.Already_Answered)
+        ? survey.Already_Answered.includes(user.id)
+        : false,
+    }));
+    res.json(surveysData);
+    
   } catch (error) {
     res.status(500).json({
       message: "Internal server error",

@@ -111,7 +111,7 @@ async function loadSurveys() {
         survey.title,
         survey.survey_id,
         "0",
-        false,
+        survey.alreadyAnswered,
         survey.questions
       );
     });
