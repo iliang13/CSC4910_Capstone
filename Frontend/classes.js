@@ -657,6 +657,7 @@ function renderSurveyQuestions(ID, pov, questionsList, accessToken, title, invit
         body: JSON.stringify({
           surveyID: ID,
           pov: pov,
+          inviteCode: inviteCode,
           responses: responses,
         }),
       });
