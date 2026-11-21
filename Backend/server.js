@@ -679,6 +679,110 @@ app.post("/submitSurvey/peer", async (req, res) => {
   }
 });
 
+app.post("/submitSurvey/guest", async (req, res) => {
+  try {
+
+    const { surveyID, inviteCode, responses } = req.body;
+
+    //Validation for surveyID and responses
+    if (
+      !surveyID ||
+      !inviteCode ||
+      !responses ||
+      typeof responses !== "object" ||
+      Array.isArray(responses)
+    ) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid survey submission.",
+      });
+    }
+
+    const { data: surveyResponse, error: surveyResponseError } =
+      await supabaseServiceClient
+        .from("survey_responses")
+        .select("SurveyID, OriginalUserID, AggregateInviteeAnswers")
+        .eq("InviteCode", inviteCode)
+        .eq("SurveyID", surveyID)
+        .single();
+
+     if (surveyResponseError || !surveyResponse) {
+      return res.status(404).json({
+        success: false,
+        error: "Invalid survey invitation.",
+      });
+    }
+
+    const { data: peerSurvey, error: peerSurveyError } =
+      await supabaseServiceClient
+        .from("surveys")
+        .select("questions")
+        .eq("survey_id", surveyID)
+        .single();
+
+    if (peerSurveyError || !peerSurvey) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Survey not found." });
+    }
+
+    const questions = peerSurvey.questions || [];
+
+    if (Object.keys(responses).length !== questions.length) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Please answer every question." });
+    }
+
+    for (let i = 0; i < questions.length; i++) {
+      const answer = Number(responses[`question_${i + 1}`]);
+      const maxOption = Number(questions[i].numberOfOptions);
+
+      if (!Number.isInteger(answer) || answer < 1 || answer > maxOption) {
+        return res.status(400).json({
+          success: false,
+          error: `Invalid answer for question ${i + 1}.`,
+        });
+      }
+    }
+
+    const aggregateAnswers = surveyResponse.AggregateInviteeAnswers || {};
+
+    for (const [question, answer] of Object.entries(responses)) {
+      if (!aggregateAnswers[question]) {
+        aggregateAnswers[question] = {};
+      }
+
+      if (!aggregateAnswers[question][answer]) {
+        aggregateAnswers[question][answer] = 0;
+      }
+      aggregateAnswers[question][answer]++;
+    }
+
+    const { error: updateError } = await supabaseServiceClient
+      .from("survey_responses")
+      .update({
+        AggregateInviteeAnswers: aggregateAnswers
+      })
+      .eq("InviteCode", inviteCode);
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    return res.json({
+      success: true,
+      message: "Guest survey submitted successfully.",
+    });
+  } catch (error) {
+    console.error("Error submitting survey:", error);
+    return res.status(500).json({
+      success: false,
+      error: "Failed to submit survey.",
+    });
+  }
+});
+
 app.post("/saveSurvey", async (req, res) => {
   try {
     const questions = req.body.questions;

@@ -40,9 +40,9 @@
         if (event.origin !== window.location.origin) return;
         if (event.source !== window.opener) return;
 
-        const { ID, pov, questionsList, accessToken, surveyTitle } = event.data;
+        const { ID, pov, questionsList, accessToken, surveyTitle, inviteCode } = event.data;
 
-        renderSurveyQuestions(ID, pov, questionsList, accessToken, surveyTitle);
+        renderSurveyQuestions(ID, pov, questionsList, accessToken, surveyTitle, inviteCode);
     });
     </script>
 </body>

@@ -35,7 +35,7 @@ function openSurveyWindow(ID, pov, questionsList, title) {
   }, { once: true });
 }
 
-function guestOpenSurveyWindow(ID, pov, questionsList, title) {
+function guestOpenSurveyWindow(ID, pov, questionsList, title, inviteCode) {
   const width = 1000;
   const height = 800;
 
@@ -62,6 +62,7 @@ function guestOpenSurveyWindow(ID, pov, questionsList, title) {
         questionsList: questionsList,
         surveyTitle: title,
         accessToken: null,
+        inviteCode: inviteCode
       },
       window.location.origin
     );
@@ -510,7 +511,7 @@ function createAdminSurveyAccessButton(
 
 
 
-function renderSurveyQuestions(ID, pov, questionsList, accessToken, title) {
+function renderSurveyQuestions(ID, pov, questionsList, accessToken, title, inviteCode) {
   const surveyAnsweringDiv = document.getElementById("surveyAnsweringDiv");
   document.getElementById("surveyTitle").textContent = title;
 
@@ -538,7 +539,8 @@ function renderSurveyQuestions(ID, pov, questionsList, accessToken, title) {
 
   submitButton.textContent = "Submit Survey";
 
-  submitButton.addEventListener("click", async () => {
+  if (accessToken) {
+    submitButton.addEventListener("click", async () => {
 
     const responses = {};
 
@@ -607,6 +609,70 @@ function renderSurveyQuestions(ID, pov, questionsList, accessToken, title) {
       document.getElementById("output").textContent = err.message;
     }
   });
+  }
+
+  else {
+    submitButton.addEventListener("click", async () => {
+
+    const responses = {};
+
+    document
+      .querySelectorAll("#surveyAnsweringDiv .question")
+      .forEach((question, index) => {
+        const selected = question.querySelector(
+          'input[type="radio"]:checked'
+        );
+
+        responses[`question_${index + 1}`] = selected
+          ? selected.value
+          : null;
+      });
+
+    const missing = Object.entries(responses)
+      .filter(([, answer]) => answer === null)
+      .map(([key]) => key.replace("question_", ""));
+
+    document
+      .querySelectorAll("#surveyAnsweringDiv .question")
+      .forEach((q, i) => {
+        q.style.outline = missing.includes(String(i + 1))
+          ? "3px solid #f7120a"
+          : "";
+      });
+
+    if (missing.length > 0) {
+      document.getElementById("output").textContent = `Please answer question${
+        missing.length > 1 ? "s" : ""
+      }: ${missing.join(", ")}`;
+      return;
+    }
+
+    try {
+      submitButton.disabled = true;
+      const res = await fetch("/submitSurvey/guest", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          surveyID: ID,
+          pov: pov,
+          responses: responses,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) submitButton.disabled = false;
+
+      document.getElementById("output").textContent = res.ok
+        ? data.message
+        : data.error;
+    } catch (err) {
+      submitButton.disabled = false;
+      document.getElementById("output").textContent = err.message;
+    }
+  });
+  }
 
   surveyAnsweringDiv.appendChild(submitButton);
 }
