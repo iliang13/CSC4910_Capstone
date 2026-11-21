@@ -169,7 +169,7 @@ app.get("/admin/home", (req, res) => {
 
 app.get("/inviteeHome", (req, res) => {
   res.sendFile(
-    path.join(__dirname, "..", "Frontend", "nonAccountHolderAnswering")
+    path.join(__dirname, "..", "Frontend", "nonAccountHolderAnswering.html")
   );
 });
 
