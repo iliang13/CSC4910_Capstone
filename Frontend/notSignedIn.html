@@ -20,6 +20,7 @@
     <div id="buttonSection">
       <button id="signIn">Sign In</button>
       <button id="signOut" type="button" hidden>Sign Out</button>
+      <button id="peerSurvey" type="button">Peer Survey</button>
     </div>
 
     <div id="mainPageContainer">
@@ -239,6 +240,12 @@
           console.error("Could not initialize sign-in:", err);
           authMessage.textContent = "Sign-in setup could not load. Refresh the page and try again.";
           document.getElementById("output").textContent = err.message;
+        });
+
+      
+        const peerSurvey = document.getElementById("peerSurvey");
+        peerSurvey.addEventListener("click", () => {
+          window.location.href = "/inviteeHome";
         });
 
 

@@ -8,7 +8,7 @@ function openSurveyWindow(ID, pov, questionsList) {
   const surveyWindow = window.open(
     "../surveyAnswering.html",
     "SurveyAnswering",
-    "width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes"
+    `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
   );
 
   if (!surveyWindow) {
@@ -28,6 +28,38 @@ function openSurveyWindow(ID, pov, questionsList) {
         pov: pov,
         questionsList: questionsList,
         accessToken: error ? null : session?.access_token,
+      },
+      window.location.origin
+    );
+  }, { once: true });
+}
+
+function guestOpenSurveyWindow(ID, pov, questionsList) {
+  const width = 1000;
+  const height = 800;
+
+  const left = (window.screen.availWidth - width) / 2;
+  const top = (window.screen.availHeight - height) / 2;
+
+  const surveyWindow = window.open(
+    "../surveyAnswering.html",
+    "SurveyAnswering",
+    `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+  );
+
+  if (!surveyWindow) {
+    alert("Your browser blocked the survey window. Please allow popups and try again.");
+    return;
+  }
+
+  surveyWindow.addEventListener("load", async () => {
+
+    surveyWindow.postMessage(
+      {
+        ID: ID,
+        pov: pov,
+        questionsList: questionsList,
+        accessToken: null,
       },
       window.location.origin
     );

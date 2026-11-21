@@ -1288,7 +1288,69 @@ app.post("/admin/loadInviteesTab", async (req, res) => {
   res.json(result);
 });
 
+app.post("/validateGuestSurveyCode", async (req, res) => {
+  const inviteCode = req.body.surveyID?.trim();
+
+  if (!inviteCode) {
+    return res.status(400).json({
+      success: false,
+      message: "no survey code entered",
+    });
+  }
+
+  const { data: survey, error } = await supabaseServiceClient
+    .from("survey_responses")
+    .select("SurveyID")
+    .eq("InviteCode", inviteCode)
+    .maybeSingle();
+
+  
+  if (error) {
+    console.error("Error Validating Invite Code", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Error Validating Invite Code",
+    });
+  }
+
+  if (!survey) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Invalid Survey Code." });
+  }
+
+  const { data: questions, error: questionsError } = await supabaseServiceClient
+    .from("surveys")
+    .select("survey_id, title, questions")
+    .eq("survey_id", survey.SurveyID)
+    .maybeSingle();
+
+  if (questionsError) {
+    console.error("Error retrieving survey questions:", questionsError.message);
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving survey questions.",
+    });
+  }
+
+  if (!questions) {
+    return res.status(404).json({
+      success: false,
+      message: "Survey not found.",
+    });
+  }
+
+  return res.json({
+    success: true,
+    surveyId: questions.survey_id,
+    surveyName: questions.title,
+    questions: questions.questions,
+  });
+  
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
