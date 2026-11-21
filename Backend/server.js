@@ -167,6 +167,12 @@ app.get("/admin/home", (req, res) => {
   );
 });
 
+app.get("/inviteeHome", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "..", "Frontend", "nonAccountHolderAnswering")
+  );
+});
+
 app.get("/admin/surveys", (req, res) => {
   res.sendFile(
     path.join(__dirname, "..", "Frontend", "AdminWebsite", "adminSurveys.html")

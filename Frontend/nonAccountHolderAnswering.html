@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataPulse360 - Surveys</title>
+    <link rel="stylesheet" href="Styling.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        #main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            gap: 20px;
+        }
+        div {
+            align-content:center;
+        }
+        .card {
+          width: 230px;
+          background-color: var(--color-button-bg);
+          border: 2px solid var(--color-accent);
+          color: white;
+          border-radius: 10px;
+          padding: 20px;
+          text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+  
+  
+    <header>
+        <img src="../images/logo.png" alt="DataPulse360 Logo">
+        <h1>DataPulse360 Merrimack</h1>
+    </header>
+
+    <main id="main">
+            <div class = "card">
+                <h3>Welcome to DataPulse360</h3>
+                <p>You have been requested to complete a peer review survey!<br>
+                    In this survey you will be rating the person who provided<br>
+                    you with their unique invite code.<br><br>
+                    Please enter the invite code you were provided below!
+                </p>
+            </div>
+
+          <button popovertarget="codePopup">
+            Click Here To Enter Code
+          </button>
+
+          <div id="loadingOverlay">
+           <div class="loader"></div>
+          </div>
+
+          <div id="codePopup" class="surveyPopup" popover>
+            <input type="text" id="surveyCode" placeholder="Enter your invite code">
+
+            <button id="submitSurveyCode" type="button">Submit</button>
+          </div>
+        <div id="surveyAnsweringDiv" class="my-div"></div>
+    </main>
+
+    <main>
+        <p id="output"></p>
+    </main>
+    <script src="/classes.js"></script>
+    <script src="/NormalUserWebsite/userSurveys.js"></script>
+
+</body>
+</html>
