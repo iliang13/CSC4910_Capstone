@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataPulse360 - Complete Survey</title>
+
+    <link rel="stylesheet" href="Styling.css">
+</head>
+
+<body>
+
+    <header>
+        <img src="images/logo.png" alt="DataPulse360 Logo">
+        <h1>DataPulse360 Merrimack</h1>
+    </header>
+
+    <main>
+        <div id="surveyAnsweringDiv" class="my-div active">
+            <h2>Complete Survey</h2>
+        </div>
+
+        <p id="output" role="status"></p>
+    </main>
+
+    <script src="classes.js"></script>
+
+    <script>
+    window.addEventListener("message", (event) => {
+        if (event.origin !== window.location.origin) return;
+        if (event.source !== window.opener) return;
+
+        const { ID, pov, questionsList, accessToken } = event.data;
+
+        console.log("Survey ID:", ID);
+        console.log("POV:", pov);
+        console.log("Questions:", questionsList);
+
+        renderSurveyQuestions(ID, pov, questionsList, accessToken);
+    });
+    </script>
+</body>
+</html>

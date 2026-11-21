@@ -480,9 +480,11 @@ app.post("/submitSurvey/personal", async (req, res) => {
       throw updateError;
     }
 
-    const inviteCode = crypto.randomBytes(16).toString("hex");
+    let inserted = false;
+    while (!inserted) {
+      const inviteCode = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
 
-    const { error: insertError } = await supabaseServiceClient
+      const { error: insertError } = await supabaseServiceClient
       .from("survey_responses")
       .insert({
         SurveyID: surveyID,
@@ -491,12 +493,23 @@ app.post("/submitSurvey/personal", async (req, res) => {
         OriginalUserAnswers: responses,
       });
 
-    if (insertError) {
-      console.error(insertError);
-      return res.status(500).json({
-        success: false,
-        error: insertError.message,
+      if (!insertError) {
+        inserted = true;
+      }
+      else {
+        const isInviteCodeCollision = insertError.code === "23505" &&
+         `${insertError.message} ${insertError.details || ""}`
+                .includes("InviteCode");
+
+        if (!isInviteCodeCollision) {
+          console.error(insertError);
+          return res.status(500).json({
+          success: false,
+          error: insertError.message,
       });
+        }
+      }
+      
     }
 
     res.json({
