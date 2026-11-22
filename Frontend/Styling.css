@@ -528,6 +528,8 @@ main {
 
 .inviteCodesDropdown {
   width: 190px;
+  width: 190px;
+  position: relative;
 }
 
 .inviteCodesDropdown summary {

@@ -195,6 +195,11 @@ class surveyAccessButton {
     };
     this.displayInviteCodes(codes);
 
+    this.inviteCodesMenu = document.createElement("div");
+    this.inviteCodesMenu.classList.add("contentContainer");
+    
+
+
     this.createCodeButton = document.createElement("button");
     this.createCodeButton.textContent = "Generate Invite Code\n(Single Use)";
     this.createCodeButton.addEventListener("click", async () => {
@@ -237,7 +242,8 @@ class surveyAccessButton {
 
     this.inviteCodesDropdown.appendChild(this.inviteCodeList);
     this.inviteCodesDropdown.appendChild(this.createCodeButton);
-    this.inviteCodesDropdown.classList.add("inviteCodesDropdown");
+    this.inviteCodesDropdown.appendChild(this.inviteCodesMenu);
+
 
     this.horizontalDiv = document.createElement("div");
     this.horizontalDiv.classList.add("horizontalDiv");
