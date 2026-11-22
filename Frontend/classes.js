@@ -197,6 +197,43 @@ class surveyAccessButton {
 
     this.createCodeButton = document.createElement("button");
     this.createCodeButton.textContent = "Generate Invite Code\n(Single Use)";
+    this.createCodeButton.addEventListener("click", async () => {
+      const {
+        data: { session },
+        error,
+      } = await supabaseClient.auth.getSession();
+
+      if (error || !session) {
+        alert("Please sign in to proceed.");
+        return;
+      }
+
+      this.createCodeButton.disabled = true;
+      try {
+        const response = await fetch("/user/generateInviteCode", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ surveyID: ID }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          alert(result.message || result.error || JSON.stringify(result));
+          return;
+        }
+
+        this.displayInviteCodes(result.inviteCodes);
+      } catch (error) {
+        console.error("Error generating invite code:", error);
+        alert("Could not contact the server");
+      } finally {
+        this.createCodeButton.disabled = false;
+      }
+    });
 
     this.inviteCodesDropdown.appendChild(this.inviteCodeList);
     this.inviteCodesDropdown.appendChild(this.createCodeButton);

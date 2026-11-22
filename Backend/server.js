@@ -1477,8 +1477,102 @@ app.post("/validateGuestSurveyCode", async (req, res) => {
   
 });
 
+app.post("/user/generateInviteCode", async (req, res) => {
+  try {
+    const authorization = req.get("authorization");
+
+    const accessToken = authorization?.startsWith("Bearer ")
+      ? authorization.slice("Bearer ".length)
+      : null;
+
+    if (!accessToken) {
+      return res.status(401).json({ error: "Authentication required." });
+    }
+    const { data, error } = await supabaseAuthClient.auth.getUser(accessToken);
+
+    if (error || !data.user) {
+      return res.status(401).json({ error: "Invalid session." });
+    }
+
+    const user = data.user;
+    const { surveyID } = req.body;
+
+    if (!surveyID) {
+      return res.status(400).json({ error: "Missing surveyID." });
+    }
+
+    const { data: surveyResponse, error: fetchError } =
+      await supabaseServiceClient
+        .from("survey_responses")
+        .select("InviteCode")
+        .eq("SurveyID", surveyID)
+        .eq("OriginalUserID", user.id)
+        .single();
+      
+    if (fetchError) {
+      if (fetchError.code === "PGRST116") {
+        return res.status(400).json({
+          error: "Please submit your own survey before generating invite codes!",
+        });
+      }
+      throw fetchError;
+    }
+
+    const existingCodes = Array.isArray(surveyResponse.InviteCode)
+      ? surveyResponse.InviteCode : [];
+
+    let newCode = null;
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const candidate = crypto.randomBytes(4).toString("hex").toUpperCase();
+
+      const { data: clash, error: clashError } = await supabaseClientService
+        .from("survey_responses")
+        .select("SurveyID")
+        .contains("InviteCode", JSON.stringify([candidate]))
+        .limit(1);
+
+      if (clashError) {
+        throw clashError;
+      }
+
+      if (clash.length === 0) {
+        newCode = candidate;
+        break;
+      }
+    }
+    if (newCode === null) {
+      return res.status(500).json({
+        error: "Could not generate a unique invite code. Please try again.",
+      });
+    }
+
+    const updatedCodes = [...existingCodes, newCode];
+    const {error: updateError} = await supabaseServiceClient
+      .from("survey_responses")
+      .update({InviteCode: updatedCodes})
+      .eq("SurveyID", surveyID)
+      .eq("OriginaluserID", user.id);
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    return res.json({
+      success: true,
+      code: newCode,
+      inviteCodes: updatedCodes
+    })
+
+  } catch (error) {
+    console.error("Error generating invite code:", error);
+    return res.status(500).json({ error: "Failed to generate invite code" });
+  }
+  
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
 
