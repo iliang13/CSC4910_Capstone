@@ -264,36 +264,11 @@ main {
 }
 
 #surveyBuilder {
-  display: none;
-  max-height: 600px;
-  overflow-y: auto;
+  display: block;
   padding: 20px;
   border: 2px solid var(--color-accent);
   border-radius: 10px;
-  background-color: var(--color-builder-bg);
-}
-
-#surveyBuilder.active {
-  display: block;
-}
-
-#surveyBuilder::-webkit-scrollbar {
-  width: 8px;
-}
-
-#surveyBuilder::-webkit-scrollbar-track {
-  border-radius: 10px;
-  background: var(--color-builder-bg);
-}
-
-#surveyBuilder::-webkit-scrollbar-thumb {
-  border: 2px solid var(--color-builder-bg);
-  border-radius: 10px;
-  background: var(--color-accent);
-}
-
-#surveyBuilder::-webkit-scrollbar-thumb:hover {
-  background: var(--color-scrollbar-hover);
+  background-color: var(--color-secondary-background);
 }
 
 #questionsContainer {

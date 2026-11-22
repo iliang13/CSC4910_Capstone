@@ -774,7 +774,7 @@ app.post("/submitSurvey/guest", async (req, res) => {
   }
 });
 
-app.post("/saveSurvey", async (req, res) => {
+app.post("/saveSurvey", requireAdmin, async (req, res) => {
   try {
     const questions = req.body.questions;
     const surveyName = req.body.surveyName?.trim();

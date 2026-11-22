@@ -4,11 +4,57 @@ const addQuestionButton = document.getElementById("addQuestion");
 const saveSurveyButton = document.getElementById("saveSurvey");
 const submitSurveyCodeButton = document.getElementById("submitSurveyCode");
 const firstPersonSurveys = document.getElementById("displaySurveyAccessButtons");
-//const surveyAnsweringDiv = document.getElementById("surveyAnsweringDiv"); might not be needed. Can delete after testing.
 const popup = document.getElementById("codePopup");
 
 let currentSurveyID = null;
 let currentPOV = null;
+
+function openSurveyCreationWindow() {
+  const width = 1000;
+  const height = 800;
+
+  const left = (window.screen.availWidth - width) / 2;
+  const top = (window.screen.availHeight - height) / 2;
+
+  const creationWindow = window.open(
+    "../surveyCreation.html",
+    "SurveyCreation",
+    `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+  );
+
+  if (!creationWindow) {
+    alert("Your browser blocked the survey window. Please allow popups and try again.");
+    return;
+  }
+
+  refreshAdminSession().catch((err) => {
+    creationWindow.close();
+    alert(err.message || "Administrator sign-in required to create surveys.");
+  });
+}
+
+// Re-issues the admin cookie from the live Supabase session.
+async function refreshAdminSession() {
+  const {
+    data: { session },
+    error,
+  } = await supabaseClient.auth.getSession();
+
+  if (error || !session) {
+    throw new Error("Administrator sign-in required to create surveys.");
+  }
+
+  const response = await fetch("/api/admin-session", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Administrator sign-in required to create surveys.");
+  }
+}
 
 submitSurveyCodeButton.addEventListener("click", async () => {
           const inviteCode = document.getElementById("surveyCode").value.trim();
@@ -47,86 +93,8 @@ submitSurveyCodeButton.addEventListener("click", async () => {
 });
 
 createSurveyButton.addEventListener("click", () => {
-    const questionsContainer = document.getElementById("questionsContainer");
-    if (questionsContainer.children.length === 0) {
-        surveyBuilder.classList.add("active");
-        CreateBlankSurveyQuestion();
-    }   
+    openSurveyCreationWindow();  
 });
-
-addQuestionButton.addEventListener("click", () => {
-    CreateBlankSurveyQuestion();
-})
-
-saveSurveyButton.addEventListener("click", async () => { 
-    const questionElements = document.querySelectorAll("#questionsContainer .question");
-    const surveyNameInput = document.getElementById("surveyNameInput");
-
-    const questions = [];
-
-    for (const element of questionElements) {
-        const textareas = element.querySelectorAll("textarea");
-        const optionInput = element.querySelector('input[type="number"]');
-
-            
-        const questionText =  textareas[0].value.trim();
-        const thirdPersonText = textareas[1].value.trim();
-        const numberOfOptions = Number(optionInput.value);
-
-        if (!questionText || !thirdPersonText || isNaN(numberOfOptions)) {
-            document.getElementById("output").textContent = "Please fill in all fields."
-            return;
-        }
-
-        if (optionInput.value.trim() === "" ||!Number.isInteger(numberOfOptions) ||numberOfOptions < 1) {
-            document.getElementById("output").textContent = "Please enter a whole number greater than 0.";
-            return;
-        }
-
-        questions.push({
-            questionText: questionText,
-            thirdPersonText: thirdPersonText,
-            numberOfOptions: numberOfOptions
-        });
-    }
-
-    if (questions.length === 0) {
-        document.getElementById("output").textContent = "Please add at least one question.";
-        return;
-    }
-
-    try {
-        const response = await fetch("/saveSurvey", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ 
-                surveyName: surveyNameInput.value.trim(),
-                questions: questions})
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.message || "Failed to save survey.");
-        }
-
-        document.getElementById("output").textContent = "Survey saved successfully.";
-
-    } catch (error) {
-        document.getElementById("output").textContent = "Error saving survey: " + error.message;
-    }
-    clearSurvey()
-});
-
-function clearSurvey() {
-    const questionsContainer = document.getElementById("questionsContainer");
-    const surveyNameInput = document.getElementById("surveyNameInput");
-    questionsContainer.innerHTML = "";
-    surveyNameInput.value = "";
-    surveyBuilder.classList.remove("active"); 
-}
 
 async function loadSurveys() {
     try {

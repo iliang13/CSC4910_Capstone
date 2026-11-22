@@ -579,8 +579,6 @@ function createAdminSurveyAccessButton(
   firstPersonSurveys.appendChild(tempSurveyAccessButton.div);
 }
 
-
-
 function renderSurveyQuestions(ID, pov, questionsList, accessToken, title, inviteCode) {
   const surveyAnsweringDiv = document.getElementById("surveyAnsweringDiv");
   document.getElementById("surveyTitle").textContent = title;
