@@ -562,17 +562,13 @@ main {
   color: white;
   text-align: center;
   align-items: center;
-  position: absolute;
-  top: calc(100% + 2px);
-  left: 0;
-  right: 0;
-  z-index: 10;
 }
 
 .inviteCodesMenu p {
   margin: 8px 0;
   font-family: monospace;
   letter-spacing: 1px;
+  font-size: 18px;
 }
 
 .inviteCodesMenu button {
