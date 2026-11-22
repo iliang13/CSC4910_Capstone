@@ -1525,7 +1525,7 @@ app.post("/user/generateInviteCode", async (req, res) => {
     for (let attempt = 0; attempt < 10; attempt++) {
       const candidate = crypto.randomBytes(4).toString("hex").toUpperCase();
 
-      const { data: clash, error: clashError } = await supabaseClientService
+      const { data: clash, error: clashError } = await supabaseServiceClient
         .from("survey_responses")
         .select("SurveyID")
         .contains("InviteCode", JSON.stringify([candidate]))
