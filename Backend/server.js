@@ -491,7 +491,7 @@ app.post("/submitSurvey/personal", async (req, res) => {
       .insert({
         SurveyID: surveyID,
         OriginalUserID: user.id,
-        InviteCode: null,
+        InviteCode: [],
         OriginalUserAnswers: responses,
       });
 
@@ -686,8 +686,8 @@ app.post("/submitSurvey/guest", async (req, res) => {
     const { data: surveyResponse, error: surveyResponseError } =
       await supabaseServiceClient
         .from("survey_responses")
-        .select("SurveyID, OriginalUserID, AggregateInviteeAnswers")
-        .eq("InviteCode", inviteCode)
+        .select("SurveyID, OriginalUserID, AggregateInviteeAnswers, InviteCode")
+        .eq("InviteCode", JSON.stringify([inviteCode]))
         .eq("SurveyID", surveyID)
         .single();
 
@@ -744,12 +744,18 @@ app.post("/submitSurvey/guest", async (req, res) => {
       aggregateAnswers[question][answer]++;
     }
 
+    const remainingCodes = (
+      Array.isArray(surveyResponse.InviteCode) ? surveyResponse.InviteCode : []
+    ).filter((code) => code !== inviteCode);
+
     const { error: updateError } = await supabaseServiceClient
       .from("survey_responses")
       .update({
-        AggregateInviteeAnswers: aggregateAnswers
+        AggregateInviteeAnswers: aggregateAnswers,
+        InviteCode: remainingCodes,
       })
-      .eq("InviteCode", inviteCode);
+      .eq("SurveyID", surveyID)
+      .eq("OriginalUserID", surveyResponse.OriginalUserID);
 
     if (updateError) {
       throw updateError;
@@ -1423,7 +1429,7 @@ app.post("/validateGuestSurveyCode", async (req, res) => {
   const { data: survey, error } = await supabaseServiceClient
     .from("survey_responses")
     .select("SurveyID")
-    .eq("InviteCode", inviteCode)
+    .eq("InviteCode", JSON.stringify([inviteCode]))
     .maybeSingle();
 
   
