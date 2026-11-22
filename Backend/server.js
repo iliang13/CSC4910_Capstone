@@ -486,36 +486,21 @@ app.post("/submitSurvey/personal", async (req, res) => {
       throw updateError;
     }
 
-    let inserted = false;
-    while (!inserted) {
-      const inviteCode = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
-
-      const { error: insertError } = await supabaseServiceClient
+    const { error: insertError } = await supabaseServiceClient
       .from("survey_responses")
       .insert({
         SurveyID: surveyID,
         OriginalUserID: user.id,
-        InviteCode: inviteCode,
+        InviteCode: null,
         OriginalUserAnswers: responses,
       });
 
-      if (!insertError) {
-        inserted = true;
-      }
-      else {
-        const isInviteCodeCollision = insertError.code === "23505" &&
-         `${insertError.message} ${insertError.details || ""}`
-                .includes("InviteCode");
-
-        if (!isInviteCodeCollision) {
-          console.error(insertError);
-          return res.status(500).json({
-          success: false,
-          error: insertError.message,
+    if (insertError) {
+      console.error(insertError);
+      return res.status(500).json({
+        success: false,
+        error: insertError.message,
       });
-        }
-      }
-      
     }
 
     res.json({
@@ -979,7 +964,7 @@ app.get("/user/loadSurveys1", async (req, res) => {
         : false,
     }));
     res.json(surveysData);
-    
+
   } catch (error) {
     res.status(500).json({
       message: "Internal server error",
@@ -1013,6 +998,7 @@ app.get("/user/loadSurveys2", async (req, res) => {
         .select("SurveyID, OriginalUserID")
         .contains("Invitees", JSON.stringify([user.id]));
 
+        
     if (invitedError) {
       console.error("Supabase error:", {
         message: invitedError.message,
@@ -1028,6 +1014,7 @@ app.get("/user/loadSurveys2", async (req, res) => {
     if (InvitedSurveys.length === 0) {
       return res.json([]);
     }
+    
 
     const surveyInviters = await Promise.all(
       InvitedSurveys.map(async (survey) => {

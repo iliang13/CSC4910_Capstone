@@ -148,7 +148,7 @@ class BlankSurveyQuestion {
 }
 
 class surveyAccessButton {
-  constructor(title, ID, pov, answered, questionsList) {
+  constructor(title, ID, pov, answered, questionsList, codes = []) {
     this.div = document.createElement("div");
     this.div.classList.add("SurveyAccessDiv");
     this.div.dataset.surveyID = ID;
@@ -176,6 +176,36 @@ class surveyAccessButton {
     this.viewButton = document.createElement("button");
     this.viewButton.textContent = "View Survey";
 
+    this.inviteCodesButton = document.createElement("button");
+    this.inviteCodeButton.textContent = "Invite Codes";
+
+    this.inviteCodesDropdown = document.createElement("div");
+    this.inviteCodesDropdown.style.display = "none";
+    this.inviteCodesDropdown.style.flexDirection = "column";
+
+    this.inviteCodesButton.addEventListener("click", () => {
+      const isHidden = this.inviteCodesDropdown.style.display === "none";
+
+      this.inviteCodesDropdown.style.display = isHidden ? "flex" : "none";
+    });
+
+    this.inviteCodeList = document.createElement("div");
+    this.displayInviteCodes = (codes) => {
+      this.inviteCodeList.replaceChildren();
+
+      codes.forEach((code) => {
+        const codeLabel = document.createElement("p");
+        codeLabel.textContent = code;
+        this.inviteCodeList.appendChild(codeLabel);
+      });
+    };
+
+    this.createCodeButton = document.createElement("button");
+    this.createCodeButton.textContent = "Generate Invite Code\n(Single Use)";
+
+    this.inviteCodesDropdown.appendChild(this.inviteCodeList);
+    this.inviteCodesDropdown.appendChild(this.createCodeButton);
+
     this.horizontalDiv = document.createElement("div");
     this.horizontalDiv.classList.add("horizontalDiv");
 
@@ -198,6 +228,8 @@ class surveyAccessButton {
 
     this.verticalDiv2.appendChild(this.viewButton);
     this.verticalDiv2.appendChild(this.inviteButton);
+    this.verticalDiv2.appendChild(this.inviteCodesButton);
+    this.verticalDiv2.appendChild(this.inviteCodesDropdown);
     this.verticalDiv2.style.alignItems = "flex-end";
     this.verticalDiv2.style.justifyContent = "center";
     this.verticalDiv2.style.paddingRight = "10px";
@@ -284,7 +316,7 @@ class peerSurveyAccessButton {
     this.div.dataset.inviterEmail = inviterEmail;
 
     this.nameLabel = document.createElement("label");
-    this.nameLabel.textContent = `${title} (Peer Evaluation For: ${inviterEmail})`;
+    this.nameLabel.textContent = `${title}\nInvited By: ${inviterEmail})`;
 
     this.IDLabel = document.createElement("label");
     this.IDLabel.textContent = `Survey ID: ${ID}`;
@@ -466,7 +498,8 @@ function createSurveyAccessButton(
   pov,
   answered,
   questionsList,
-  inviterEmail
+  inviterEmail,
+  codes = []
 ) {
   if (pov === "0") {
     const tempSurveyAccessButton = new surveyAccessButton(
@@ -474,7 +507,8 @@ function createSurveyAccessButton(
       ID,
       pov,
       answered,
-      questionsList
+      questionsList,
+      codes = []
     );
     firstPersonSurveys.appendChild(tempSurveyAccessButton.div);
   }
