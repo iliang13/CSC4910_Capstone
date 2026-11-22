@@ -176,18 +176,12 @@ class surveyAccessButton {
     this.viewButton = document.createElement("button");
     this.viewButton.textContent = "View Survey";
 
-    this.inviteCodesButton = document.createElement("button");
-    this.inviteCodesButton.textContent = "Invite Codes";
+    this.inviteCodesDropdown = document.createElement("details");
+    this.inviteCodesDropdown.classList.add("inviteCodesDropdown");
 
-    this.inviteCodesDropdown = document.createElement("div");
-    this.inviteCodesDropdown.style.display = "none";
-    this.inviteCodesDropdown.style.flexDirection = "column";
-
-    this.inviteCodesButton.addEventListener("click", () => {
-      const isHidden = this.inviteCodesDropdown.style.display === "none";
-
-      this.inviteCodesDropdown.style.display = isHidden ? "flex" : "none";
-    });
+    this.inviteCodesSummary = document.createElement("summary");
+    this.inviteCodesSummary.textContent = "Invite Codes";
+    this.inviteCodesDropdown.appendChild(this.inviteCodesSummary);
 
     this.inviteCodeList = document.createElement("div");
     this.displayInviteCodes = (codes) => {
@@ -199,6 +193,7 @@ class surveyAccessButton {
         this.inviteCodeList.appendChild(codeLabel);
       });
     };
+    this.displayInviteCodes(codes);
 
     this.createCodeButton = document.createElement("button");
     this.createCodeButton.textContent = "Generate Invite Code\n(Single Use)";
@@ -228,7 +223,6 @@ class surveyAccessButton {
 
     this.verticalDiv2.appendChild(this.viewButton);
     this.verticalDiv2.appendChild(this.inviteButton);
-    this.verticalDiv2.appendChild(this.inviteCodesButton);
     this.verticalDiv2.appendChild(this.inviteCodesDropdown);
     this.verticalDiv2.style.alignItems = "flex-end";
     this.verticalDiv2.style.justifyContent = "center";
@@ -508,7 +502,7 @@ function createSurveyAccessButton(
       pov,
       answered,
       questionsList,
-      codes = []
+      codes
     );
     firstPersonSurveys.appendChild(tempSurveyAccessButton.div);
   }

@@ -525,3 +525,24 @@ main {
   border: 0;
   border-top: 1px solid var(--color-accent);
 }
+
+.inviteCodesDropdown {
+  width: 190px;
+}
+
+.inviteCodesDropdown summary {
+  padding: 10px;
+  border: 1px solid var(--color-accent);
+  border-radius: 10px;
+  background-color: var(--color-button-bg);
+  color: white;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  list-style: none;
+  position: relative;
+}
+
+.inviteCodesDropdown summary:hover {
+  background-color: var(--color-button-hover);
+}
