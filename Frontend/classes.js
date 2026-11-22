@@ -177,7 +177,7 @@ class surveyAccessButton {
     this.viewButton.textContent = "View Survey";
 
     this.inviteCodesButton = document.createElement("button");
-    this.inviteCodeButton.textContent = "Invite Codes";
+    this.inviteCodesButton.textContent = "Invite Codes";
 
     this.inviteCodesDropdown = document.createElement("div");
     this.inviteCodesDropdown.style.display = "none";
