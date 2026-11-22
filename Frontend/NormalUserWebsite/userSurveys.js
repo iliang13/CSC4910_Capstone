@@ -112,7 +112,9 @@ async function loadSurveys() {
         survey.survey_id,
         "0",
         survey.alreadyAnswered,
-        survey.questions
+        survey.questions,
+        null,
+        survey.inviteCodes
       );
     });
   } catch (error) {

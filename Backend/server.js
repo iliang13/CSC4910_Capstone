@@ -955,6 +955,27 @@ app.get("/user/loadSurveys1", async (req, res) => {
       });
     }
 
+    const { data: inviteCodes, error: inviteCodesError } =
+      await supabaseServiceClient
+        .from("survey_responses")
+        .select("SurveyID, InviteCode")
+        .eq("OriginalUserID", user.id)
+        .in("SurveyID", surveyIDs);
+
+    if (inviteCodesError) {
+      console.error("Supabase error:", inviteCodesError.message);
+      return res.status(500).json({
+        message: "Failed to load survey invite codes",
+      });
+    } 
+
+    const inviteCodesBySurvey = {};
+    (inviteCodes || []).forEach((row) => {
+      inviteCodesBySurvey[row.SurveyID] = Array.isArray(row.InviteCode)
+        ? row.InviteCode
+        : [];
+    });
+
     const surveysData = data.map((survey) => ({
       survey_id: survey.survey_id,
       title: survey.title,
@@ -962,6 +983,7 @@ app.get("/user/loadSurveys1", async (req, res) => {
       alreadyAnswered: Array.isArray(survey.Already_Answered)
         ? survey.Already_Answered.includes(user.id)
         : false,
+      inviteCodes: inviteCodesBySurvey[survey.survey_id] || [],
     }));
     res.json(surveysData);
 
