@@ -540,7 +540,7 @@ main {
 
 .inviteCodesDropdown[open] summary {
   border-bottom: 1px solid var(--color-accent);
-  border-radius: 0;
+  border-radius: 10px 10px 0 0;
 }
 
 .inviteCodesMenu {
@@ -556,6 +556,7 @@ main {
   border-top: none;
   border-radius: 0 0 10px 10px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+  color: white;
 }
 
 .inviteCodesMenu p {
