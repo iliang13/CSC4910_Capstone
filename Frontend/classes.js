@@ -180,7 +180,7 @@ class surveyAccessButton {
     this.inviteCodesDropdown.classList.add("inviteCodesDropdown");
 
     this.inviteCodesSummary = document.createElement("summary");
-    this.inviteCodesSummary.textContent = "Invite Codes";
+    this.inviteCodesSummary.textContent = "Guest Invite Codes";
     this.inviteCodesDropdown.appendChild(this.inviteCodesSummary);
 
     this.inviteCodeList = document.createElement("div");

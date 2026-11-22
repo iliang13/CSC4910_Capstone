@@ -539,7 +539,7 @@ main {
 }
 
 .inviteCodesDropdown[open] summary {
-  border-bottom: 1px solid var(--color-accent);
+  border-bottom: none;
   border-radius: 10px 10px 0 0;
 }
 
@@ -576,9 +576,9 @@ main {
   width: 100%;
   margin: 0;
   border: none;
-  border-top: 1px solid var(--color-accent);
   border-radius: 0;
   box-shadow: none;
+  text-decoration: underline;
 }
 
 .inviteCodesMenu button:hover,
