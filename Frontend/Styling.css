@@ -556,7 +556,13 @@ main {
   border-top: none;
   border-radius: 0 0 10px 10px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 0;
   color: white;
+  text-align: center;
 }
 
 .inviteCodesMenu p {
