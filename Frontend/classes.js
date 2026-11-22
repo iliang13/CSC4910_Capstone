@@ -237,6 +237,7 @@ class surveyAccessButton {
 
     this.inviteCodesDropdown.appendChild(this.inviteCodeList);
     this.inviteCodesDropdown.appendChild(this.createCodeButton);
+    this.inviteCodesDropdown.classList.add("inviteCodesDropdown");
 
     this.horizontalDiv = document.createElement("div");
     this.horizontalDiv.classList.add("horizontalDiv");
