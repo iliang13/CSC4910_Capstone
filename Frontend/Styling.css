@@ -548,3 +548,33 @@ main {
 .inviteCodesDropdown summary:hover {
   background-color: var(--color-button-hover);
 }
+
+.inviteCodesMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid var(--color-accent);
+  border-radius: 4px;
+  background-color: var(--color-secondary-background);
+  color: white;
+  text-align: center;
+  align-items: center;
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+}
+
+.inviteCodesMenu p {
+  margin: 8px 0;
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
+.inviteCodesMenu button {
+  width: 100%;
+}

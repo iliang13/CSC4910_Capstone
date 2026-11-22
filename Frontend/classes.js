@@ -196,7 +196,7 @@ class surveyAccessButton {
     this.displayInviteCodes(codes);
 
     this.inviteCodesMenu = document.createElement("div");
-    this.inviteCodesMenu.classList.add("contentContainer");
+    this.inviteCodesMenu.classList.add("inviteCodesMenu");
 
     this.createCodeButton = document.createElement("button");
     this.createCodeButton.textContent = "Generate Invite Code\n(Single Use)";
