@@ -1551,7 +1551,7 @@ app.post("/user/generateInviteCode", async (req, res) => {
       .from("survey_responses")
       .update({InviteCode: updatedCodes})
       .eq("SurveyID", surveyID)
-      .eq("OriginaluserID", user.id);
+      .eq("OriginalUserID", user.id);
 
     if (updateError) {
       throw updateError;
