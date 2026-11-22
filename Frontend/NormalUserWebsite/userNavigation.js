@@ -48,12 +48,13 @@ homeButton.addEventListener("click", () => {
         authForm.reset();
         authTitle.textContent = "Sign In";
         googleAuthButton.textContent = "Sign in with Google";
-        authMessage.textContent = authSetupState === "ready"
-          ? ""
-          : authSetupState === "loading"
-            ? "Loading secure sign-in..."
-            : "Sign-in setup could not load. Refresh the page and try again.";
-        authDialog.showModal();
+        authMessage.textContent = authSetupState === "loading"
+          ? "Loading secure sign-in..."
+          : "";
+          authDialog.showModal();
+        if (authSetupState === "error") {
+          alert("Sign-in setup could not load. Refresh the page and try again.");
+        }
       }
 
       signInButton.addEventListener("click", () => openAuthDialog());
@@ -84,19 +85,15 @@ homeButton.addEventListener("click", () => {
           if (output) {
             output.textContent = "Successfully signed out.";
           }
-        } catch {
+        } catch (err) {
           console.error("Could not sign out:", err);
-
-          const output = document.getElementById("output");
-          if (output) {
-            output.textContent = err.message;
-          }
+          alert(err.message);
         }
       });
 
       googleAuthButton.addEventListener("click", async () => {
         if (!supabaseClient) {
-          authMessage.textContent = "Sign-in setup could not load. Refresh the page and try again.";
+          alert("Sign-in setup could not load. Refresh the page and try again.");
           return;
         }
 
@@ -112,7 +109,7 @@ homeButton.addEventListener("click", () => {
           });
           if (error) throw error;
         } catch (err) {
-          authMessage.textContent = err.message || "Google sign-in failed.";
+          alert(err.message || "Google sign-in failed.");
           googleAuthButton.disabled = false;
         }
       });
@@ -174,10 +171,7 @@ homeButton.addEventListener("click", () => {
             updateAuthenticationButtons(false); //False shows sign in
             userStatus.textContent = "Not Signed In";
           }
-
-          if (output) {
-            output.textContent = err.message;
-          }
+          alert(alertmessage);          
         }
       }
 
@@ -226,8 +220,7 @@ homeButton.addEventListener("click", () => {
           authSetupState = "error";
           googleAuthButton.disabled = true;
           console.error("Could not initialize sign-in:", err);
-          authMessage.textContent = "Sign-in setup could not load. Refresh the page and try again.";
-          document.getElementById("output").textContent = err.message;
+          alert("Sign-in setup could not load. Refresh the page and try again.\n" + err.message);
         });
 
 const loadingOverlay = document.getElementById("loadingOverlay");
