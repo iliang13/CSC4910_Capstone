@@ -133,6 +133,7 @@ class BlankSurveyQuestion {
     this.button.type = "button";
     this.button.textContent = "X";
     this.button.classList.add("deleteSurveyButton");
+    this.button.title = "Delete Question"
 
     this.button.addEventListener("click", () => {
       this.question.remove();

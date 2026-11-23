@@ -6,6 +6,16 @@
     <title>DataPulse360 - Create Survey</title>
 
     <link rel="stylesheet" href="Styling.css">
+    <style>
+        #title {
+            color: white;
+        }
+        .builderHeading {
+            margin: 0 0 10px 0;
+            color: white;
+        }
+
+    </style>
 </head>
 
 <body>
@@ -16,18 +26,20 @@
     </header>
 
     <main>
-        <h2>Create New Survey</h2>
+        <h2 id="title">Create New Survey</h2>
 
         <div id="surveyBuilder" class="surveyBuilder">
-                <input type="text" id="surveyNameInput"
-                    placeholder="Enter survey name"
-                    class="questionInput"
-                />
+            <h3 class="builderHeading">Title:</h3>
+            <input type="text" id="surveyNameInput"
+                placeholder="Enter survey name"
+                class="questionInput"
+            />
 
-                <div id="questionsContainer"></div>
+            <h3 class="builderHeading">Questions:</h3>
+            <div id="questionsContainer"></div>
 
-                <button id="addQuestion">Add Question</button>
-                <button id="saveSurvey">Save Survey</button>
+            <button id="addQuestion">Add Question</button>
+            <button id="saveSurvey">Save Survey</button>
         </div>
 
         <p id="output" role="status"></p>
