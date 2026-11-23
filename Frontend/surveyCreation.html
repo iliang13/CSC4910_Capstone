@@ -41,14 +41,6 @@
         window.addEventListener("message", (event) => {
             if (event.origin !== window.location.origin) return;
             if (event.source !== window.opener) return;
-
-            if (!accessToken) {
-                if (window.opener && !window.opener.closed) {
-                    window.opener.alert("Administrator sign-in required to create surveys.");
-                }   
-                window.close();
-                return;
-            }
         });
 
         // Element declarations
@@ -62,10 +54,6 @@
         });
 
         saveSurveyButton.addEventListener("click", async () => {
-            if (!accessToken) {
-                document.getElementById("output").textContent = "Administrator sign-in required to create surveys.";
-                return;
-            }
             const questionElements = document.querySelectorAll("#questionsContainer .question");
             const surveyNameInput = document.getElementById("surveyNameInput");
 
