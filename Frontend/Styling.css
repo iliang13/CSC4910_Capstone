@@ -231,7 +231,7 @@ main {
   padding: 20px;
   border: 1px solid var(--color-accent);
   border-radius: 10px;
-  background-color: rgb(214, 190, 125);
+  background-color: white;
   resize: none;
 }
 
@@ -269,6 +269,18 @@ main {
   border: 2px solid var(--color-accent);
   border-radius: 10px;
   background-color: var(--color-secondary-background);
+}
+.questionCreatorBackground {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+  border: 1px solid var(--color-accent);
+  background-color: var(--color-tertiary-background);
+  border-radius: 10px;
 }
 
 #questionsContainer {

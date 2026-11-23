@@ -99,7 +99,7 @@ class SurveyQuestion {
 class BlankSurveyQuestion {
   constructor() {
     this.question = document.createElement("div");
-    this.question.classList.add("question");
+    this.question.classList.add("questionCreatorBackground");
 
     this.div = document.createElement("div");
     this.div.classList.add("horizontalDiv");
