@@ -422,6 +422,9 @@ class adminSurveyAccessButton {
     this.viewButton = document.createElement("button");
     this.viewButton.textContent = "View Survey";
 
+    this.deleteButton = document.createElement("delete");
+    this.deleteButton.textContent = "Delete Survey";
+
     this.horizontalDiv = document.createElement("div");
     this.horizontalDiv.classList.add("horizontalDiv");
 
@@ -443,6 +446,7 @@ class adminSurveyAccessButton {
 
     this.verticalDiv2.appendChild(this.viewButton);
     this.verticalDiv2.appendChild(this.inviteButton);
+    this.verticalDiv2.appendChild(this.deleteButton);
     this.verticalDiv2.style.alignItems = "flex-end";
     this.verticalDiv2.style.justifyContent = "center";
     this.verticalDiv2.style.paddingRight = "10px";
@@ -512,6 +516,33 @@ class adminSurveyAccessButton {
 
     this.viewButton.addEventListener("click", async () => {
       openSurveyWindow(ID, "0", questionsList, title, true);
+    });
+
+    this.deleteButton.addEventListener("click", async () => {
+      if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+      try {
+        const response = await fetch("/admin/delete", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            surveyID: ID,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          alert(result.message || result.error || JSON.stringify(result));
+          return;
+        }
+        alert("Survey deleted successfully.");
+        window.location.reload();
+      } catch (error) {
+        console.error("Error deleting survey:", error);
+        alert("Could not contact the server");
+      }
     });
   }
 }
