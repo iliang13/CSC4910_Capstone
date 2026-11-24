@@ -1,3 +1,5 @@
+let surveyReadyHandler = null;
+
 function openSurveyWindow(ID, pov, questionsList, title, viewOnly = false) {
   const width = 1000;
   const height = 800;
@@ -18,28 +20,36 @@ function openSurveyWindow(ID, pov, questionsList, title, viewOnly = false) {
     return;
   }
 
-  surveyWindow.addEventListener(
-    "load",
-    async () => {
-      const {
-        data: { session },
-        error,
-      } = await supabaseClient.auth.getSession();
+  const onReady = async (event) => {
+    if (event.origin !== window.location.origin) return;
+    if (event.source !== surveyWindow) return;
+    if (event.data?.type !== "surveyWindowReady") return;
 
-      surveyWindow.postMessage(
-        {
-          ID: ID,
-          pov: pov,
-          questionsList: questionsList,
-          surveyTitle: title,
-          viewOnly: viewOnly,
-          accessToken: error ? null : session?.access_token,
-        },
-        window.location.origin
-      );
-    },
-    { once: true }
-  );
+    // No removeEventListener here: the popup may load more than once
+    const {
+      data: { session },
+      error,
+    } = await supabaseClient.auth.getSession();
+
+    surveyWindow.postMessage(
+      {
+        ID: ID,
+        pov: pov,
+        questionsList: questionsList,
+        surveyTitle: title,
+        viewOnly: viewOnly,
+        accessToken: error ? null : session?.access_token,
+      },
+      window.location.origin
+    );
+  };
+
+  // Only one responder at a time, so repeated clicks don't pile up listeners
+  if (surveyReadyHandler) {
+    window.removeEventListener("message", surveyReadyHandler);
+  }
+  surveyReadyHandler = onReady;
+  window.addEventListener("message", onReady);
 }
 
 function guestOpenSurveyWindow(ID, pov, questionsList, title, inviteCode) {
@@ -619,6 +629,67 @@ function createAdminSurveyAccessButton(
   firstPersonSurveys.appendChild(tempSurveyAccessButton.div);
 }
 
+let answerShortcutHandler = null;
+
+function setupAnswerShortcuts(container) {
+  const questions = () => Array.from(container.querySelectorAll(".question"));
+  let current = 0;
+
+  const highlight = (scroll = true) => {
+    questions().forEach((q, i) => {
+      q.style.boxShadow = i === current ? "0 0 0 3px #d39805" : "";
+    });
+    if (scroll) {
+      questions()[current]?.scrollIntoView({
+        block: "center",
+        behavior: "smooth",
+      });
+    }
+  };
+
+  if (!document.getElementById("shortcutHint")) {
+    const hint = document.createElement("p");
+    hint.id = "shortcutHint";
+    hint.textContent =
+      "Tip: press 1\u20139 to answer the highlighted question.";
+    hint.style.color = "#cfd3dc";
+    container.before(hint);
+  }
+
+  if (answerShortcutHandler) {
+    document.removeEventListener("keydown", answerShortcutHandler);
+  }
+
+  answerShortcutHandler = (event) => {
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    if (!/^[1-9]$/.test(event.key)) return;
+
+    const qs = questions();
+    if (qs.length === 0) return;
+
+    const radios = qs[current].querySelectorAll('input[type="radio"]');
+    const choice = radios[Number(event.key) - 1];
+    if (!choice) return; // that question doesn't have this many options
+
+    choice.checked = true;
+    qs[current].style.outline = ""; // clear the red "unanswered" outline
+    if (current < qs.length - 1) current++;
+    highlight();
+  };
+  document.addEventListener("keydown", answerShortcutHandler);
+
+  container.addEventListener("click", (event) => {
+    const clicked = event.target.closest(".question");
+    const index = questions().indexOf(clicked);
+    if (index !== -1) {
+      current = index;
+      highlight(false);
+    }
+  });
+
+  highlight(false);
+}
+
 function renderSurveyQuestions(
   ID,
   pov,
@@ -628,12 +699,20 @@ function renderSurveyQuestions(
   viewOnly = false,
   inviteCode
 ) {
+  console.log("renderSurveyQuestions fired");
+  console.log("title:", title);
+  console.log("questionsList:", questionsList);
+
   const surveyAnsweringDiv = document.getElementById("surveyAnsweringDiv");
+  surveyAnsweringDiv.classList.add("active");
   document.getElementById("surveyTitle").textContent = title;
+
+  console.log("before clear");
 
   surveyAnsweringDiv.replaceChildren();
 
   for (let i = 0; i < questionsList.length; i++) {
+    console.log("Question data: ", questionsList[i]);
     if (pov === "0") {
       surveyAnsweringDiv.appendChild(
         CreateSurveyQuestion(
@@ -794,6 +873,7 @@ function renderSurveyQuestions(
       }
     });
   }
+  console.log("questions rendered:", surveyAnsweringDiv.children.length);
   if (!viewOnly) {
     surveyAnsweringDiv.appendChild(submitButton);
   }

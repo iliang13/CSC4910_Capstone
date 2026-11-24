@@ -1,49 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DataPulse360 - Complete Survey</title>
 
-    <link rel="stylesheet" href="Styling.css">
-    <style>
-        div {
-            background-color: white;
-            color: black;
-        }
-        #surveyTitle {
-            color: white;
-        }
-    </style>
-</head>
+    <link rel="stylesheet" href="Styling.css" />
+  </head>
 
-<body>
-
+  <body>
     <header>
-        <img src="images/logo.png" alt="DataPulse360 Logo">
-        <h1>DataPulse360 Merrimack</h1>
+      <img src="images/logo.png" alt="DataPulse360 Logo" />
+      <h1>DataPulse360 Merrimack</h1>
     </header>
 
     <main>
-        <h2 id="surveyTitle"></h2>
-        <div id="surveyAnsweringDiv" class="my-div active">
-            
-        </div>
+      <h2 id="surveyTitle"></h2>
+      <div id="surveyAnsweringDiv" class="my-div active"></div>
 
-        <p id="output" role="status"></p>
+      <p id="output" role="status"></p>
     </main>
 
     <script src="classes.js"></script>
 
     <script>
-    window.addEventListener("message", (event) => {
+      window.addEventListener("message", (event) => {
         if (event.origin !== window.location.origin) return;
         if (event.source !== window.opener) return;
 
-        const { ID, pov, questionsList, accessToken, surveyTitle, viewOnly, inviteCode } = event.data;
+        const {
+          ID,
+          pov,
+          questionsList,
+          accessToken,
+          surveyTitle,
+          viewOnly,
+          inviteCode,
+        } = event.data;
 
-        renderSurveyQuestions(ID, pov, questionsList, accessToken, surveyTitle, viewOnly, inviteCode);
-    });
+        if (!Array.isArray(questionsList)) return;
+
+        renderSurveyQuestions(
+          ID,
+          pov,
+          questionsList,
+          accessToken,
+          surveyTitle,
+          viewOnly,
+          inviteCode
+        );
+      });
+
+      if (window.opener) {
+        window.opener.postMessage(
+          { type: "surveyWindowReady" },
+          window.location.origin
+        );
+      }
     </script>
-</body>
+  </body>
 </html>
