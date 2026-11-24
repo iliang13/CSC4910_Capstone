@@ -119,7 +119,7 @@
                     throw new Error(result.message || "Failed to save survey.");
                 }
 
-                document.getElementById("output").textContent = "Survey saved successfully.";
+                document.getElementById("output").textContent = "Survey saved successfully.\nYou may now close this window.";
                 if (window.opener && !window.opener.closed) {
                     window.opener.location.reload();
                 }

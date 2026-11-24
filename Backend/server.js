@@ -74,7 +74,6 @@ app.use( //Protects against common web-based attacks -- Specifically prevents lo
   helmet({
     contentSecurityPolicy: {
       useDefaults: true,
-      reportOnly: true,
       directives: {
         "script-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
         "connect-src": ["'self'", new URL(supabaseUrl).origin],
