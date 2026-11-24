@@ -29,7 +29,36 @@ function downloadResultsCsv() {
   a.click();
   URL.revokeObjectURL(url);
 }
+function showEmptyState(list, title, text, withButton = false) {
+  list.replaceChildren();
 
+  const box = document.createElement("div");
+  box.className = "emptyState";
+
+  const icon = document.createElement("div");
+  icon.className = "emptyStateIcon";
+  icon.textContent = "📋";
+
+  const h = document.createElement("h3");
+  h.textContent = title;
+
+  const p = document.createElement("p");
+  p.textContent = text;
+
+  box.append(icon, h, p);
+
+  if (withButton) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "View Surveys";
+    btn.addEventListener("click", () => {
+      window.location.href = "/user/surveys";
+    });
+    box.appendChild(btn);
+  }
+
+  list.appendChild(box);
+}
 async function loadMyResponses() {
   const list = document.getElementById("resultsList");
   const downloadButton = document.getElementById("downloadResults");
@@ -42,7 +71,11 @@ async function loadMyResponses() {
     data: { session },
   } = await supabaseClient.auth.getSession();
   if (!session) {
-    list.textContent = "Please sign in to see your results.";
+    showEmptyState(
+      list,
+      "Please sign in",
+      "Sign in to see the surveys you've submitted."
+    );
     return;
   }
 
@@ -54,7 +87,12 @@ async function loadMyResponses() {
     const items = await res.json();
 
     if (items.length === 0) {
-      list.textContent = "You haven't submitted any surveys yet.";
+      showEmptyState(
+        list,
+        "No survey results yet",
+        "Once you submit a survey, your answers and peer feedback will show up here.",
+        true
+      );
       return;
     }
 
@@ -89,18 +127,22 @@ async function loadMyResponses() {
     });
   } catch (err) {
     console.error(err);
-    list.textContent = "Unable to load your results.";
+    showEmptyState(
+      list,
+      "Couldn't load your results",
+      "Something went wrong. Please refresh the page and try again."
+    );
   }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const loadingOverlay = document.getElementById("loadingOverlay");
+  const loadingOverlay = document.getElementById("loadingOverlay");
 
-    loadingOverlay.style.display = "flex";
+  loadingOverlay.style.display = "flex";
 
-    try {
-        await loadMyResponses();
-    } finally {
-        loadingOverlay.style.display = "none";
-    }
+  try {
+    await loadMyResponses();
+  } finally {
+    loadingOverlay.style.display = "none";
+  }
 });
