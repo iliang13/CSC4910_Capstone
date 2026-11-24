@@ -623,3 +623,19 @@ main {
 .surveyField {
   color: black;
 }
+
+#surveyTitle {
+  margin: 0 0 20px 0;
+  padding: 16px 24px;
+
+  border: 2px solid var(--color-accent);
+  border-radius: 10px;
+
+  background-color: var(--color-button-bg);
+
+  color: white;
+  font-size: 32px;
+  font-weight: bold;
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+}
