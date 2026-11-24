@@ -6,8 +6,11 @@ const fs = require("fs");
 const crypto = require("crypto");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
 const cookieParser = require("cookie-parser");
+const rateLimit = require("express-rate-limit");
+const helmet = require("hemlet");
 
 const app = express();
+app.set("trust proxy", 1);
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -67,10 +70,41 @@ async function requireAdmin(req, res, next) {
     res.status(500).send("Authentication error.");
   }
 }
+app.use( //Protects against common web-based attacks -- Specifically prevents loading the website via other websites, which in turn can prevent admin permissions from leaking
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      reportOnly: true,
+      directives: {
+        "script-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+        "connect-src": ["'self'", new URL(supabaseUrl).origin],
+        "upgrade-insecure-requests":
+        process.env.NODE_ENV === "production" ? [] : null,
+      },
+    },
+  })
+);
 
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || false }));
 app.use(express.json());
 app.use(cookieParser());
+
+const guestLimiter = rateLimit({ //Prevents guests from spamming surveys
+  windowMs: 15 * 60 * 1000,
+  limit: 25, //RAISE IF TOO MANY PEOPLE ARE GETTING THIS ERROR
+  standardHeaders: "draft=7",
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many attempts. Please try again alter.",
+    error: "Too many attempts. Please try again later.",
+  },
+});
+
+app.use("/validateGuestSurveyCode", guestLimiter);
+app.use("/submitSurvey/guest", guestLimiter);
+app.use("/validateSurveyCode", guestLimiter);
+
 app.use("/admin", requireAdmin);
 
 app.use((req, res, next) => {
