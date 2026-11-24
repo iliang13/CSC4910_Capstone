@@ -609,3 +609,9 @@ main {
   margin: 0 0 20px;
   color: #cfd3dc;
 }
+
+.csvButton {
+  margin-top: 16px;
+  width: auto;
+  padding: 8px 16px;
+}

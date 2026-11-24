@@ -70,7 +70,8 @@ async function requireAdmin(req, res, next) {
     res.status(500).send("Authentication error.");
   }
 }
-app.use( //Protects against common web-based attacks -- Specifically prevents loading the website via other websites, which in turn can prevent admin permissions from leaking
+app.use(
+  //Protects against common web-based attacks -- Specifically prevents loading the website via other websites, which in turn can prevent admin permissions from leaking
   helmet({
     contentSecurityPolicy: {
       useDefaults: true,
@@ -78,7 +79,7 @@ app.use( //Protects against common web-based attacks -- Specifically prevents lo
         "script-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
         "connect-src": ["'self'", new URL(supabaseUrl).origin],
         "upgrade-insecure-requests":
-        process.env.NODE_ENV === "production" ? [] : null,
+          process.env.NODE_ENV === "production" ? [] : null,
       },
     },
   })
@@ -88,7 +89,8 @@ app.use(cors({ origin: process.env.FRONTEND_ORIGIN || false }));
 app.use(express.json());
 app.use(cookieParser());
 
-const guestLimiter = rateLimit({ //Prevents guests from spamming surveys
+const guestLimiter = rateLimit({
+  //Prevents guests from spamming surveys
   windowMs: 15 * 60 * 1000,
   limit: 25, //RAISE IF TOO MANY PEOPLE ARE GETTING THIS ERROR
   standardHeaders: "draft=7",
@@ -345,6 +347,99 @@ app.get("/user/myResponses", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });
+  }
+});
+function csvCell(value) {
+  let text = String(value ?? "");
+  // Stop spreadsheet apps from treating text as a formula
+  if (/^[=+\-@]/.test(text)) text = "'" + text;
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+app.get("/user/myResponses/:surveyID/csv", async (req, res) => {
+  try {
+    const authorization = req.get("authorization");
+    const accessToken = authorization?.startsWith("Bearer ")
+      ? authorization.slice("Bearer ".length)
+      : null;
+    if (!accessToken)
+      return res.status(401).json({ error: "Authentication required." });
+
+    const { data: authData, error: authError } =
+      await supabaseAuthClient.auth.getUser(accessToken);
+    if (authError || !authData.user)
+      return res.status(401).json({ error: "Invalid session." });
+
+    const surveyID = req.params.surveyID;
+
+    // Only this user's own response to this survey
+    const { data: response, error: responseError } = await supabaseServiceClient
+      .from("survey_responses")
+      .select("OriginalUserAnswers, AggregateInviteeAnswers")
+      .eq("SurveyID", surveyID)
+      .eq("OriginalUserID", authData.user.id)
+      .maybeSingle();
+    if (responseError)
+      return res.status(500).json({ error: "Failed to load response." });
+    if (!response)
+      return res.status(404).json({ error: "No submitted response found." });
+
+    const { data: survey, error: surveyError } = await supabaseServiceClient
+      .from("surveys")
+      .select("title, questions")
+      .eq("survey_id", surveyID)
+      .maybeSingle();
+    if (surveyError || !survey)
+      return res.status(500).json({ error: "Failed to load survey." });
+
+    const rows = [
+      [
+        "Survey",
+        "Question #",
+        "Question",
+        "My Answer",
+        "Peer Average",
+        "Peer Responses",
+      ],
+    ];
+
+    (survey.questions || []).forEach((q, i) => {
+      const key = `question_${i + 1}`;
+      const counts = response.AggregateInviteeAnswers?.[key] || {};
+
+      let total = 0;
+      let sum = 0;
+      for (const [answer, n] of Object.entries(counts)) {
+        total += n;
+        sum += Number(answer) * n;
+      }
+
+      rows.push([
+        survey.title,
+        i + 1,
+        q.questionText,
+        response.OriginalUserAnswers?.[key] ?? "",
+        total ? (sum / total).toFixed(1) : "",
+        total,
+      ]);
+    });
+
+    const csv =
+      "\uFEFF" + rows.map((r) => r.map(csvCell).join(",")).join("\r\n");
+    const safeName =
+      (survey.title || "survey")
+        .replace(/[^a-z0-9]+/gi, "_")
+        .replace(/^_+|_+$/g, "") || "survey";
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${safeName}_results.csv"`
+    );
+    res.send(csv);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -699,7 +794,6 @@ app.post("/submitSurvey/peer", async (req, res) => {
 
 app.post("/submitSurvey/guest", async (req, res) => {
   try {
-
     const { surveyID, inviteCode, responses } = req.body;
 
     //Validation for surveyID and responses
@@ -724,7 +818,7 @@ app.post("/submitSurvey/guest", async (req, res) => {
         .eq("SurveyID", surveyID)
         .single();
 
-     if (surveyResponseError || !surveyResponse) {
+    if (surveyResponseError || !surveyResponse) {
       return res.status(404).json({
         success: false,
         error: "Invalid survey invitation.",
@@ -865,7 +959,7 @@ app.post("/saveSurvey", requireAdmin, async (req, res) => {
 app.post("/admin/delete", requireAdmin, async (req, res) => {
   try {
     const ID = req.body.surveyID;
-    
+
     if (!ID) {
       return res.status(400).json({
         success: false,
@@ -874,10 +968,10 @@ app.post("/admin/delete", requireAdmin, async (req, res) => {
     }
 
     const { error: surveyResponsesError } = await supabaseServiceClient
-    .from("survey_responses")
-    .delete()
-    .eq("SurveyID", ID)
-    .select("SurveyID");
+      .from("survey_responses")
+      .delete()
+      .eq("SurveyID", ID)
+      .select("SurveyID");
 
     if (surveyResponsesError) {
       console.error("Supabase deletion error:", surveyResponsesError.message);
@@ -888,10 +982,10 @@ app.post("/admin/delete", requireAdmin, async (req, res) => {
     }
 
     const { error: userSurveysError } = await supabaseServiceClient
-    .from("user_surveys")
-    .delete()
-    .eq("survey_id", ID)
-    .select("survey_id");
+      .from("user_surveys")
+      .delete()
+      .eq("survey_id", ID)
+      .select("survey_id");
 
     if (userSurveysError) {
       console.error("Supabase deletion error:", userSurveysError.message);
@@ -900,12 +994,12 @@ app.post("/admin/delete", requireAdmin, async (req, res) => {
         message: "Failed to delete survey.",
       });
     }
-    
+
     const { data, error: surveysError } = await supabaseServiceClient
-    .from("surveys")
-    .delete()
-    .eq("survey_id", ID)
-    .select("survey_id");
+      .from("surveys")
+      .delete()
+      .eq("survey_id", ID)
+      .select("survey_id");
 
     if (surveysError) {
       console.error("Supabase deletion error:", surveysError.message);
@@ -1080,7 +1174,7 @@ app.get("/user/loadSurveys1", async (req, res) => {
       return res.status(500).json({
         message: "Failed to load survey invite codes",
       });
-    } 
+    }
 
     const inviteCodesBySurvey = {};
     (inviteCodes || []).forEach((row) => {
@@ -1099,7 +1193,6 @@ app.get("/user/loadSurveys1", async (req, res) => {
       inviteCodes: inviteCodesBySurvey[survey.survey_id] || [],
     }));
     res.json(surveysData);
-
   } catch (error) {
     res.status(500).json({
       message: "Internal server error",
@@ -1133,7 +1226,6 @@ app.get("/user/loadSurveys2", async (req, res) => {
         .select("SurveyID, OriginalUserID")
         .contains("Invitees", JSON.stringify([user.id]));
 
-        
     if (invitedError) {
       console.error("Supabase error:", {
         message: invitedError.message,
@@ -1149,7 +1241,6 @@ app.get("/user/loadSurveys2", async (req, res) => {
     if (InvitedSurveys.length === 0) {
       return res.json([]);
     }
-    
 
     const surveyInviters = await Promise.all(
       InvitedSurveys.map(async (survey) => {
@@ -1539,7 +1630,6 @@ app.post("/validateGuestSurveyCode", async (req, res) => {
     .eq("InviteCode", JSON.stringify([inviteCode]))
     .maybeSingle();
 
-  
   if (error) {
     console.error("Error Validating Invite Code", error.message);
     return res.status(500).json({
@@ -1581,7 +1671,6 @@ app.post("/validateGuestSurveyCode", async (req, res) => {
     surveyName: questions.title,
     questions: questions.questions,
   });
-  
 });
 
 app.post("/user/generateInviteCode", async (req, res) => {
@@ -1615,18 +1704,20 @@ app.post("/user/generateInviteCode", async (req, res) => {
         .eq("SurveyID", surveyID)
         .eq("OriginalUserID", user.id)
         .single();
-      
+
     if (fetchError) {
       if (fetchError.code === "PGRST116") {
         return res.status(400).json({
-          error: "Please submit your own survey before generating invite codes!",
+          error:
+            "Please submit your own survey before generating invite codes!",
         });
       }
       throw fetchError;
     }
 
     const existingCodes = Array.isArray(surveyResponse.InviteCode)
-      ? surveyResponse.InviteCode : [];
+      ? surveyResponse.InviteCode
+      : [];
 
     let newCode = null;
     for (let attempt = 0; attempt < 10; attempt++) {
@@ -1654,9 +1745,9 @@ app.post("/user/generateInviteCode", async (req, res) => {
     }
 
     const updatedCodes = [...existingCodes, newCode];
-    const {error: updateError} = await supabaseServiceClient
+    const { error: updateError } = await supabaseServiceClient
       .from("survey_responses")
-      .update({InviteCode: updatedCodes})
+      .update({ InviteCode: updatedCodes })
       .eq("SurveyID", surveyID)
       .eq("OriginalUserID", user.id);
 
@@ -1667,19 +1758,15 @@ app.post("/user/generateInviteCode", async (req, res) => {
     return res.json({
       success: true,
       code: newCode,
-      inviteCodes: updatedCodes
-    })
-
+      inviteCodes: updatedCodes,
+    });
   } catch (error) {
     console.error("Error generating invite code:", error);
     return res.status(500).json({ error: "Failed to generate invite code" });
   }
-  
 });
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-
-

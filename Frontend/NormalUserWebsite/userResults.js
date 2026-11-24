@@ -59,6 +59,44 @@ function showEmptyState(list, title, text, withButton = false) {
 
   list.appendChild(box);
 }
+
+async function downloadSurveyCsv(surveyID, button) {
+  const {
+    data: { session },
+  } = await supabaseClient.auth.getSession();
+  if (!session) {
+    alert("Please sign in to download your results.");
+    return;
+  }
+
+  button.disabled = true;
+  try {
+    const res = await fetch(
+      `/user/myResponses/${encodeURIComponent(surveyID)}/csv`,
+      { headers: { Authorization: `Bearer ${session.access_token}` } }
+    );
+    if (!res.ok) throw new Error("Download failed");
+
+    const match = /filename="([^"]+)"/.exec(
+      res.headers.get("Content-Disposition") || ""
+    );
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = match ? match[1] : "survey-results.csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error(err);
+    alert("Could not download this survey's results.");
+  } finally {
+    button.disabled = false;
+  }
+}
+
 async function loadMyResponses() {
   const list = document.getElementById("resultsList");
   const downloadButton = document.getElementById("downloadResults");
@@ -122,6 +160,15 @@ async function loadMyResponses() {
         row.append(question, answer);
         card.appendChild(row);
       });
+
+      const csvButton = document.createElement("button");
+      csvButton.type = "button";
+      csvButton.className = "csvButton";
+      csvButton.textContent = "Download CSV";
+      csvButton.addEventListener("click", () =>
+        downloadSurveyCsv(item.surveyID, csvButton)
+      );
+      card.appendChild(csvButton);
 
       list.appendChild(card);
     });
