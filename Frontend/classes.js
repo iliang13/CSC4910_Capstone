@@ -674,6 +674,10 @@ function renderSurveyQuestions(ID, pov, questionsList, accessToken, title, viewO
       document.getElementById("output").textContent = res.ok
         ? data.message
         : data.error;
+
+      if (res.ok && window.opener && !window.opener.closed) {
+        window.opener.location.reload();
+      }
     } catch (err) {
       submitButton.disabled = false;
       document.getElementById("output").textContent = err.message;

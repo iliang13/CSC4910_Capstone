@@ -120,6 +120,9 @@
                 }
 
                 document.getElementById("output").textContent = "Survey saved successfully.";
+                if (window.opener && !window.opener.closed) {
+                    window.opener.location.reload();
+                }
 
             } catch (error) {
                 document.getElementById("output").textContent = "Error saving survey: " + error.message;
