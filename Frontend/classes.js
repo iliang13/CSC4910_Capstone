@@ -12,28 +12,34 @@ function openSurveyWindow(ID, pov, questionsList, title, viewOnly = false) {
   );
 
   if (!surveyWindow) {
-    alert("Your browser blocked the survey window. Please allow popups and try again.");
+    alert(
+      "Your browser blocked the survey window. Please allow popups and try again."
+    );
     return;
   }
 
-  surveyWindow.addEventListener("load", async () => {
-    const {
-      data: { session },
-      error,
-    } = await supabaseClient.auth.getSession();
+  surveyWindow.addEventListener(
+    "load",
+    async () => {
+      const {
+        data: { session },
+        error,
+      } = await supabaseClient.auth.getSession();
 
-    surveyWindow.postMessage(
-      {
-        ID: ID,
-        pov: pov,
-        questionsList: questionsList,
-        surveyTitle: title,
-        viewOnly: viewOnly,
-        accessToken: error ? null : session?.access_token,
-      },
-      window.location.origin
-    );
-  }, { once: true });
+      surveyWindow.postMessage(
+        {
+          ID: ID,
+          pov: pov,
+          questionsList: questionsList,
+          surveyTitle: title,
+          viewOnly: viewOnly,
+          accessToken: error ? null : session?.access_token,
+        },
+        window.location.origin
+      );
+    },
+    { once: true }
+  );
 }
 
 function guestOpenSurveyWindow(ID, pov, questionsList, title, inviteCode) {
@@ -50,26 +56,30 @@ function guestOpenSurveyWindow(ID, pov, questionsList, title, inviteCode) {
   );
 
   if (!surveyWindow) {
-    alert("Your browser blocked the survey window. Please allow popups and try again.");
+    alert(
+      "Your browser blocked the survey window. Please allow popups and try again."
+    );
     return;
   }
 
-  surveyWindow.addEventListener("load", async () => {
-
-    surveyWindow.postMessage(
-      {
-        ID: ID,
-        pov: pov,
-        questionsList: questionsList,
-        surveyTitle: title,
-        accessToken: null,
-        inviteCode: inviteCode
-      },
-      window.location.origin
-    );
-  }, { once: true });
+  surveyWindow.addEventListener(
+    "load",
+    async () => {
+      surveyWindow.postMessage(
+        {
+          ID: ID,
+          pov: pov,
+          questionsList: questionsList,
+          surveyTitle: title,
+          accessToken: null,
+          inviteCode: inviteCode,
+        },
+        window.location.origin
+      );
+    },
+    { once: true }
+  );
 }
-
 
 class SurveyQuestion {
   constructor(questionText, options) {
@@ -134,7 +144,7 @@ class BlankSurveyQuestion {
     this.button.type = "button";
     this.button.textContent = "X";
     this.button.classList.add("deleteSurveyButton");
-    this.button.title = "Delete Question"
+    this.button.title = "Delete Question";
 
     this.button.addEventListener("click", () => {
       this.question.remove();
@@ -244,7 +254,6 @@ class surveyAccessButton {
     this.inviteCodesMenu.appendChild(this.createCodeButton);
     this.inviteCodesDropdown.appendChild(this.inviteCodesMenu);
 
-
     this.horizontalDiv = document.createElement("div");
     this.horizontalDiv.classList.add("horizontalDiv");
 
@@ -338,8 +347,6 @@ class surveyAccessButton {
     this.viewButton.addEventListener("click", async () => {
       openSurveyWindow(ID, "0", questionsList, title);
     });
-
-    
   }
 }
 
@@ -527,7 +534,7 @@ class adminSurveyAccessButton {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-          surveyID: ID,
+            surveyID: ID,
           }),
         });
 
@@ -612,7 +619,15 @@ function createAdminSurveyAccessButton(
   firstPersonSurveys.appendChild(tempSurveyAccessButton.div);
 }
 
-function renderSurveyQuestions(ID, pov, questionsList, accessToken, title, viewOnly = false, inviteCode) {
+function renderSurveyQuestions(
+  ID,
+  pov,
+  questionsList,
+  accessToken,
+  title,
+  viewOnly = false,
+  inviteCode
+) {
   const surveyAnsweringDiv = document.getElementById("surveyAnsweringDiv");
   document.getElementById("surveyTitle").textContent = title;
 
@@ -642,144 +657,174 @@ function renderSurveyQuestions(ID, pov, questionsList, accessToken, title, viewO
 
   if (accessToken) {
     submitButton.addEventListener("click", async () => {
+      const responses = {};
 
-    const responses = {};
+      document
+        .querySelectorAll("#surveyAnsweringDiv .question")
+        .forEach((question, index) => {
+          const selected = question.querySelector(
+            'input[type="radio"]:checked'
+          );
 
-    document
-      .querySelectorAll("#surveyAnsweringDiv .question")
-      .forEach((question, index) => {
-        const selected = question.querySelector(
-          'input[type="radio"]:checked'
-        );
+          responses[`question_${index + 1}`] = selected ? selected.value : null;
+        });
 
-        responses[`question_${index + 1}`] = selected
-          ? selected.value
-          : null;
-      });
+      const missing = Object.entries(responses)
+        .filter(([, answer]) => answer === null)
+        .map(([key]) => key.replace("question_", ""));
 
-    const missing = Object.entries(responses)
-      .filter(([, answer]) => answer === null)
-      .map(([key]) => key.replace("question_", ""));
+      document
+        .querySelectorAll("#surveyAnsweringDiv .question")
+        .forEach((q, i) => {
+          q.style.outline = missing.includes(String(i + 1))
+            ? "3px solid #f7120a"
+            : "";
+        });
 
-    document
-      .querySelectorAll("#surveyAnsweringDiv .question")
-      .forEach((q, i) => {
-        q.style.outline = missing.includes(String(i + 1))
-          ? "3px solid #f7120a"
-          : "";
-      });
-
-    if (missing.length > 0) {
-      document.getElementById("output").textContent = `Please answer question${
-        missing.length > 1 ? "s" : ""
-      }: ${missing.join(", ")}`;
-      return;
-    }
-
-    console.log("Survey:", ID);
-    console.log("Responses:", responses);
-
-    if (!accessToken) {
-      document.getElementById("output").textContent = "Please sign in to submit the survey.";
-      return;
-    }
-
-    try {
-      submitButton.disabled = true;
-      const res = await fetch(pov === "0" ? "/submitSurvey/personal" : "/submitSurvey/peer", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          surveyID: ID,
-          pov: pov,
-          responses: responses,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) submitButton.disabled = false;
-
-      document.getElementById("output").textContent = res.ok
-        ? data.message
-        : data.error;
-
-      if (res.ok && window.opener && !window.opener.closed) {
-        window.opener.location.reload();
+      if (missing.length > 0) {
+        document.getElementById(
+          "output"
+        ).textContent = `Please answer question${
+          missing.length > 1 ? "s" : ""
+        }: ${missing.join(", ")}`;
+        return;
       }
-    } catch (err) {
-      submitButton.disabled = false;
-      document.getElementById("output").textContent = err.message;
-    }
-  });
-  }
 
-  else {
-    submitButton.addEventListener("click", async () => {
+      console.log("Survey:", ID);
+      console.log("Responses:", responses);
 
-    const responses = {};
+      if (!accessToken) {
+        document.getElementById("output").textContent =
+          "Please sign in to submit the survey.";
+        return;
+      }
 
-    document
-      .querySelectorAll("#surveyAnsweringDiv .question")
-      .forEach((question, index) => {
-        const selected = question.querySelector(
-          'input[type="radio"]:checked'
+      try {
+        submitButton.disabled = true;
+        const res = await fetch(
+          pov === "0" ? "/submitSurvey/personal" : "/submitSurvey/peer",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              surveyID: ID,
+              pov: pov,
+              responses: responses,
+            }),
+          }
         );
 
-        responses[`question_${index + 1}`] = selected
-          ? selected.value
-          : null;
-      });
+        const data = await res.json();
+        if (!res.ok) submitButton.disabled = false;
 
-    const missing = Object.entries(responses)
-      .filter(([, answer]) => answer === null)
-      .map(([key]) => key.replace("question_", ""));
+        document.getElementById("output").textContent = res.ok
+          ? data.message
+          : data.error;
 
-    document
-      .querySelectorAll("#surveyAnsweringDiv .question")
-      .forEach((q, i) => {
-        q.style.outline = missing.includes(String(i + 1))
-          ? "3px solid #f7120a"
-          : "";
-      });
+        if (res.ok && window.opener && !window.opener.closed) {
+          window.opener.location.reload();
+        }
+      } catch (err) {
+        submitButton.disabled = false;
+        document.getElementById("output").textContent = err.message;
+      }
+    });
+  } else {
+    submitButton.addEventListener("click", async () => {
+      const responses = {};
 
-    if (missing.length > 0) {
-      document.getElementById("output").textContent = `Please answer question${
-        missing.length > 1 ? "s" : ""
-      }: ${missing.join(", ")}`;
-      return;
-    }
+      document
+        .querySelectorAll("#surveyAnsweringDiv .question")
+        .forEach((question, index) => {
+          const selected = question.querySelector(
+            'input[type="radio"]:checked'
+          );
 
-    try {
-      submitButton.disabled = true;
-      const res = await fetch("/submitSurvey/guest", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          surveyID: ID,
-          pov: pov,
-          inviteCode: inviteCode,
-          responses: responses,
-        }),
-      });
+          responses[`question_${index + 1}`] = selected ? selected.value : null;
+        });
 
-      const data = await res.json();
-      if (!res.ok) submitButton.disabled = false;
+      const missing = Object.entries(responses)
+        .filter(([, answer]) => answer === null)
+        .map(([key]) => key.replace("question_", ""));
 
-      document.getElementById("output").textContent = res.ok
-        ? data.message
-        : data.error;
-    } catch (err) {
-      submitButton.disabled = false;
-      document.getElementById("output").textContent = err.message;
-    }
-  });
+      document
+        .querySelectorAll("#surveyAnsweringDiv .question")
+        .forEach((q, i) => {
+          q.style.outline = missing.includes(String(i + 1))
+            ? "3px solid #f7120a"
+            : "";
+        });
+
+      if (missing.length > 0) {
+        document.getElementById(
+          "output"
+        ).textContent = `Please answer question${
+          missing.length > 1 ? "s" : ""
+        }: ${missing.join(", ")}`;
+        return;
+      }
+
+      try {
+        submitButton.disabled = true;
+        const res = await fetch("/submitSurvey/guest", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            surveyID: ID,
+            pov: pov,
+            inviteCode: inviteCode,
+            responses: responses,
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) submitButton.disabled = false;
+
+        document.getElementById("output").textContent = res.ok
+          ? data.message
+          : data.error;
+      } catch (err) {
+        submitButton.disabled = false;
+        document.getElementById("output").textContent = err.message;
+      }
+    });
   }
   if (!viewOnly) {
     surveyAnsweringDiv.appendChild(submitButton);
   }
 }
+
+function filterSurveys() {
+  const input = document.getElementById("surveySearch");
+  if (!input) return;
+
+  const query = input.value.trim().toLowerCase();
+  let visible = 0;
+
+  document.querySelectorAll(".SurveyAccessDiv").forEach((card) => {
+    const title = card.querySelector("label")?.textContent || "";
+    const haystack = `${title} ${card.dataset.surveyID || ""}`.toLowerCase();
+    const matches = !query || haystack.includes(query);
+
+    card.style.display = matches ? "" : "none";
+    if (matches) visible++;
+  });
+
+  let message = document.getElementById("surveySearchEmpty");
+  if (!message) {
+    message = document.createElement("p");
+    message.id = "surveySearchEmpty";
+    document.getElementById("surveysDiv")?.prepend(message);
+  }
+  message.textContent =
+    query && visible === 0 ? `No surveys match "${input.value.trim()}".` : "";
+}
+
+document.addEventListener("input", (event) => {
+  if (event.target.id === "surveySearch") filterSurveys();
+});

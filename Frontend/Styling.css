@@ -9,8 +9,8 @@
   --color-inviteeSubDiv-bg: #ffffff; /**/
 
   /*New Colors For Final Sprint Ui Redesign*/
-  --color-background: #1F232D;
-  --color-secondary-background: #111C38;
+  --color-background: #1f232d;
+  --color-secondary-background: #111c38;
   --color-tertiary-background: #ffffff; /*#99D6EA*/
 
   --color-scrollbar-hover: #ffffff; /*#c79512*/
@@ -19,7 +19,6 @@
   --color-accent: #976d03;
   --color-button-bg: #121d3a;
   --color-button-hover: #0e162c;
-
 }
 
 body {
@@ -579,4 +578,9 @@ main {
 .emptyMessage {
   margin: 0;
   color: white;
+}
+
+#surveySearchEmpty {
+  color: var(--color-highlight);
+  margin: 0 0 15px;
 }
