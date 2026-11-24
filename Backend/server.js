@@ -7,7 +7,7 @@ const crypto = require("crypto");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
 const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
-const helmet = require("hemlet");
+const helmet = require("helmet");
 
 const app = express();
 app.set("trust proxy", 1);
