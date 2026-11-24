@@ -840,6 +840,34 @@ app.post("/admin/delete", requireAdmin, async (req, res) => {
       });
     }
 
+    const { error: surveyResponsesError } = await supabaseServiceClient
+    .from("survey_responses")
+    .delete()
+    .eq("SurveyID", ID)
+    .select("SurveyID");
+
+    if (surveyResponsesError) {
+      console.error("Supabase deletion error:", surveyResponsesError.message);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to delete survey.",
+      });
+    }
+
+    const { error: userSurveysError } = await supabaseServiceClient
+    .from("user_surveys")
+    .delete()
+    .eq("survey_id", ID)
+    .select("survey_id");
+
+    if (userSurveysError) {
+      console.error("Supabase deletion error:", userSurveysError.message);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to delete survey.",
+      });
+    }
+    
     const { data, error: surveysError } = await supabaseServiceClient
     .from("surveys")
     .delete()
@@ -858,20 +886,6 @@ app.post("/admin/delete", requireAdmin, async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Survey not found.",
-      });
-    }
-
-    const { error: surveyResponsesError } = await supabaseServiceClient
-    .from("survey_responses")
-    .delete()
-    .eq("SurveyID", ID)
-    .select("SurveyID");
-
-    if (surveyResponsesError) {
-      console.error("Supabase deletion error:", surveyResponsesError.message);
-      return res.status(500).json({
-        success: false,
-        message: "Failed to delete survey.",
       });
     }
 
