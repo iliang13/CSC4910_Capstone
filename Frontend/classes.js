@@ -422,7 +422,7 @@ class adminSurveyAccessButton {
     this.viewButton = document.createElement("button");
     this.viewButton.textContent = "View Survey";
 
-    this.deleteButton = document.createElement("delete");
+    this.deleteButton = document.createElement("button");
     this.deleteButton.textContent = "Delete Survey";
 
     this.horizontalDiv = document.createElement("div");
