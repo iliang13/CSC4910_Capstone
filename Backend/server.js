@@ -829,6 +829,66 @@ app.post("/saveSurvey", requireAdmin, async (req, res) => {
   }
 });
 
+app.post("/admin/delete", requireAdmin, async (req, res) => {
+  try {
+    const ID = req.body.surveyID;
+    
+    if (!ID) {
+      return res.status(400).json({
+        success: false,
+        message: "Survey ID is required.",
+      });
+    }
+
+    const { data, error: surveysError } = await supabaseServiceClient
+    .from("surveys")
+    .delete()
+    .eq("survey_id", ID)
+    .select("survey_id");
+
+    if (surveysError) {
+      console.error("Supabase deletion error:", surveysError.message);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to delete survey.",
+      });
+    }
+
+    if (!data || data.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Survey not found.",
+      });
+    }
+
+    const { error: surveyResponsesError } = await supabaseServiceClient
+    .from("survey_responses")
+    .delete()
+    .eq("SurveyID", ID)
+    .select("SurveyID");
+
+    if (surveyResponsesError) {
+      console.error("Supabase deletion error:", surveyResponsesError.message);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to delete survey.",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Survey deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Error deleting survey:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete survey.",
+    });
+  }
+});
+
 app.post("/validateSurveyCode", async (req, res) => {
   const inviteCode = req.body.surveyID?.trim();
 

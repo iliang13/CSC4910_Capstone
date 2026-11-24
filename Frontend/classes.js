@@ -527,7 +527,7 @@ class adminSurveyAccessButton {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            surveyID: ID,
+          surveyID: ID,
           }),
         });
 
