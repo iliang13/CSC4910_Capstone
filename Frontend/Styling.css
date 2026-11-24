@@ -353,8 +353,11 @@ main {
   justify-content: center;
   align-items: center;
   gap: 5px;
-  width: 15%;
+  width: clamp(260px, 25%, 420px);
+  box-sizing: border-box;
+  max-width: calc(100vw - 32px);
   height: fit-content;
+  overflow: auto;
   padding: 10px;
   border: none;
   border-radius: 12px;

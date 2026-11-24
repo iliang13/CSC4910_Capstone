@@ -1,4 +1,4 @@
-function openSurveyWindow(ID, pov, questionsList, title) {
+function openSurveyWindow(ID, pov, questionsList, title, viewOnly = false) {
   const width = 1000;
   const height = 800;
 
@@ -28,6 +28,7 @@ function openSurveyWindow(ID, pov, questionsList, title) {
         pov: pov,
         questionsList: questionsList,
         surveyTitle: title,
+        viewOnly: viewOnly,
         accessToken: error ? null : session?.access_token,
       },
       window.location.origin
@@ -510,7 +511,7 @@ class adminSurveyAccessButton {
     });
 
     this.viewButton.addEventListener("click", async () => {
-      openSurveyWindow(ID, "0", questionsList, title);
+      openSurveyWindow(ID, "0", questionsList, title, true);
     });
   }
 }
@@ -580,7 +581,7 @@ function createAdminSurveyAccessButton(
   firstPersonSurveys.appendChild(tempSurveyAccessButton.div);
 }
 
-function renderSurveyQuestions(ID, pov, questionsList, accessToken, title, inviteCode) {
+function renderSurveyQuestions(ID, pov, questionsList, accessToken, title, viewOnly = false, inviteCode) {
   const surveyAnsweringDiv = document.getElementById("surveyAnsweringDiv");
   document.getElementById("surveyTitle").textContent = title;
 
@@ -743,6 +744,7 @@ function renderSurveyQuestions(ID, pov, questionsList, accessToken, title, invit
     }
   });
   }
-
-  surveyAnsweringDiv.appendChild(submitButton);
+  if (!viewOnly) {
+    surveyAnsweringDiv.appendChild(submitButton);
+  }
 }

@@ -42,6 +42,10 @@
     </div>
 
     <main>
+      <div id="loadingOverlay">
+        <div class="loader"></div>
+        <span>Signing you in...</span>
+      </div>
       <p id="output"></p>
     </main>
 
@@ -140,6 +144,8 @@
           }
           return;
         }
+        const loadingOverlay = document.getElementById("loadingOverlay");
+        loadingOverlay.style.display = "flex";
 
         try {
           const response = await fetch("/api/me", {
@@ -185,6 +191,7 @@
             output.textContent = "Successfully signed in.";
           }
         } catch (err) {
+          loadingOverlay.style.display = "none";
           if (userStatus) {
             userStatus.textContent = "Not Signed In";
           }
