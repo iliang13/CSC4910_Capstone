@@ -575,3 +575,8 @@ main {
 .inviteCodesMenu button:active {
   transform: none;
 }
+
+.emptyMessage {
+  margin: 0;
+  color: white;
+}

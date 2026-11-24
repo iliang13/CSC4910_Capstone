@@ -106,6 +106,14 @@ async function loadSurveys() {
         const surveys = await response.json();
         firstPersonSurveys.replaceChildren();
 
+        if (surveys.length === 0) {
+          const emptyMessage = document.createElement("p");
+          emptyMessage.classList.add("emptyMessage");
+          emptyMessage.textContent = "No Surveys Available";
+          firstPersonSurveys.appendChild(emptyMessage);
+          return;
+        }
+
         surveys.forEach((survey) => { //title, ID, pov, answered, questionsList
             createAdminSurveyAccessButton(survey.title, survey.survey_id, "0", false, survey.questions);
         });
