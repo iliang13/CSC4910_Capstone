@@ -603,56 +603,35 @@ app.post("/submitSurvey/personal", async (req, res) => {
       }
     }
 
-    survey.Already_Answered = survey.Already_Answered || [];
-    if (survey.Already_Answered.includes(user.id)) {
+    const cleanResponses = {};
+    for (let i = 0; i < questions.length; i++) {
+      cleanResponses[`question_${i + 1}`] = Number(
+        responses[`question_${i + 1}`]
+      );
+    }
+
+    const { data: result, error: submitError } =
+      await supabaseServiceClient.rpc("submit_personal_survey", {
+        p_survey_id: surveyID,
+        p_user_id: user.id,
+        p_responses: cleanResponses,
+      });
+
+    if (submitError) {
+      throw submitError;
+    }
+
+    if (result === "already_answered") {
       return res.status(409).json({
         success: false,
         error: "User has already answered this survey.",
       });
     }
 
-    const globalAnswers = survey.Global_Class_Answers_JSON || {};
-
-    for (const [question, answer] of Object.entries(responses)) {
-      if (!globalAnswers[question]) {
-        globalAnswers[question] = {};
-      }
-
-      if (!globalAnswers[question][answer]) {
-        globalAnswers[question][answer] = 0;
-      }
-
-      globalAnswers[question][answer]++;
-    }
-
-    survey.Already_Answered.push(user.id);
-
-    const { error: updateError } = await supabaseServiceClient
-      .from("surveys")
-      .update({
-        Already_Answered: survey.Already_Answered,
-        Global_Class_Answers_JSON: globalAnswers,
-      })
-      .eq("survey_id", surveyID);
-
-    if (updateError) {
-      throw updateError;
-    }
-
-    const { error: insertError } = await supabaseServiceClient
-      .from("survey_responses")
-      .insert({
-        SurveyID: surveyID,
-        OriginalUserID: user.id,
-        InviteCode: [],
-        OriginalUserAnswers: responses,
-      });
-
-    if (insertError) {
-      console.error(insertError);
-      return res.status(500).json({
+    if (result !== "ok") {
+      return res.status(404).json({
         success: false,
-        error: insertError.message,
+        error: "Survey not found.",
       });
     }
 
