@@ -300,7 +300,6 @@ class surveyAccessButton {
     this.submitButton.textContent = "Invite";
 
     this.inviteButton.addEventListener("click", () => {
-      const surveyCode = `S${ID}`;
 
       this.popup.textContent = "Invitees Email Address: ";
       this.popup.appendChild(this.emailInput);
@@ -477,8 +476,6 @@ class adminSurveyAccessButton {
     this.submitButton.textContent = "Invite";
 
     this.inviteButton.addEventListener("click", () => {
-      const surveyCode = `S${ID}`;
-
       this.popup.textContent = "Invitees Email Address: ";
       this.popup.appendChild(this.emailInput);
       this.popup.appendChild(this.submitButton);

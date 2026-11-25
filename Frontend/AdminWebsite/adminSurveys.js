@@ -2,9 +2,7 @@ const createSurveyButton = document.getElementById("CreateSurvey");
 const surveyBuilder = document.getElementById("surveyBuilder");
 const addQuestionButton = document.getElementById("addQuestion");
 const saveSurveyButton = document.getElementById("saveSurvey");
-const submitSurveyCodeButton = document.getElementById("submitSurveyCode");
 const firstPersonSurveys = document.getElementById("displaySurveyAccessButtons");
-const popup = document.getElementById("codePopup");
 
 let currentSurveyID = null;
 let currentPOV = null;
@@ -55,42 +53,6 @@ async function refreshAdminSession() {
     throw new Error("Administrator sign-in required to create surveys.");
   }
 }
-
-submitSurveyCodeButton.addEventListener("click", async () => {
-          const inviteCode = document.getElementById("surveyCode").value.trim();
-          const alreadyAdded = Array.from(document.querySelectorAll(".SurveyAccessDiv")).some((button) => {
-            return inviteCode.slice(1) === button.dataset.surveyID;
-          });
-          if (alreadyAdded) {
-            alert("Survey already added");
-            popup.hidePopover();
-            return;
-          }
-          try {
-            const response = await fetch("/validateSurveyCode", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({ 
-                surveyID: inviteCode
-              })
-            });
-            
-            const result = await response.json();
-            
-            if (!response.ok) {
-              alert(result.message);
-              return;
-            }
-            createAdminSurveyAccessButton(result.surveyName, result.surveyId, result.pov, false, result.questions); //title, ID, pov, answered, questionsList
-            alert("Survey Added Successfully");
-          } catch (error) {
-            console.error("Error validating survey code:", error);
-            alert("Could not contact the server");
-    }
-  popup.hidePopover();
-});
 
 createSurveyButton.addEventListener("click", () => {
     openSurveyCreationWindow();  
@@ -143,7 +105,7 @@ document.addEventListener("click", (event) => {
             return;
         }
         // Check whether the click was on a button that opens a popup
-        if (submitSurveyCodeButton.contains(event.target) || event.target.closest(".inviteButton")) {
+        if (event.target.closest(".inviteButton")) {
             return;
         }
         popup.hidePopover();

@@ -1,6 +1,4 @@
 const surveyBuilder = document.getElementById("surveyBuilder");
-
-const submitSurveyCodeButton = document.getElementById("submitSurveyCode");
 const surveyAccessDisplay = document.getElementById(
   "displaySurveyAccessButtons"
 );
@@ -8,53 +6,8 @@ const surveyAccessDisplay = document.getElementById(
 const firstPersonSurveys = document.getElementById("firstPersonSurveys");
 const thirdPersonSurveys = document.getElementById("thirdPersonSurveys");
 
-const popup = document.getElementById("codePopup");
 
 let currentSurveyID = null;
-
-submitSurveyCodeButton.addEventListener("click", async () => {
-  const inviteCode = document.getElementById("surveyCode").value.trim();
-  const alreadyAdded = Array.from(
-    document.querySelectorAll(".SurveyAccessDiv")
-  ).some((button) => {
-    return inviteCode.slice(1) === button.dataset.surveyID;
-  });
-  if (alreadyAdded) {
-    alert("Survey already added");
-    popup.hidePopover();
-    return;
-  }
-  try {
-    const response = await fetch("/validateSurveyCode", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        surveyID: inviteCode,
-      }),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      alert(result.message);
-      return;
-    }
-    createSurveyAccessButton(
-      result.surveyName,
-      result.surveyId,
-      result.pov,
-      false,
-      result.questions
-    ); //title, ID, pov, answered, questionsList
-    alert("Survey Added Successfully");
-  } catch (error) {
-    console.error("Error validating survey code:", error);
-    alert("Could not contact the server");
-  }
-  popup.hidePopover();
-});
 
 document.addEventListener("click", (event) => {
   const popups = document.querySelectorAll(".surveyPopup:popover-open");
@@ -65,7 +18,6 @@ document.addEventListener("click", (event) => {
     }
     // Check whether the click was on a button that opens a popup
     if (
-      submitSurveyCodeButton.contains(event.target) ||
       event.target.closest(".inviteButton")
     ) {
       return;
