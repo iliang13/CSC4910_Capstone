@@ -513,8 +513,6 @@ class adminSurveyAccessButton {
         });
 
         const result = await response.json();
-        console.log("Invite response status:", response.status);
-        console.log("Invite response body:", result);
 
         if (!response.ok) {
           alert(result.message || result.error || JSON.stringify(result));

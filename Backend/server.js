@@ -127,7 +127,15 @@ app.use((req, res, next) => {
     "/AdminWebsite/adminInvites.html",
   ];
 
-  if (adminPages.includes(req.path)) {
+  let requestPath;
+  try {
+    requestPath = path.posix
+      .normalize(decodeURIComponent(req.path))
+      .toLowerCase();
+  } catch {
+    return res.status(400).send("Bad request");
+  }
+  if (adminPages.includes(requestPath)) {
     return requireAdmin(req, res, next);
   }
 
@@ -169,11 +177,7 @@ app.get("/testSurvey/:id", async (req, res) => {
 const surveysDirectory = path.join(__dirname, "surveys");
 
 function generateSurveyID() {
-  let result = "";
-  for (let i = 0; i < 8; i++) {
-    result += Math.floor(Math.random() * 10);
-  }
-  return result;
+  return crypto.randomBytes(6).toString("hex").toUpperCase();
 }
 
 var surveyIDLookupTable = {};
@@ -624,7 +628,7 @@ app.post("/submitSurvey/personal", async (req, res) => {
     if (result === "already_answered") {
       return res.status(409).json({
         success: false,
-        error: "User has already answered this survey.",
+        error: "You may only complete this survey once.",
       });
     }
 
@@ -697,11 +701,6 @@ app.post("/submitSurvey/peer", async (req, res) => {
         .contains("Invitees", JSON.stringify([user.id]))
         .single();
 
-    console.log("Peer survey lookup:", {
-      fetchError,
-      surveyResponse,
-    });
-
     if (fetchError || !surveyResponse) {
       return res.status(404).json({
         success: false,
@@ -738,6 +737,7 @@ app.post("/submitSurvey/peer", async (req, res) => {
         .json({ success: false, error: "Please answer every question." });
     }
 
+    const cleanResponses = {};
     for (let i = 0; i < questions.length; i++) {
       const answer = Number(responses[`question_${i + 1}`]);
       const maxOption = Number(questions[i].numberOfOptions);
@@ -748,37 +748,31 @@ app.post("/submitSurvey/peer", async (req, res) => {
           error: `Invalid answer for question ${i + 1}.`,
         });
       }
+      cleanResponses[`question_${i + 1}`] = answer;
     }
-    const aggregateAnswers = surveyResponse.AggregateInviteeAnswers || {};
+    const { data: result, error: submitError } =
+      await supabaseServiceClient.rpc("submit_peer_survey", {
+        p_survey_id: surveyID,
+        p_user_id: user.id,
+        p_responses: cleanResponses,
+      });
 
-    for (const [question, answer] of Object.entries(responses)) {
-      if (!aggregateAnswers[question]) {
-        aggregateAnswers[question] = {};
-      }
-
-      if (!aggregateAnswers[question][answer]) {
-        aggregateAnswers[question][answer] = 0;
-      }
-      aggregateAnswers[question][answer]++;
+    if (submitError) {
+      throw submitError;
     }
 
-    inviteesWhoAnswered.push(user.id);
-    const remainingInvitees = (surveyResponse.Invitees || []).filter(
-      (inviteeID) => inviteeID !== user.id
-    );
+    if (result === "already_answered") {
+      return res.status(409).json({
+        success: false,
+        error: "You have already submitted your peer responses.",
+      });
+    }
 
-    const { error: updateError } = await supabaseServiceClient
-      .from("survey_responses")
-      .update({
-        AggregateInviteeAnswers: aggregateAnswers,
-        InviteesWhoHaveAnswered: inviteesWhoAnswered,
-        Invitees: remainingInvitees,
-      })
-      .eq("SurveyID", surveyID)
-      .eq("OriginalUserID", surveyResponse.OriginalUserID);
-
-    if (updateError) {
-      throw updateError;
+    if (result !== "ok") {
+      return res.status(404).json({
+        success: false,
+        error: "You have not been invited to this survey or it does not exist.",
+      });
     }
 
     return res.json({
@@ -816,7 +810,7 @@ app.post("/submitSurvey/guest", async (req, res) => {
       await supabaseServiceClient
         .from("survey_responses")
         .select("SurveyID, OriginalUserID, AggregateInviteeAnswers, InviteCode")
-        .eq("InviteCode", JSON.stringify([inviteCode]))
+        .contains("InviteCode", JSON.stringify([inviteCode]))
         .eq("SurveyID", surveyID)
         .single();
 
@@ -848,6 +842,7 @@ app.post("/submitSurvey/guest", async (req, res) => {
         .json({ success: false, error: "Please answer every question." });
     }
 
+    const cleanResponses = {};
     for (let i = 0; i < questions.length; i++) {
       const answer = Number(responses[`question_${i + 1}`]);
       const maxOption = Number(questions[i].numberOfOptions);
@@ -858,36 +853,25 @@ app.post("/submitSurvey/guest", async (req, res) => {
           error: `Invalid answer for question ${i + 1}.`,
         });
       }
+      cleanResponses[`question_${i + 1}`] = answer;
     }
 
-    const aggregateAnswers = surveyResponse.AggregateInviteeAnswers || {};
+    const { data: result, error: submitError } =
+      await supabaseServiceClient.rpc("submit_guest_survey", {
+        p_survey_id: surveyID,
+        p_invite_code: inviteCode,
+        p_responses: cleanResponses,
+      });
 
-    for (const [question, answer] of Object.entries(responses)) {
-      if (!aggregateAnswers[question]) {
-        aggregateAnswers[question] = {};
-      }
-
-      if (!aggregateAnswers[question][answer]) {
-        aggregateAnswers[question][answer] = 0;
-      }
-      aggregateAnswers[question][answer]++;
+    if (submitError) {
+      throw submitError;
     }
 
-    const remainingCodes = (
-      Array.isArray(surveyResponse.InviteCode) ? surveyResponse.InviteCode : []
-    ).filter((code) => code !== inviteCode);
-
-    const { error: updateError } = await supabaseServiceClient
-      .from("survey_responses")
-      .update({
-        AggregateInviteeAnswers: aggregateAnswers,
-        InviteCode: remainingCodes,
-      })
-      .eq("SurveyID", surveyID)
-      .eq("OriginalUserID", surveyResponse.OriginalUserID);
-
-    if (updateError) {
-      throw updateError;
+    if (result !== "ok") {
+      return res.status(404).json({
+        success: false,
+        error: "Invalid survey invitation.",
+      });
     }
 
     return res.json({
@@ -922,11 +906,9 @@ app.post("/saveSurvey", requireAdmin, async (req, res) => {
       });
     }
 
-    let surveyID = generateSurveyID();
+    const surveyID = generateSurveyID();
 
-    while (Object.hasOwn(surveyIDLookupTable, surveyID)) {
-      surveyID = generateSurveyID();
-    }
+    
 
     const { error } = await supabaseServiceClient.from("surveys").insert({
       survey_id: surveyID,
@@ -1252,7 +1234,7 @@ app.get("/user/loadSurveys2", async (req, res) => {
   }
 });
 
-app.post("/admin/invite",  requireAdmin, async (req, res) => {
+app.post("/admin/invite", requireAdmin, async (req, res) => {
   const authorization = req.get("authorization");
 
   const accessToken = authorization?.startsWith("Bearer ")
@@ -1565,7 +1547,7 @@ app.post("/validateGuestSurveyCode", async (req, res) => {
   const { data: survey, error } = await supabaseServiceClient
     .from("survey_responses")
     .select("SurveyID")
-    .eq("InviteCode", JSON.stringify([inviteCode]))
+    .contains("InviteCode", JSON.stringify([inviteCode]))
     .maybeSingle();
 
   if (error) {
