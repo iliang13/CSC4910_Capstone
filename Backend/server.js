@@ -1186,13 +1186,10 @@ app.get("/user/loadSurveys2", async (req, res) => {
             survey.OriginalUserID
           );
 
-        if (inviterError) {
-          throw inviterError;
-        }
-
         return {
           surveyID: survey.SurveyID,
-          inviterEmail: inviter.user.email,
+          inviterEmail:
+          inviterError || !inviter?.user ? "Unknown user" : inviter.user.email,
         };
       })
     );
@@ -1446,11 +1443,7 @@ app.post("/user/loadInviteesTab", async (req, res) => {
       const { data, error } =
         await supabaseServiceClient.auth.admin.getUserById(inviteeId);
 
-      if (error) {
-        throw error;
-      }
-
-      inviteeEmails[inviteeId] = data.user.email;
+      inviteeEmails[inviteeId] = error || !data?.user ? "Unknown user" : data.user.email;
     }
 
     const processedSurveys = surveys.map((survey) => {
