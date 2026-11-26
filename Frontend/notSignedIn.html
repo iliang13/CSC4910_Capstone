@@ -13,32 +13,55 @@
 
   <body>
     <header>
-      <img src="../images/logo.png"/>
-      <h1>DataPulse360 Merrimack</h1>
+      <div class="verticalLeftDiv">
+        <div class="horizontalLeftDiv">
+          <img src="../images/logo.png" />
+          <h1>DataPulse360</h1>
+        </div>
+      </div>
     </header>
 
-    <div id="buttonSection">
-      <button id="signIn">Sign In</button>
-      <button id="signOut" type="button" hidden>Sign Out</button>
-      <button id="peerSurvey" type="button">Peer Survey</button>
-    </div>
 
-    <div id="mainPageContainer">
+    <div id="buttonSection" style="border:none;"></div> 
+
+    <div id="mainPageContainer" class ="verticalDiv">
+      
+      <div id="homeDiv" class="my-div active" style="align-self: stretch;">
+        <div id="welcomeMessage">
+          <h1 style="font-size: 60px; margin: 0 0 10px 0;">Welcome</h1>
+          <p style="font-size: 30px; color: white; padding-left: 20px; margin: 0">
+            DataPulse360 is designed to streamline survey
+            <br />participation, enable the tracking of survey
+            <br />completion, and to provide an environment for young
+            <br />professionals to gain insight into their capabilities.
+          </p>
+        </div>
+      </div>
+
+      <div class="horizontalDiv">
+        <div id="homeDiv" class="my-div active">
+          <div id="welcomeMessage">
+            <h1 style="font-size: 40px; margin: 0 0 10px 0;">Students!</h1>
+            <h1 style="font-size: 20px; color: white; padding-left: 20px; margin: 0">
+              Please sign in with a google account <br />below to get started!
+            </h1>
+            <button id="signIn" style="margin-top: 20px;">Sign In</button>
+            <button id="signOut" type="button" hidden style="margin-top: 20px;">Sign Out</button>
+          </div>
+        </div>
 
         <div id="homeDiv" class="my-div active">
-          
           <div id="welcomeMessage">
-            <h2>Welcome to DataPulse360</h2>
-            <p>
-                DataPulse360 is designed to streamline survey participation, student
-                feedback collection, and engagement analytics across Merrimack
-                College.
-            </p>
+            <h1 style="font-size: 40px; margin: 0 0 10px 0;">Guests!</h1>
+            <h1 style="font-size: 20px; color: white; padding-left: 20px; margin: 0">
+              If you have been invited to complete 
+              <br/>a survey via an invite code click below!
+              <br><button id="peerSurvey" type="button" style="margin-top: 20px;">Guest Surveys</button>
+          </h1>
           </div>
-  
-      
         </div>
-    </div>
+      </div>
+
     </div>
 
     <main>
